@@ -1,0 +1,133 @@
+% ============================================================
+% 附录：代码与复现
+% ============================================================
+
+\section{代码与复现}
+
+\subsection{目录结构}
+
+本文的论文源码、代码、图片与原始数据分开存放，目录职责如表~\ref{tab:appendix-layout} 所示。原始数据只读，任何派生数据与中间结果都不写回 \texttt{附件/}。
+
+\begin{table}[htbp]
+  \centering
+  \caption{项目目录与职责}
+  \label{tab:appendix-layout}
+  \small
+  \begin{tabularx}{\textwidth}{@{}l X@{}}
+    \toprule
+    路径 & 职责 \\
+    \midrule
+    \texttt{latex/} & 论文源码：入口、导言区、参考文献与分节文件。 \\
+    \texttt{latex/main.tex} & 论文入口，按顺序读入各节文件。 \\
+    \texttt{latex/preamble.tex} & 宏包、页面格式、符号宏、占位宏与算法/代码环境。 \\
+    \texttt{latex/refs.bib} & 参考文献数据库。 \\
+    \texttt{latex/sections/} & 摘要、问题重述、预处理、三问、结论与附录。 \\
+    \texttt{src/} & Python 脚本：数据读取、预处理、建模、绘图。 \\
+    \texttt{img/} & 所有图片的输出目录，供 LaTeX 以 \texttt{../img/} 引用。 \\
+    \texttt{附件/} & 赛题原始数据，只读；不在其中生成任何文件。 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{运行环境与依赖}
+
+表~\ref{tab:appendix-env} 汇总本文实际使用的运行环境与依赖版本；从原始数据到论文图表的流程可在该环境中复跑。
+
+\begin{table}[htbp]
+  \centering
+  \caption{运行环境与依赖}
+  \label{tab:appendix-env}
+  \small
+  \begin{tabularx}{\textwidth}{@{}l X l@{}}
+    \toprule
+    项目 & 说明 & 版本 \\
+    \midrule
+    操作系统 & Ubuntu 22.04.5 LTS（内核 6.8.0-138-generic） & — \\
+    Python & 解释器版本 & 3.10.12 \\
+    科学计算 & \texttt{numpy}、\texttt{scipy}、\texttt{pandas} & 2.2.6 / 1.15.3 / 2.2.3 \\
+    机器学习 & \texttt{scikit-learn}、\texttt{lightgbm}、\texttt{statsmodels} & 1.5.2 / 4.5.0 / 0.14.4 \\
+    图与网络 & \texttt{matplotlib}、\texttt{networkx} & 3.9.2 / 3.3 \\
+    表格读取 & \texttt{openpyxl} & 3.1.5 \\
+    论文编译 & TinyTeX（TeX Live 2026）+ \texttt{xelatex} + \texttt{bibtex} & 2026 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+本文的数据处理、建模与绘图使用 NumPy\citep{harris2020array}、pandas、scikit-learn\citep{pedregosa2011scikit}、NetworkX\citep{hagberg2008exploring} 与 Matplotlib\citep{hunter2007matplotlib}；具体版本以实际环境为准。
+
+\subsection{复现步骤}
+
+复现流程遵循“原始数据只读—脚本生成图片—LaTeX 引用图片”的顺序：
+
+\begin{enumerate}
+  \item 在项目根目录准备 Python 环境并安装表~\ref{tab:appendix-env} 中的依赖；
+  \item 运行 \texttt{src/} 下的数据读取与预处理脚本，生成对齐后的数据与缺失掩码；
+  \item 依次运行问题一至问题三的建模脚本，把结果表与图片写入约定目录；
+  \item 进入 \texttt{latex/} 目录，执行 \texttt{latexmk -xelatex main.tex}；
+  \item 检查生成的 PDF 中是否仍有红色占位文字，图片是否来自 \texttt{../img/}。
+\end{enumerate}
+
+命令示例见代码清单~\ref{lst:pipeline}。具体脚本名与参数以 \texttt{src/} 中的实际文件为准。
+
+\begin{lstlisting}[style=shellcode,caption={复现命令},label={lst:pipeline}]
+# Run from the project root
+MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/01_profile.py
+MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/00_figures.py
+MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/02_external.py
+MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/q1.py
+MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/q2.py
+MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/q3.py
+# Build the paper (TinyTeX installed at ~/.TinyTeX)
+export PATH="$HOME/.TinyTeX/bin/x86_64-linux:$PATH"
+cd latex
+latexmk -xelatex main.tex
+\end{lstlisting}
+
+\subsection{主要超参数与复现配置}
+
+表~\ref{tab:appendix-config} 汇总影响结果的主要配置；论文中的数字均由同一配置复跑得到。
+
+\begin{table}[htbp]
+  \centering
+  \caption{主要超参数与复现配置}
+  \label{tab:appendix-config}
+  \small
+  \begin{tabularx}{\textwidth}{@{}l X X@{}}
+    \toprule
+    模块 & 配置项 & 取值 \\
+    \midrule
+    全局 & 随机种子、交叉验证折数 & 42；5 折 $\times$ 3 次重复 \\
+    预处理 & 插补方法、MCAR/MAR 网格 & 折内中位数插补；MCAR 5/10/20/30\%；MAR 由 ethanol 分位数驱动 \\
+    问题一 & 基学习器与校准 & RidgeCV、PLS 5 成分、ET/RF 500 棵、LGBM 400 棵（lr 0.03、叶子 15）；保序 + q01/q99 min-max \\
+    问题二 & 图与稳定性 & $K=10$；$\alpha=0.3$；$B=500$；入选频率门槛 0.8；机制先验 $\lambda=0.5$ \\
+    问题三 & 生成与缺陷约束 & 70 个校准化合物；log1p；Ledoit--Wolf；每风格 300 条；style cap $\max(\tau_j,q_{g,j})$ \\
+    评价 & 指标与实现 & 宏平均 $R^2$/RMSE/MAE/Spearman；QWK；MMD；RF 风格分类器 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{核心代码说明}
+
+表~\ref{tab:appendix-code} 给出本文代码模块的职责与主要输出；每个模块均可单独运行。
+
+\begin{table}[htbp]
+  \centering
+  \caption{核心代码模块}
+  \label{tab:appendix-code}
+  \small
+  \begin{tabularx}{\textwidth}{@{}l X X@{}}
+    \toprule
+    模块 & 功能 & 主要输出 \\
+    \midrule
+    数据读取与对齐 & \texttt{src/data\_utils.py}、\texttt{src/01\_profile.py}、\texttt{src/02\_external.py} & 对齐数据、变换表、EDA 图 \\
+    问题一 & \texttt{src/q1.py}：岭回归/PLS/ET/RF/LGBM 等权融合、保序校准、缺失模拟 & 评分表、指标表、\texttt{img/q1\_*} \\
+    问题二 & \texttt{src/q2.py}：共表达图、五方法融合、500 次 bootstrap、机制先验 & Top-3 表、网络图、稳定性表 \\
+    问题三 & \texttt{src/q3.py}：条件 copula、OT、style cap、感官画像 & 生成谱、雷达图、评价表 \\
+    概念图 & \texttt{src/00\_figures.py}：路线图、预处理流程图、Q1 框架图 & \texttt{img/fig\_*} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{可复现性检查清单}
+
+提交前逐项核对：（1）随机种子是否固定并在附录记录；（2）数据划分是否在建模前固定，预处理是否只在训练折内拟合；（3）论文中的每个数字是否能由代码输出直接对应；（4）图片是否由脚本生成而非手工拼接；（5）\texttt{latex/} 中是否没有散落的中间文件；（6）是否没有把原始数据、模型权重或日志提交进仓库。

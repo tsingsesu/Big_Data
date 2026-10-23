@@ -1,0 +1,53 @@
+% !TeX program = xelatex
+% !TeX root = main.tex
+%
+% 2026 MathorCup 大数据竞赛 A 题论文
+% 啤酒酿造化合物分析与啤酒风味预测
+%
+% 编译（在 latex/ 目录下执行）：
+%   latexmk -xelatex main.tex          % 推荐，自动处理 bibtex 与多次编译
+% 或手动：
+%   xelatex main.tex
+%   bibtex main
+%   xelatex main.tex
+%   xelatex main.tex
+%
+% 说明：
+%   1. 编译需要 TeX Live（含 ctex 与 fandol 字体）；本仓库不附带 TeX 安装。
+%   2. 图片统一放在 ../img/，由 src/ 下 Python 脚本生成；
+%      图片不存在时 \figauto 会自动显示占位框，不影响编译。
+%   3. 正文中所有 [TODO: ...] 与“待定”均为待填内容，定稿前须清零。
+
+\documentclass[UTF8,a4paper,12pt,fontset=fandol]{ctexart}
+% fontset=fandol 随 TeX Live 安装，Overleaf 亦可直接用；
+% 若本机已装 Noto CJK，可改为 fontset=ubuntu。
+
+\input{preamble}
+
+\begin{document}
+
+\title{\bfseries 啤酒酿造化合物分析与啤酒风味预测\\[0.35em]
+  \large ——基于多源化合物数据的分级评分、关键因素识别与风格条件生成}
+\author{参赛队号：\underline{\hspace{2.5cm}}\quad 队员：\underline{\hspace{4.5cm}}}
+\date{}
+\maketitle
+\thispagestyle{empty}
+
+\input{sections/00_abstract}
+
+\newpage
+
+\input{sections/01_problem}
+\input{sections/02_preprocess}
+\input{sections/03_q1}
+\input{sections/04_q2}
+\input{sections/05_q3}
+\input{sections/06_conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\appendix
+\input{sections/07_appendix}
+
+\end{document}

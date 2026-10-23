@@ -1,0 +1,209 @@
+% ============================================================
+% 第 4 章 问题二：化合物—风味关联分析
+% ============================================================
+
+\section{问题二：化合物—风味关联分析}
+\label{sec:q2}
+
+\subsection{问题分析}
+
+问题二要求为每个感官维度给出 Top-3 关键因素化合物，并论证结果的稳定性与化学合理性。它的核心不是“训练一个预测精度最高的模型”，而是“在大量高度共线的化合物中，找出对某个感官维度既有统计支持、又有化学解释的少数变量”。
+
+附件提供了三类可用信息：\texttt{2.csv} 的化合物—化合物相关矩阵、\texttt{1.csv} 的样本级化合物丰度、\texttt{6.csv} 的化合物—感官交叉相关矩阵。三者分别刻画“化合物之间是否共同变化”“样本间差异是否与感官相关”“已有研究/数据中是否观察到对应关系”。一个稳健的 Top-3 应该在三类信息上都不出现明显矛盾，而不是只在一张相关矩阵上排到前列。
+
+因此本文把问题二组织为三步：先由 \texttt{2.csv} 与 \texttt{1.csv} 构建共表达图，刻画化合物之间的模块结构；再在图上做重要性排序，得到每个感官维度的候选化合物；最后用多方法集成、bootstrap 重采样与化学类别核对筛选 Top-3，并明确报告稳定性指标。
+
+\subsection{共表达图构建}
+
+设化合物 $j$ 与 $j'$ 的相关系数为 $r_{j,j'}$（来自 \texttt{2.csv}），邻接矩阵 $\bA$ 的元素定义为
+\begin{equation}
+  a_{j,j'}=
+  \begin{cases}
+    1, & \abs{r_{j,j'}}\ge \eta,\\[2pt]
+    0, & \text{否则},
+  \end{cases}
+  \qquad a_{j,j}=0,
+  \label{eq:q2-graph}
+\end{equation}
+其中阈值 $\eta$ 不是固定常数，而是在验证集上按“图连通性—模块可解释性—下游稳定性”三者折中选取。若简单阈值导致孤立点过多，则改用每个节点保留 Top-$K$ 强相关的 $K$ 近邻图，并在附录中报告两种图的差异。
+
+图的拉普拉斯矩阵定义为
+\begin{equation}
+  \bL=\bD-\bA,\qquad
+  d_j=\sum_{j'=1}^{P}a_{j,j'},
+  \label{eq:q2-laplacian}
+\end{equation}
+其中 $\bD=\operatorname{diag}(d_1,\dots,d_P)$ 为度矩阵。对 $\bL$ 做特征分解可以得到化合物的低频模块结构；本文用模块度与社区划分检查图是否把酒花萜类、酵母酯类、高级醇类等已知类别分开。共表达网络的构建与模块分析参照 WGCNA 的做法\citep{langfelder2008wgcna}。
+
+\figauto[1.0\textwidth]{q2_network.pdf}{化合物共表达网络与社区结构示例}{fig:q2network}
+
+图~\ref{fig:q2network} 给出共表达网络的示意结构：节点为化合物，边表示强相关，颜色表示社区。网络既是后续图平滑重要性的输入，也是化学合理性论证的可视化依据。主方案（每个节点保留 Top-10 强相关邻居）得到 231 个节点、1,683 条边、8 个社区，模块度 $Q=0.586$；社区大小与主要化学类别见表~\ref{tab:q2-communities}。与硬阈值 $|r|\ge0.5$（48 个孤立点）和 Top-5 近邻（865 条边）相比，Top-10 在保留全部节点的同时维持了清晰的模块结构，故作为主方案。
+
+\begin{table}[htbp]
+  \centering
+  \caption{共表达网络的 8 个社区及其化学解释}
+  \label{tab:q2-communities}
+  \small
+  \begin{tabularx}{\textwidth}{@{}l c l l X@{}}
+    \toprule
+    社区 & 节点数 & 主要来源 & 主要类别 & 代表成员 \\
+    \midrule
+    C1 & 40 & 酵母/酒花 & 酯/萜/醇/醛 & E-nerolidol、2,3-dihydrofarnesol、n-dodecanol \\
+    C2 & 34 & 酒花 & 萜类/酯 & nerol oxide、$\alpha$-calacorene、epicubenol \\
+    C3 & 32 & 酒花/酵母/野生菌 & 酯/挥发性酚 & ethyl phenylacetate、$\beta$-ionone、neryl formate \\
+    C4 & 29 & 酵母 & 酯/醇/硫/理化 & ethanol、total esters、isopentyl acetate \\
+    C5 & 28 & 麦芽/酵母 & 酯/醛/呋喃吡嗪 & diacetyl、$\beta$-farnesene、2-pentylfuran \\
+    C6 & 24 & 酵母/酒花 & 酯（16/24） & 2-methylbutyl octanoate、isopentyl hexanoate \\
+    C7 & 22 & 酵母/酒花 & 醇/酯/萜 & 3-furanmethanol、3-methyl-2-hexanol、o-cresol \\
+    C8 & 22 & 酒花/香料 & 萜类（11/22） & isoborneol、terpinolene、terpinen-4-ol \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{基线方法：边际相关排序}
+
+最直接的 Top-3 是逐化合物计算其与目标感官维度的边际相关，再取绝对值最大的三个：
+\begin{equation}
+  w_{j,s}^{(0)}=\abs{\Corr\left(x_{\cdot,j},y_{\cdot,s}\right)},
+  \qquad
+  \Tcal_s^{(0)}=\operatorname*{Top3}_{j}\ w_{j,s}^{(0)},
+  \label{eq:q2-baseline}
+\end{equation}
+其中 $x_{\cdot,j}$ 为第 $j$ 个化合物的样本向量，$y_{\cdot,s}$ 为第 $s$ 个感官维度的评分向量。该基线完全可复现、解释直接，但存在三个问题：其一，共线化合物会“轮流”占据前列，Top-3 不稳定；其二，边际相关无法区分直接关联与通过第三变量产生的间接关联；其三，缺失值与异常值会显著影响单个相关系数。下面的改进与最终模型分别针对这三点。
+
+\subsection{改进方法：图平滑重要性}
+
+共表达图提供了“哪些化合物应该一起被考虑”的先验。本文把基线重要性向量 $\bw_s^{(0)}$ 在图上做拉普拉斯平滑：
+\begin{equation}
+  \tilde{\bw}_s=\left(\bI+\alpha\bL\right)^{-1}\bw_s^{(0)},
+  \label{eq:q2-smooth}
+\end{equation}
+其中 $\alpha>0$ 控制平滑强度。式~\eqref{eq:q2-smooth} 的直观含义是：一个化合物的重要性不仅取决于它自己的边际相关，还取决于与它强连接的邻居；孤立的高相关点会被适度压低，成模块出现的高相关化合物会被整体保留。与直接对相关系数做阈值相比，这种做法不切断弱相关边，而是让重要性沿图扩散，因而对阈值选择不那么敏感。
+
+平滑强度 $\alpha$ 由验证集上的 Top-3 稳定性选择，而不是固定为 1。若 $\alpha\to 0$，模型退化为基线；若 $\alpha$ 过大，所有化合物的重要性会被拉平，Top-3 失去区分度。这一“从基线出发、由数据选择改进幅度”的设计，使改进模型始终包含基线作为特例。
+
+\subsection{最终方法：多方法集成与稳定性选择}
+
+单一建模方法对共线结构敏感，因此最终模型集成三类互补方法：
+
+\begin{enumerate}
+  \item \textbf{稀疏线性模型}：对每个感官维度做弹性网回归，用系数绝对值作为重要性\citep{zou2005regularization}；
+  \item \textbf{PLS 回归}：用潜变量投影保留化合物间的共同变异，用投影权重或变量重要性作为重要性\citep{wold2001pls}；
+  \item \textbf{树模型与 SHAP}：用梯度提升树拟合非线性关系，用 SHAP 值衡量化合物对单个感官维度的贡献（随机森林作为对照）\citep{breiman2001random,friedman2001greedy,chen2016xgboost,lundberg2017unified}。
+\end{enumerate}
+
+记方法集合为 $\Mcal$，第 $\nu$ 种方法给出的平滑重要性为 $\tilde{w}_{j,s}^{(\nu)}$，集成为
+\begin{equation}
+  w_{j,s}^{*}=\sum_{\nu\in\Mcal}\omega_\nu\,\tilde{w}_{j,s}^{(\nu)},
+  \qquad
+  \sum_{\nu\in\Mcal}\omega_\nu=1,\quad \omega_\nu\ge 0,
+  \label{eq:q2-ensemble}
+\end{equation}
+其中 $\omega_\nu$ 由验证集上的 Top-3 一致性确定；若某方法在多数感官维度上与其他方法冲突，则降低其权重，而不是直接删除，以保留“该方法发现了别人没发现的化合物”的可能性。
+
+稳定性用 bootstrap 入选频率与 Jaccard 系数量化。对第 $s$ 个感官维度，重复 $B$ 次有放回重采样，记第 $b$ 次得到的 Top-3 集合为 $\Tcal_s^{(b)}$，则化合物 $j$ 的入选频率为
+\begin{equation}
+  \pi_{j,s}=\frac{1}{B}\sum_{b=1}^{B}\mathbf{1}\left\{j\in\Tcal_s^{(b)}\right\}.
+  \label{eq:q2-frequency}
+\end{equation}
+两种方法 $\nu$ 与 $\nu'$ 之间的一致性为
+\begin{equation}
+  J\left(\Tcal_s^{(\nu)},\Tcal_s^{(\nu')}\right)=
+  \frac{\abs{\Tcal_s^{(\nu)}\cap\Tcal_s^{(\nu')}}}
+  {\abs{\Tcal_s^{(\nu)}\cup\Tcal_s^{(\nu')}}}.
+  \label{eq:q2-jaccard}
+\end{equation}
+最终 Top-3 不直接取 $w_{j,s}^{*}$ 最大的三个，而是要求其 bootstrap 入选频率超过预设门槛；若不足三个，则按 $w_{j,s}^{*}$ 补足，并在表中标注“低稳定”\citep{efron1979bootstrap,jaccard1901etude}。
+
+\begin{algorithm}[htbp]
+  \small
+  \caption{基于 bootstrap 的 Top-3 稳定性选择}
+  \label{alg:stability}
+  \Input{训练集特征 $\bX$、感官矩阵 $\bY$、共表达图 $\bA$、方法集合 $\Mcal$、重采样次数 $B$}
+  \Output{每个感官维度的 Top-3 集合与入选频率 $\pi_{j,s}$}
+  \For{$b=1$ \KwTo $B$}{
+    从训练集中有放回抽取样本，得到第 $b$ 个重采样集\;
+    \For{$\nu\in\Mcal$}{
+      用方法 $\nu$ 拟合模型，计算并平滑重要性 $\tilde{w}_{j,s}^{(\nu)}$\;
+    }
+    按式~\eqref{eq:q2-ensemble} 集成并记录每个感官维度的 Top-3 集合 $\Tcal_s^{(b)}$\;
+  }
+  按式~\eqref{eq:q2-frequency} 计算 $\pi_{j,s}$，按门槛筛选并补足 Top-3\;
+  计算方法间 Jaccard 系数，输出稳定性报告\;
+\end{algorithm}
+
+\subsection{实验设置}
+
+本文把样本按 \texttt{beer} 分层划分训练/验证/测试集，所有方法在同一划分上比较；缺失值在训练折内插补，测试折只做变换。主要超参数包括图阈值 $\eta$（或近邻数 $K$）、平滑强度 $\alpha$、弹性网的混合比例与正则化强度、PLS 潜变量数、树模型深度与学习率；搜索范围记录在附录表~\ref{tab:appendix-config}。稳定性实验重采样次数 $B$ 与入选频率门槛也在附录中给出。主方案 $K=10$；图平滑 $\alpha=0.3$；Elastic Net 用内层 CV 选 $\alpha$ 与 $l_1$ 比例；PLS 用内层 CV 选成分数；树模型 300 棵（bootstrap 60 棵）；LightGBM 150 棵、5 折 OOF SHAP；bootstrap $B=500$；入选频率门槛 0.8；机制先验 $\lambda=0.5$。
+
+评价分为四层：（1）预测层：各方法对感官维度的交叉验证误差；（2）排序层：Top-3 的 bootstrap 入选频率；（3）一致层：方法间 Jaccard 系数；（4）化学层：Top-3 是否落在合理的化合物类别、方向是否与已知代谢路径一致。只有四层都不出现明显矛盾，才把该组 Top-3 作为最终结果。
+
+\subsection{结果与分析}
+
+表~\ref{tab:q2-top3} 对 8 个代表性维度同时给出纯数据 Top-3 与机制导向 Top-3。纯数据 Top-3 由 \texttt{2.csv}/\texttt{1.csv} 的统计关联决定，回答“哪些化合物最能预测该感官”；机制导向 Top-3 在融合分数上加一个文献先验（$\lambda=0.5$，直接化合物权重 1.0），回答“哪些化合物在化学上最应被关注”。两者不是替代关系：纯数据结果反映预测性关联，机制导向结果用于化学审计；把两者混为一谈会把相关当因果。
+
+\begin{table}[htbp]
+  \centering
+  \caption{纯数据 Top-3 与机制导向 Top-3 的对照（8 个代表性维度）}
+  \label{tab:q2-top3}
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\textwidth}{@{}l X X X@{}}
+    \toprule
+    感官维度 & 纯数据 Top-3 & 机制导向 Top-3（$\lambda=0.5$） & 说明 \\
+    \midrule
+    diacetyl & Pentyl octanoate; Ethyl decanoate; $\beta$-phellandrene & Diacetyl; Pentyl octanoate; Ethyl decanoate & 纯数据选酯/萜烯代理；机制导向把二乙酰放回第 1 \\
+    dms & Protein; Color; total sulfur & Total sulfur; SO$_2$; DMS & 纯数据选蛋白/色度；机制导向把 DMS 放回第 3 \\
+    t2n & Glycerol; $\alpha$-phellandrene; $\beta$-phellandrene & E-2-nonenal; dimethoxy-E-citral; Z-dihydro-apofarnesal & 纯数据无醛类；机制导向选醛类 \\
+    X4vg & 4-vinylguaiacol; neryl formate; prenyl isobutyrate & 4-vinylguaiacol; 4-ethyl-guaiacol; 4-ethyl-phenol & 两视图一致：挥发性酚 \\
+    A\_esters\_fruity & $\beta$-phellandrene; epicubenol; humulene epoxide II & Neryl formate; Ethyl decanoate; 2-phenylethyl butyrate & 纯数据选萜烯；机制导向选酯类 \\
+    A\_hops\_citrus & Total hop aroma; cis-dihydro-$\beta$-terpineol; citronellol & Citronellol; Geraniol; Humulene epoxide II & 两视图都落在萜类/酒花 \\
+    A\_malt\_all & Color; Caloric value; pH & 2-acetylfuran; 5-methylfurfural; Furfural & 纯数据选物化代理；机制导向选麦芽美拉德产物 \\
+    bitternes & Ethyl octanoate; Iso-alpha acids; Ethyl decanoate & Iso-alpha acids; Ethyl octanoate; Ethyl decanoate & 两视图一致：异 $\alpha$-酸 + 酯类 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+对二乙酰、DMS、T2N 三个缺陷维度，纯数据 Top-3 没有选到同名直接化合物：二乙酰的直接化合物 fused rank=120.8，DMS=86.5，T2N=91.4；机制导向在 $\lambda=0.5$ 时把它们放回第 1/3/1 位。这个差异本身是重要发现：在本数据中，直接缺陷化合物的边际信号弱于风格/物化代理，可能来自阈值效应、测量噪声与风格混杂；因此不能仅凭相关排序断言“二乙酰是二乙酰感官的最强预测因子”。相反，X4vg 与 bitternes 的两视图一致，说明这两条关联既有统计支持又有化学对应。
+
+$\lambda$ 的敏感性见表~\ref{tab:q2-domain-sensitivity}：$\lambda=0$ 时机制导向退化为纯数据，Top-3 重合率 1.0；$\lambda=0.5$ 时重合率 0.387，9 个直接/特定化合物进入 Top-3；$\lambda$ 增大不改变与 \texttt{6.csv} 的符号一致率（1.0），但 Top-3 与 \texttt{6.csv} 的重合率从 0.46 降到 0.31。$\lambda=0.5$ 不是最优，而是“强先验”情景；本文不以它替代纯数据结果，只把它作为机制审计。
+
+\begin{table}[htbp]
+  \centering
+  \caption{机制先验强度 $\lambda$ 的敏感性}
+  \label{tab:q2-domain-sensitivity}
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{@{}c c c c c@{}}
+    \toprule
+    $\lambda$ & 与纯数据 Top-3 重合率 & 直接/特定化合物数 & 6.csv 符号一致率 & 6.csv Top-3 重合率 \\
+    \midrule
+    0.0 & 1.000 & 5 & 1.0 & 0.460 \\
+    0.1 & 0.780 & 5 & 1.0 & 0.393 \\
+    0.2 & 0.633 & 5 & 1.0 & 0.387 \\
+    0.5 & 0.387 & 9 & 1.0 & 0.313 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+结果分析区分三类：第一类是多方法一致、bootstrap 高频、化学路径清楚，例如 bitternes 的 iso-alpha acids、X4vg 的 4-vinylguaiacol、A\_hops\_citrus 的 citronellol/geraniol；第二类是统计上稳定但化学解释弱，例如 dms 的 protein/color、A\_malt\_all 的 color/caloric value/pH，这类标注为数据驱动关联，并说明可能是风格/工艺混杂；第三类是只在机制先验下进入 Top-3 的直接化合物（diacetyl、DMS、T2N），作为机制审计线索，不声称它们是最强预测因子。这样的分层报告比单纯列三个名字更符合题目“稳定性与化学合理性论证”的要求。
+
+\subsection{稳定性与化学合理性论证}
+
+\paragraph{稳定性。}500 次 bootstrap 下，纯数据 Top-3 的平均入选频率为 0.525，中位数 0.47；150 个条目中 29 个达到 0.8、67 个达到 0.5。没有感官维度的三个条目全部达到 0.8，6 个维度三个条目都达到 0.5，24 个维度至少两个条目达到 0.5，22 个维度至少一个条目达到 0.8；方法间 Jaccard 均值为 0.313。这说明“单个化合物稳定”比“整组 Top-3 稳定”更常见，Top-3 应带着频率报告，而不是只给三个名字。
+
+\figauto{q2_top3_stability.pdf}{纯数据 Top-3 的 bootstrap 入选频率}{fig:q2stability}
+
+\figauto{q2_jaccard.pdf}{五种方法之间的 Top-3 Jaccard 系数}{fig:q2jaccard}
+
+图构造方案的扰动也支持这一点：Top-5 与 Top-10 的社区划分 ARI 为 0.558，阈值 $|r|\ge0.5$ 会产生 48 个孤立点，因此本文选 Top-10 作为主方案，并在图~\ref{fig:q2network} 中标注社区。
+
+\paragraph{与 \texttt{6.csv} 的关系。}\texttt{6.csv} 的 44 个化合物与 \texttt{2.csv}/\texttt{1.csv} 同源；方法 A 的边际相关排序与 \texttt{6.csv} 的平均秩相关接近 1.0。这验证了表间对齐，但不能当作独立复现；多变量方法（B/C/D/E）与 \texttt{6.csv} 的偏离是预期的，因为 \texttt{6.csv} 是边际相关，未控制共线。方法 E 在 $\lambda=0.3$ 时把秩相关从 1.0 降到 0.982、Top-3 重合率从 1.0 降到 0.82，因此只作为 family-aware 审计，不作为“更好”的证据。
+
+\paragraph{化学合理性。}网络社区与已知化学家族对齐：C2/C8 富集酒花萜类，C4/C6 富集酵母酯类/醇类，C5 富集麦芽醛/呋喃/吡嗪（表~\ref{tab:q2-communities}）。Top-3 中，bitternes 的 iso-alpha acids、X4vg 的 4-vinylguaiacol、A\_hops\_citrus 的 citronellol/geraniol 与文献一致；diacetyl/DMS/T2N 的直接化合物在纯数据中排名靠后，但在机制先验下进入 Top-3，说明它们的作用可能被风格/阈值效应掩盖。类别富集在 Top-3 上有 3 个显著、Top-10 上有 9 个显著（$q<0.05$），数量不多，说明“类别富集”只能作为辅助证据，不能替代逐化合物核对。
+
+\paragraph{与问题一的衔接。}问题二得到的 Top-3 可以作为问题一模型的可解释性检查：若某个化合物在问题二中被判为某感官维度的关键因素，却在问题一的多任务模型中没有非零或稳定系数，说明两者至少有一个需要复查。本文不把这种不一致藏起来，而是把它作为模型诊断信息报告。
+
+\subsection{讨论}
+
+问题二的结论受三类因素限制。第一，相关不等于因果：共表达图上的边可能来自共同上游调控、测量批次或样品制备，而非直接化学作用；本文用多方法与 \texttt{6.csv} 交叉校验降低这种风险，但不能证明因果。第二，化合物注释与类别划分依赖 \texttt{8.xlsx} 与文献，若注释有误，化学合理性判断会跟着错；因此本文把类别核对过程与来源写进附录，便于复查。第三，Top-3 是“给定数据与给定感官维度下的紧凑摘要”，不是“只有这三个化合物重要”；排名第 4、5 位的化合物可能在特定风格或特定缺陷场景中更关键，实际使用时不应把 Top-3 当作硬阈值。

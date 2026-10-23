@@ -1,0 +1,180 @@
+% ============================================================
+% preamble.tex
+% 2026 MathorCup 大数据竞赛 A 题论文导言区
+% 编译引擎：xelatex（中文由 ctexart / xeCJK 提供）
+% 说明：本文件只放宏包、全局格式与常用宏，不放正文。
+% ============================================================
+
+% ---------- 页面与版式 ----------
+\usepackage{geometry}
+\geometry{left=2.6cm,right=2.6cm,top=2.5cm,bottom=2.5cm}
+\linespread{1.3}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\emergencystretch}{2em}
+
+% ---------- 数学 ----------
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\allowdisplaybreaks[3]
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Corr}{\operatorname{Corr}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\inner}[2]{\left\langle #1,#2 \right\rangle}
+
+% ---------- 一套符号：向量、矩阵、希腊字母 ----------
+% 约定：粗体小写表示向量，粗体大写表示矩阵。
+\newcommand{\vx}{\bm{x}}
+\newcommand{\vy}{\bm{y}}
+\newcommand{\bz}{\bm{z}}
+\newcommand{\bw}{\bm{w}}
+\newcommand{\vb}{\bm{b}}
+\newcommand{\bs}{\bm{s}}
+\newcommand{\bzero}{\bm{0}}
+\newcommand{\bX}{\bm{X}}
+\newcommand{\bY}{\bm{Y}}
+\newcommand{\bZ}{\bm{Z}}
+\newcommand{\bW}{\bm{W}}
+\newcommand{\bB}{\bm{B}}
+\newcommand{\bA}{\bm{A}}
+\newcommand{\bR}{\bm{R}}
+\newcommand{\bM}{\bm{M}}
+\newcommand{\bI}{\bm{I}}
+\newcommand{\bD}{\bm{D}}
+\newcommand{\bL}{\bm{L}}
+\newcommand{\bU}{\bm{U}}
+\newcommand{\bV}{\bm{V}}
+\newcommand{\bP}{\bm{P}}
+\newcommand{\bT}{\bm{T}}
+\newcommand{\bbeta}{\bm{\beta}}
+\newcommand{\btheta}{\bm{\theta}}
+\newcommand{\bmu}{\bm{\mu}}
+\newcommand{\bSigma}{\bm{\Sigma}}
+\newcommand{\bepsilon}{\bm{\epsilon}}
+\newcommand{\vxt}{\tilde{\bm{x}}}
+\newcommand{\yhat}{\hat{y}}
+\newcommand{\Dcal}{\mathcal{D}}
+\newcommand{\Lcal}{\mathcal{L}}
+\newcommand{\Ncal}{\mathcal{N}}
+\newcommand{\Jcal}{\mathcal{J}}
+\newcommand{\Tcal}{\mathcal{T}}
+\newcommand{\Mcal}{\mathcal{M}}
+
+% ---------- 图 ----------
+\usepackage{graphicx}
+% 图片统一放在项目根目录的 img/ 下，由 src/ 的 Python 脚本生成。
+% 同时保留 img/，便于从项目根目录编译时也能找到图。
+\graphicspath{{../img/}{img/}}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg}
+
+% ---------- 表 ----------
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.18}
+
+% ---------- 算法 ----------
+\usepackage{xcolor}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\SetAlgorithmName{算法}{算法}{算法列表}
+\SetKwInOut{Input}{输入}
+\SetKwInOut{Output}{输出}
+
+% ---------- 代码 ----------
+\usepackage{listings}
+\renewcommand{\lstlistingname}{代码}
+\definecolor{codeblue}{RGB}{25,70,160}
+\definecolor{codegreen}{RGB}{0,110,60}
+\definecolor{codered}{RGB}{170,30,30}
+\definecolor{codegray}{RGB}{110,110,110}
+\lstdefinestyle{pycode}{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{codeblue}\bfseries,
+  commentstyle=\color{codegreen},
+  stringstyle=\color{codered},
+  numbers=left,
+  numberstyle=\tiny\color{codegray},
+  numbersep=6pt,
+  frame=single,
+  breaklines=true,
+  showstringspaces=false,
+  columns=fullflexible,
+  keepspaces=true,
+  tabsize=4,
+  captionpos=b
+}
+\lstdefinestyle{shellcode}{
+  language=bash,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{codeblue}\bfseries,
+  commentstyle=\color{codegreen},
+  stringstyle=\color{codered},
+  numbers=left,
+  numberstyle=\tiny\color{codegray},
+  numbersep=6pt,
+  frame=single,
+  breaklines=true,
+  showstringspaces=false,
+  columns=fullflexible,
+  keepspaces=true,
+  tabsize=4,
+  captionpos=b
+}
+\lstset{style=pycode}
+% 注意：代码块内请使用英文注释，避免 CJK 字符在 listings 中断行异常。
+
+% ---------- 参考文献与链接 ----------
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks,bookmarksnumbered=true]{hyperref}
+
+% ---------- 常用占位宏 ----------
+% 定稿前全文搜索 TODO 与“待定”，逐项清零。
+\newcommand{\todo}[1]{\textcolor{red!75!black}{\textbf{[TODO: #1]}}}
+\newcommand{\tbd}{\textcolor{red!75!black}{待定}}
+
+% \figauto{文件名}{图题}{标签}
+% 用法：\figauto{fig_q1_framework.pdf}{问题一框架}{fig:q1framework}
+% 若 ../img/ 或 img/ 下存在该文件则自动插图；否则显示带文件名的占位框。
+% 这样骨架在图片尚未生成时也能编译，图片生成后无需改正文。
+\newcommand{\figauto}[4][0.82\textwidth]{%
+  \begin{figure}[htbp]
+    \centering
+    \IfFileExists{../img/#2}{%
+      \includegraphics[width=#1]{#2}%
+    }{%
+      \IfFileExists{img/#2}{%
+        \includegraphics[width=#1]{#2}%
+      }{%
+        \fbox{\begin{minipage}[c][4.2cm][c]{0.78\textwidth}
+          \centering\small
+          图待生成：\texttt{\detokenize{#2}}\\
+          由 \texttt{src/} 下脚本输出到 \texttt{img/}
+        \end{minipage}}%
+      }%
+    }%
+    \caption{#3}
+    \label{#4}
+  \end{figure}%
+}
+
+% ---------- 章节标题格式 ----------
+\ctexset{
+  section = {format = \Large\bfseries},
+  subsection = {format = \large\bfseries},
+  subsubsection = {format = \normalsize\bfseries},
+  paragraph = {format = \normalsize\bfseries}
+}
