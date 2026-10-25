@@ -160,7 +160,7 @@
 
 表~\ref{tab:q3-results} 给出三风格平均的五维评价。OT+约束在分布保真（MMD 0.038）、覆盖度（0.863）与 top-1 命中率（0.981）上均最好；条件 copula 的命中率 0.974 接近，但 MMD（0.111）与感官 RMSE（0.132）更差，说明它更接近风格中心、却牺牲了分布与感官一致性；均值噪声的命中率 0.851、覆盖度 0.300，存在模式崩塌。缺陷列显示，OT+约束把 T2N/4VG 的超严格阈值率降到 0，但 DMS/Diacetyl 仍分别有 0.59/0.81 的超严格阈值率，这是因为 Tripel/Kriek/Lambic 的风格 p75 本身高于附件严格阈值；相对 style cap 的超标率为 0（四缺陷均 0.000），详见迁移段落。因此“风格允许”与“绝对安全”必须分开报告；表中的超严格阈值率按 DMS/Diacetyl/T2N 三项报告。
 
-\figauto{q3_mmd_classifier.pdf}{生成模型的分布距离与风格分类命中率}{fig:q3mmd}
+\figauto[1.0\textwidth]{q3_mmd_classifier.pdf}{生成模型的分布距离与风格分类命中率}{fig:q3mmd}
 
 \figauto[1.0\textwidth]{q3_transfer_defects.pdf}{Pils/Lager $\to$ Tripel 迁移的缺陷控制}{fig:q3transfer}
 

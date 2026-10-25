@@ -117,7 +117,7 @@
   输出对齐后的数据与一份可复查的预处理日志\;
 \end{algorithm}
 
-\figauto{fig_preprocess.pdf}{数据预处理与表间对齐流程}{fig:preprocess}
+\figauto[1.0\textwidth]{fig_preprocess.pdf}{数据预处理与表间对齐流程}{fig:preprocess}
 
 预处理流程如图~\ref{fig:preprocess} 所示：先对齐样本主键，再核验变换、建立掩码、划分数据与拟合变换参数，最后输出可复查的日志。该顺序保证任何监督信息都不会从验证/测试折泄漏到训练折。
 

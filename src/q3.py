@@ -67,11 +67,11 @@ TARGET_STYLE = "Tripel"
 MODEL_ORDER = ["mean_noise", "global_cov", "copula", "ot", "ot_constrained"]
 MODEL_ORDER_BASE = ["mean_noise", "global_cov", "copula", "ot"]
 MODEL_LABELS = {
-    "mean_noise": "Style mean + noise",
-    "global_cov": "Global cov + style mean",
-    "copula": "Conditional copula",
-    "ot": "Conditional OT",
-    "ot_constrained": "OT + style cap",
+    "mean_noise": "风格均值+噪声",
+    "global_cov": "全局协方差+风格均值",
+    "copula": "条件 copula",
+    "ot": "条件 OT",
+    "ot_constrained": "OT+风格上限",
 }
 
 # Colour-blind-safe first slots (validated with the dataviz palette validator).
@@ -147,12 +147,17 @@ RADAR_DIMS = [
     "acidity", "bitternes", "sweetness", "alcohol", "body", "overall",
 ]
 RADAR_LABELS = {
-    "A_malt_all": "A-malt", "A_hops_all": "A-hops",
-    "A_esters_all": "A-esters", "F_malt_all": "F-malt",
-    "F_hops_all": "F-hops", "F_esters_all": "F-esters",
-    "acidity": "acidity", "bitternes": "bitterness",
-    "sweetness": "sweetness", "alcohol": "alcohol",
-    "body": "body", "overall": "overall",
+    "A_malt_all": "麦芽香", "A_hops_all": "酒花香",
+    "A_esters_all": "酯香", "F_malt_all": "麦芽味",
+    "F_hops_all": "酒花味", "F_esters_all": "酯味",
+    "acidity": "酸度", "bitternes": "苦味",
+    "sweetness": "甜味", "alcohol": "酒精",
+    "body": "酒体", "overall": "总体",
+}
+
+VARIANT_LABELS = {
+    "source": "源样本", "raw": "原始 OT",
+    "strict": "严格投影", "style": "风格投影",
 }
 
 plt.rcParams.update({
@@ -780,10 +785,10 @@ def plot_radar(P, gen_sensory_med, real_sensory_med):
         ax.set_title(st, pad=34)
         ax.grid(color="#e1e0d9", linewidth=0.6)
     handles = [
-        Line2D([0], [0], color=C_INK, lw=1.6, label="Real (OOF)"),
-        Line2D([0], [0], color=C_BLUE, lw=1.8, label="Copula"),
-        Line2D([0], [0], color=C_ORANGE, lw=1.8, ls="--", label="OT"),
-        Line2D([0], [0], color=C_MAGENTA, lw=1.4, ls=":", label="OT + style cap"),
+        Line2D([0], [0], color=C_INK, lw=1.6, label="真实（OOF）"),
+        Line2D([0], [0], color=C_BLUE, lw=1.8, label="条件 copula"),
+        Line2D([0], [0], color=C_ORANGE, lw=1.8, ls="--", label="条件 OT"),
+        Line2D([0], [0], color=C_MAGENTA, lw=1.4, ls=":", label="OT + 风格上限"),
     ]
     fig.legend(handles=handles, loc="upper center", ncol=4, frameon=False,
                bbox_to_anchor=(0.5, 1.03))
@@ -844,9 +849,9 @@ def plot_mmd_classifier(gen_metrics):
     n_models = len(MODEL_ORDER)
     width = 0.80 / n_models
     for ax, metric, ylabel, title in [
-        (axes[0], "mmd", "MMD$^2$ (RBF, Z space)", "Distribution distance"),
-        (axes[1], "rf_hit", "RF top-1 style hit rate",
-         "Style classifier hit rate (colours as left)"),
+        (axes[0], "mmd", "MMD$^2$（RBF，Z 空间）", "分布距离"),
+        (axes[1], "rf_hit", "RF 风格 top-1 命中率",
+         "风格分类命中率（颜色同左）"),
     ]:
         for i, model in enumerate(MODEL_ORDER):
             offset = (i - (n_models - 1) / 2.0) * width
@@ -869,7 +874,7 @@ def plot_mmd_classifier(gen_metrics):
             handles, labels = ax.get_legend_handles_labels()
             handles += [Line2D([0], [0], color=C_INK, lw=1.2, ls="--"),
                         Line2D([0], [0], color=C_GRAY, lw=1.2, ls=":")]
-            labels += ["Real bootstrap floor", "Other-style ceiling"]
+            labels += ["真实 bootstrap 下限", "其他风格上限"]
             ax.legend(handles, labels, frameon=False, ncol=2, fontsize=7)
         ax.set_xticks(x)
         ax.set_xticklabels(TARGET_STYLES)
@@ -887,14 +892,14 @@ def plot_transfer_defects(transfer_metrics, pils_proxy_p75, tripel_proxy_p75):
     x = np.arange(len(defect_names))
     width = 0.19
     for ax, key, title, ylabel in [
-        (axes[0], "above_strict", "Above strict absolute threshold", "Fraction"),
-        (axes[1], "above_style_p75", "Above Tripel style p75", "Fraction"),
-        (axes[2], "above_style_cap", "Above style cap max(threshold, p75)", "Fraction"),
+        (axes[0], "above_strict", "超严格绝对阈值", "比例"),
+        (axes[1], "above_style_p75", "超 Tripel 风格 p75", "比例"),
+        (axes[2], "above_style_cap", "超风格上限 max(阈值, p75)", "比例"),
     ]:
         for i, v in enumerate(variants):
             vals = [transfer_metrics[v][f"{d}_{key}"] for d in defect_names]
             ax.bar(x + (i - 1.5) * width, vals, width, color=VARIANT_COLORS[v],
-                   label=v, edgecolor=C_SURFACE, linewidth=0.8)
+                   label=VARIANT_LABELS[v], edgecolor=C_SURFACE, linewidth=0.8)
             for xi, val in zip(x + (i - 1.5) * width, vals):
                 ax.text(xi, val + 0.01, f"{val:.2f}", ha="center",
                         va="bottom", fontsize=5.8, color=C_INK)
@@ -902,7 +907,7 @@ def plot_transfer_defects(transfer_metrics, pils_proxy_p75, tripel_proxy_p75):
         ax.set_xticklabels(defect_names)
         ax.set_ylim(0, 1.08)
         ax.set_ylabel(ylabel)
-        ax.set_title(title[0].upper() + title[1:])
+        ax.set_title(title)
     # stale hops proxy
     ax = axes[3]
     vals = [transfer_metrics[v]["stale_proxy_above_pils_p75"] for v in variants]
@@ -914,13 +919,13 @@ def plot_transfer_defects(transfer_metrics, pils_proxy_p75, tripel_proxy_p75):
                 fontsize=7, color=C_INK)
     ax.axhline(0.0, color=C_GRAY, lw=0.8)
     ax.set_xticks(np.arange(len(variants)))
-    ax.set_xticklabels(variants, rotation=0)
+    ax.set_xticklabels([VARIANT_LABELS[v] for v in variants], rotation=0)
     ax.set_ylim(0, 1.08)
-    ax.set_ylabel("Fraction")
-    ax.set_title("Stale-hop proxy above Pils p75")
-    ax.text(0.02, 0.96, f"Pils proxy p75 = {pils_proxy_p75:.2f}\nTripel proxy p75 = {tripel_proxy_p75:.2f}",
+    ax.set_ylabel("比例")
+    ax.set_title("陈旧酒花代理超过 Pils p75")
+    ax.text(0.02, 0.96, f"Pils 代理 p75 = {pils_proxy_p75:.2f}\nTripel 代理 p75 = {tripel_proxy_p75:.2f}",
             transform=ax.transAxes, fontsize=7, va="top", color=C_INK)
-    handles = [Line2D([0], [0], color=VARIANT_COLORS[v], lw=7, label=v)
+    handles = [Line2D([0], [0], color=VARIANT_COLORS[v], lw=7, label=VARIANT_LABELS[v])
                for v in variants]
     fig.legend(handles=handles, loc="upper center", ncol=4, frameon=False,
                bbox_to_anchor=(0.5, 1.02))

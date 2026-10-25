@@ -66,7 +66,7 @@ from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from statsmodels.stats.multitest import multipletests
 
-from data_utils import load_all
+from data_utils import TARGET_CN, load_all
 
 warnings.filterwarnings("ignore")
 
@@ -121,13 +121,14 @@ plt.rcParams.update({
 
 METHODS = ["A", "B", "C", "D", "E"]
 METHOD_LABEL = {
-    "A": "Marginal Spearman",
-    "B": "Elastic Net",
-    "C": "ExtraTrees",
-    "D": "LGBM SHAP",
-    "E": "Network-smoothed",
-    "FUSED": "Fused (Borda)",
+    "A": "边际 Spearman",
+    "B": "弹性网",
+    "C": "极端随机树",
+    "D": "LightGBM SHAP",
+    "E": "网络平滑",
+    "FUSED": "融合（Borda）",
 }
+METHOD_SHORT = {"A": "边际", "B": "弹性网", "C": "极端树", "D": "SHAP", "E": "网络平滑"}
 
 # ---------------------------------------------------------------------------
 # 6.csv mappings (44 chemical rows) and chemical classes
@@ -1466,7 +1467,7 @@ def plot_network(net: dict, path_stem: str = "q2_network"):
         members = [f for f in feats if nodes.loc[f, "community"] == c]
         xy = np.mean([pos[f] for f in members], axis=0)
         centroids[c] = xy
-        ax.text(xy[0], xy[1], c, fontsize=9, fontweight="bold",
+        ax.text(xy[0], xy[1], f"社区{c}", fontsize=9, fontweight="bold",
                 ha="center", va="center", color=INK,
                 bbox=dict(boxstyle="round,pad=0.22", fc=SURFACE, ec=GRID, lw=0.5, alpha=0.92),
                 zorder=5)
@@ -1496,13 +1497,13 @@ def plot_network(net: dict, path_stem: str = "q2_network"):
     handles = [Patch(facecolor=color_of[c], edgecolor=SURFACE,
                      label=f"{c} (n={comm_size[c]})") for c in comms]
     ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.01, 0.98),
-              frameon=False, title="Louvain community", fontsize=7.2,
+              frameon=False, title="Louvain 社区", fontsize=7.2,
               title_fontsize=8.0)
-    fig.suptitle("Compound co-expression network (top-10 neighbours per node)",
+    fig.suptitle("化合物共表达网络（每节点保留 Top-10 强相关邻居）",
                  x=0.06, y=0.975, ha="left", fontsize=13, fontweight="bold", color=INK)
-    fig.text(0.06, 0.945, f"{G.number_of_nodes()} compounds, {G.number_of_edges()} edges, "
-             f"Q = {net['stats']['modularity']:.3f}; node colour = community, "
-             f"size = degree; labels = 2 hub compounds per community",
+    fig.text(0.06, 0.945, f"{G.number_of_nodes()} 个化合物，{G.number_of_edges()} 条边，"
+             f"Q = {net['stats']['modularity']:.3f}；节点颜色=社区，"
+             f"大小=度；标签=每社区 2 个枢纽化合物",
              fontsize=8, color=INK2, va="bottom")
     ax.axis("off")
     _save(fig, path_stem)
@@ -1523,8 +1524,8 @@ def plot_top3_stability(top3: pd.DataFrame, n_boot: int = N_BOOT,
             labels[i, k] = f"{name}\n{r.stability_freq:.2f}"
     fig, ax = plt.subplots(figsize=(9.2, 14.0))
     im = ax.imshow(mat, aspect="auto", cmap=BLUE_SEQ, vmin=0, vmax=1)
-    ax.set_xticks(range(3), ["Rank 1", "Rank 2", "Rank 3"])
-    ax.set_yticks(range(len(targets)), targets, fontsize=6.4)
+    ax.set_xticks(range(3), ["第 1 名", "第 2 名", "第 3 名"])
+    ax.set_yticks(range(len(targets)), [TARGET_CN.get(t, t) for t in targets], fontsize=6.4)
     ax.tick_params(axis="x", top=True, labeltop=True, bottom=False, labelbottom=False)
     for i in range(len(targets)):
         for k in range(3):
@@ -1541,9 +1542,9 @@ def plot_top3_stability(top3: pd.DataFrame, n_boot: int = N_BOOT,
     for s in ax.spines.values():
         s.set_visible(False)
     cb = fig.colorbar(im, ax=ax, fraction=0.025, pad=0.02)
-    cb.set_label("Bootstrap selection frequency (fused Top-3)", fontsize=8)
+    cb.set_label("bootstrap 入选频率（融合 Top-3）", fontsize=8)
     cb.outline.set_visible(False)
-    ax.set_title(f"Final Top-3 compounds and their bootstrap stability ({n_boot} resamples)",
+    ax.set_title(f"最终 Top-3 化合物及其 bootstrap 稳定性（{n_boot} 次重采样）",
                  loc="left", fontsize=12, fontweight="bold", pad=28)
     _save(fig, path_stem)
 
@@ -1561,7 +1562,7 @@ def plot_jaccard(jac_mat: np.ndarray, jac_long: pd.DataFrame,
         for j in range(5):
             ax.text(j, i, f"{jac_mat[i, j]:.2f}", ha="center", va="center",
                     fontsize=7.2, color="white" if jac_mat[i, j] > 0.55 else INK)
-    ax.set_title("Mean Top-3 Jaccard (50 targets)", loc="left", fontweight="bold")
+    ax.set_title("五种方法的平均 Top-3 Jaccard（50 个目标）", loc="left", fontweight="bold")
     for s in ax.spines.values():
         s.set_visible(False)
     cb = fig.colorbar(im, ax=ax, fraction=0.045, pad=0.02)
@@ -1569,13 +1570,14 @@ def plot_jaccard(jac_mat: np.ndarray, jac_long: pd.DataFrame,
     cb.outline.set_visible(False)
 
     ax = axes[1]
-    pairs = []
+    pairs, pair_codes = [], []
     for a in range(5):
         for b in range(a + 1, 5):
-            pairs.append(f"{METHODS[a]}-{METHODS[b]}")
-    data_box = [jac_long[(jac_long.method_i == p.split("-")[0]) &
-                         (jac_long.method_j == p.split("-")[1])]["jaccard"].values
-                for p in pairs]
+            pair_codes.append((METHODS[a], METHODS[b]))
+            pairs.append(f"{METHOD_SHORT[METHODS[a]]}-{METHOD_SHORT[METHODS[b]]}")
+    data_box = [jac_long[(jac_long.method_i == a) &
+                         (jac_long.method_j == b)]["jaccard"].values
+                for a, b in pair_codes]
     bp = ax.boxplot(data_box, patch_artist=True, widths=0.55,
                     medianprops=dict(color=INK, linewidth=1.0),
                     whiskerprops=dict(color=MUTED, linewidth=0.6),
@@ -1586,8 +1588,8 @@ def plot_jaccard(jac_mat: np.ndarray, jac_long: pd.DataFrame,
         patch.set_facecolor("#86b6ef"); patch.set_edgecolor("#3987e5"); patch.set_linewidth(0.6)
     ax.set_xticks(range(1, len(pairs) + 1), pairs, rotation=35, ha="right")
     ax.set_ylim(0, 1.02)
-    ax.set_ylabel("Per-target Jaccard")
-    ax.set_title("Pairwise method agreement across targets", loc="left", fontweight="bold")
+    ax.set_ylabel("逐目标 Jaccard")
+    ax.set_title("不同方法在目标间的一致性", loc="left", fontweight="bold")
     ax.grid(axis="y", alpha=0.7)
     ax.set_axisbelow(True)
     for s in ["top", "right"]:

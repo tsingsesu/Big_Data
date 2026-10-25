@@ -38,7 +38,7 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.preprocessing import OneHotEncoder
 from lightgbm import LGBMRegressor
 
-from data_utils import apply_grade_cutpoints, load_all, make_grade_labels, make_preprocessor
+from data_utils import MODEL_CN, TARGET_CN, apply_grade_cutpoints, load_all, make_grade_labels, make_preprocessor
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "data" / "q1"
@@ -1159,7 +1159,7 @@ def plot_model_comparison(summary: dict, best_model: str):
         ax.barh(order, means, xerr=stds_plot, color=colors, alpha=0.85, capsize=3)
         ax.axvline(0, color="0.45", lw=0.8, ls="--")
         ax.set_yticks(range(len(order)))
-        ax.set_yticklabels(order)
+        ax.set_yticklabels([TARGET_CN.get(t, t) for t in order])
         ax.set_ylim(-0.6, len(order) - 0.4)
         span = max(np.nanmax(np.abs(means)) + np.nanmax(stds_plot), 1e-6)
         for i, v in enumerate(means):
@@ -1200,9 +1200,9 @@ def plot_target_heatmap(cv_df: pd.DataFrame, best_model: str):
     fig, ax = plt.subplots(figsize=(10, 16))
     im = ax.imshow(mat, aspect="auto", cmap="RdYlGn", vmin=vmin, vmax=vmax)
     ax.set_xticks(range(len(ALL_MODELS)))
-    ax.set_xticklabels(ALL_MODELS, rotation=35, ha="right")
+    ax.set_xticklabels([MODEL_CN.get(m, m) for m in ALL_MODELS], rotation=35, ha="right")
     ax.set_yticks(range(len(order)))
-    ax.set_yticklabels(order)
+    ax.set_yticklabels([TARGET_CN.get(t, t) for t in order])
     for lbl, target in zip(ax.get_yticklabels(), order):
         if target.startswith("A_"):
             lbl.set_color("#1f77b4")
@@ -1224,10 +1224,10 @@ def plot_target_heatmap(cv_df: pd.DataFrame, best_model: str):
                     color="black" if -0.05 < v < 0.55 else "white",
                 )
     cbar = fig.colorbar(im, ax=ax, fraction=0.025, pad=0.02)
-    cbar.set_label("R² (mean over folds)")
+    cbar.set_label("R²（折间均值）")
     ax.set_title(
-        f"Per-target cross-validated R² by model (mean over {N_SPLITS}-fold × {N_REPEATS} repeats)\n"
-        f"rows sorted by {best_model}; blue=Aroma, orange=Flavour, green=other",
+        f"各感官维度的交叉验证 R²（{N_SPLITS} 折 × {N_REPEATS} 次重复的折间均值）\n"
+        f"按 {MODEL_CN.get(best_model, best_model)} 排序；蓝=香气，橙=风味，绿=其他",
         fontsize=11,
     )
     fig.tight_layout()
@@ -1237,13 +1237,13 @@ def plot_target_heatmap(cv_df: pd.DataFrame, best_model: str):
 def plot_missingness(missing_df: pd.DataFrame, best_model: str):
     natural = missing_df[missing_df["missing_type"] == "natural"].iloc[0]
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.8))
-    for ax, metric, label in zip(axes, ["r2", "rmse"], ["Macro R²", "Macro RMSE"]):
+    for ax, metric, label in zip(axes, ["r2", "rmse"], ["宏平均 R²", "宏平均 RMSE"]):
         ax.axhline(
             natural[f"{metric}_mean"],
             color="0.45",
             ls="--",
             lw=1.0,
-            label=f"Natural missing ({natural['total_missing_rate'] * 100:.2f}%)",
+            label=f"自然缺失（{natural['total_missing_rate'] * 100:.2f}%）",
         )
         ax.plot(
             [0],
@@ -1275,14 +1275,14 @@ def plot_missingness(missing_df: pd.DataFrame, best_model: str):
                 ms=8,
                 capsize=3,
                 lw=1.5,
-                label="MAR (driver-quantile)",
+                label="MAR（分位数驱动）",
             )
-        ax.set_xlabel("Additional missing rate (%)")
+        ax.set_xlabel("额外缺失率（%）")
         ax.set_ylabel(label)
-        ax.set_title(f"{label} vs missingness")
+        ax.set_title(f"{label} 随缺失率的变化")
         ax.grid(alpha=0.25)
         ax.legend(fontsize=8)
-    fig.suptitle(f"Missing-data robustness of best model: {best_model}", fontsize=12)
+    fig.suptitle(f"最佳模型的缺失鲁棒性：{MODEL_CN.get(best_model, best_model)}", fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.95))
     _save(fig, "q1_missingness")
 

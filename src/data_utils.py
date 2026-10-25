@@ -27,6 +27,42 @@ PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 ID_COLS = ["beer", "beer_id", "tasting_category_fine"]
 STYLE_COL = "tasting_category_fine"
 
+# 图表用中文标签：感官维度与模型名（逻辑不变，仅显示用）
+TARGET_CN = {
+    "A_malt_all": "麦芽香-总体", "A_malt_grain": "麦芽香-谷物",
+    "A_malt_bread": "麦芽香-面包", "A_malt_cara": "麦芽香-焦糖",
+    "A_malt_burn": "麦芽香-烟熏",
+    "A_hops_all": "酒花香-总体", "A_hops_citrus": "酒花香-柑橘",
+    "A_hops_tropical": "酒花香-热带水果", "A_hops_noble": "酒花香-贵族酒花",
+    "A_hops_woody": "酒花香-木质",
+    "A_esters_all": "酯香-总体", "A_esters_ethac": "酯香-乙酸乙酯",
+    "A_esters_isoaa": "酯香-乙酸异戊酯", "A_esters_flower": "酯香-花香",
+    "A_esters_fruity": "酯香-果香",
+    "F_malt_all": "麦芽味-总体", "F_malt_grain": "麦芽味-谷物",
+    "F_malt_bread": "麦芽味-面包", "F_malt_cara": "麦芽味-焦糖",
+    "F_malt_burn": "麦芽味-烟熏",
+    "F_hops_all": "酒花味-总体", "F_hops_citrus": "酒花味-柑橘",
+    "F_hops_tropical": "酒花味-热带水果", "F_hops_noble": "酒花味-贵族酒花",
+    "F_hops_woody": "酒花味-木质",
+    "F_esters_all": "酯味-总体", "F_esters_ethac": "酯味-乙酸乙酯",
+    "F_esters_isoaa": "酯味-乙酸异戊酯", "F_esters_flower": "酯味-花香",
+    "F_esters_fruity": "酯味-果香",
+    "acidity": "酸度", "bitternes": "苦味", "sweetness": "甜味",
+    "X4vg": "4-乙烯基愈创木酚", "diacetyl": "双乙酰", "dms": "二甲基硫",
+    "metallic": "金属味", "stale_hops": "陈旧酒花", "t2n": "反-2-壬烯醛",
+    "orange": "橙", "coriander": "芫荽", "clove": "丁香",
+    "lactic": "乳酸", "acetic": "醋酸", "barnyard": "谷仓",
+    "alcohol": "酒精", "aftertaste": "余味", "body": "酒体",
+    "co2": "二氧化碳", "overall": "总体",
+}
+
+MODEL_CN = {
+    "mean": "均值", "ridge": "岭回归", "pls": "PLS",
+    "extratrees": "极端随机树", "randomforest": "随机森林",
+    "lightgbm": "LightGBM", "blend_avg": "等权融合",
+    "stack_ridge": "Ridge 堆叠",
+}
+
 
 def _read_csv(name: str) -> pd.DataFrame:
     return pd.read_csv(ATTACH / name, dtype={"beer_id": str}, encoding="utf-8-sig")
