@@ -68,12 +68,40 @@
 \end{equation}
 这样既不把缺陷一律压到零（避免破坏风格基线），也不允许生成超出风格正常波动的极端值；同时报告严格阈值 $\tau_j$ 下的超阈值率，区分“风格允许”与“绝对超标”。
 
+其中 4VG 的风格上限取固定安全值 $0.10$~mg/L 而非 $\max(\tau_j,q_{g,j})$，因为小麦风格 4VG 的 $p_{75}$ 显著高于该安全值；其余三个缺陷按式~\eqref{eq:q3-cap} 取风格上限。stale hops 不是单一化合物，本文用反式-2-壬烯醛、DMS、\texttt{ethyl 2-methylbutyrate}、\texttt{ethyl isovalerate} 与 4VG 五列标准化均值构造代理，并在迁移中对每一列施加“不高于源样本”的约束。各缺陷的阈值与依据见表~\ref{tab:q3-thresholds}。
+
+\begin{table}[htbp]
+  \centering
+  \caption{缺陷化合物的严格阈值与取值依据}
+  \label{tab:q3-thresholds}
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{@{}l l l l l@{}}
+    \toprule
+    缺陷 & 对应列 & 严格阈值 $\tau_j$ & 单位 & 依据 \\
+    \midrule
+    DMS & \texttt{DMS} & 17.25 & \textmu g/L & 附件与文献综合 \\
+    Diacetyl & \texttt{X2.3.butanedione} & 0.09 & mg/L & 附件与文献综合 \\
+    4VG & \texttt{X4VG} & 0.10 & mg/L & 非小麦安全值（均值 0.206） \\
+    trans-2-nonenal & \texttt{X.E..2.nonenal} & 0.10 & \textmu g/L & 外部文献 \\
+    stale hops & 五列复合代理 & — & — & 见正文说明 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 \paragraph{跨风格迁移。}设源风格为 $g$、目标风格为 $g'$。在正态分数空间，用高斯最优传输的闭式映射
 \begin{equation}
   T_{g\to g'}(\bz)=\bmu_{g'}+\bSigma_{g'}^{1/2}\bSigma_g^{-1/2}\left(\bz-\bmu_g\right),
   \label{eq:q3-ot}
 \end{equation}
 将源样本映射到目标风格，再逆变换回浓度空间并做式~\eqref{eq:q3-projection} 的缺陷投影。式~\eqref{eq:q3-ot} 是均值和协方差匹配意义下的最优传输映射；它比“只加风格均值差”多了协方差校正，能同时改变化合物的相关结构。对 Pils/Lager $\to$ Tripel，本文比较三种迁移：raw（只做 OT，不加缺陷约束）、strict（投影到附件严格阈值）、style（投影到式~\eqref{eq:q3-cap} 的风格上限），并报告三者的缺陷超标率与感官画像。
+
+\paragraph{目标边际校准。}仿射 OT 只匹配均值与协方差，不保证各化合物的边际形状（零膨胀的痕量化合物尤甚）。因此迁移后对每个化合物列再做一次秩映射，把生成样本的分位数对齐到目标风格的经验分布：
+\begin{equation}
+  \tilde{x}_{i,j}\leftarrow Q_{g',j}\!\left(\frac{\operatorname{rank}(\tilde{x}_{i,j})-1/2}{n}\right),
+  \label{eq:q3-rank}
+\end{equation}
+其中 $Q_{g',j}$ 为目标风格 $g'$ 化合物 $j$ 的经验分位数函数。该步之后每一列的边际与目标风格严格一致，因此后文的 MMD 与覆盖度衡量的是\textbf{化合物之间的相关结构}，而非整体分布形状；引用 $0.038$ 这一数值时必须带上此口径。
 
 \begin{algorithm}[htbp]
   \small
@@ -103,7 +131,7 @@
     \bSigma_g^{-1}\left(\tilde{\vx}-\bmu_g\right)}.
     \label{eq:q3-mahalanobis}
   \end{equation}
-  \item \textbf{多样性}：生成样本两两之间的平均距离，以及各化合物维度的方差；防止模型只输出风格均值。
+  \item \textbf{多样性}：生成样本两两之间的平均距离，以及各化合物维度的方差；防止模型只输出风格均值。另有覆盖度与精确度两个派生指标：以真实样本留一最近邻距离的中位数为阈值，覆盖度定义为“至少被一个生成样本落入该阈值的真实样本比例”；以真实留一最近邻距离的 95\% 分位为阈值，精确度定义为“到真实集最近邻距离不超过该阈值的生成样本比例”。
   \item \textbf{缺陷控制}：缺陷化合物超阈值比例
   \begin{equation}
     R_{\mathrm{def}}=\frac{1}{\abs{\Jcal}}
@@ -166,5 +194,7 @@
 \subsection{讨论}
 
 问题三的评价没有唯一真值，本文用五维指标与案例结合，但仍有三点局限。第一，风格分类器本身是在真实数据上训练的，若真实数据存在标签噪声，生成样本的“保真”分数会继承这种噪声；因此本文同时报告马氏距离与感官一致性，避免只依赖分类器。第二，缺陷阈值来自 \texttt{8.xlsx} 与题目给定口径，不同风格、不同市场的阈值可能不同；本文把阈值作为可配置参数，并在敏感性分析中改变阈值，检查结论是否稳健。第三，OT 映射假设正态分数空间中的风格差异可由均值/协方差线性刻画；若风格流形高度非线性，线性 OT 可能只迁移了部分特征。后续可改用核 OT 或条件流模型，但必须保留缺陷约束与可解释性检查。
+
+另有两处口径必须在结论前交代。其一，\texttt{X.E..2.nonenal} 在附件中标注为 mg/L，但其数值范围（Pils/Lager 中位数约 0.002、Tripel 约 0.011）与文献常用的 \textmu g/L 阈值量级一致，本文按 \textmu g/L 解释；若按标注单位计算，全部样本都远低于检测限，分类将失去意义。其二，stale hops 代理中的 \texttt{ethyl 2-methylbutyrate} 与 \texttt{ethyl isovalerate} 本身属于果香酯类，把它们纳入“不恶化”约束会同时抑制 Tripel 应有的酯类上升，因此 strict 迁移对这两列是\textbf{保守偏置}，不能读作对 stale hops 的独立实测。
 
 另一个需要如实说明的问题是数据规模。部分风格样本很少，生成模型在该风格上的多样性指标可能被高估或低估；本文不把少数风格的结果外推到所有商业啤酒，而是把它们作为“数据条件下的可行方案”，并建议后续补充同风格样本后再复评。

@@ -72,11 +72,11 @@
 \begin{lstlisting}[style=shellcode,caption={复现命令},label={lst:pipeline}]
 # Run from the project root
 MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/01_profile.py
-MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/00_figures.py
 MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/02_external.py
 MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/q1.py
 MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/q2.py
 MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/q3.py
+MPLBACKEND=Agg PYTHONPATH=.pylibs:src python3 src/00_figures.py
 # Build the paper (TinyTeX installed at ~/.TinyTeX)
 export PATH="$HOME/.TinyTeX/bin/x86_64-linux:$PATH"
 cd latex
@@ -98,8 +98,8 @@ latexmk -xelatex main.tex
     \midrule
     全局 & 随机种子、交叉验证折数 & 42；5 折 $\times$ 3 次重复 \\
     预处理 & 插补方法、MCAR/MAR 网格 & 折内中位数插补；MCAR 5/10/20/30\%；MAR 由 ethanol 分位数驱动 \\
-    问题一 & 基学习器与校准 & RidgeCV、PLS 5 成分、ET/RF 500 棵、LGBM 400 棵（lr 0.03、叶子 15）；保序 + q01/q99 min-max \\
-    问题二 & 图与稳定性 & $K=10$；$\alpha=0.3$；$B=500$；入选频率门槛 0.8；机制先验 $\lambda=0.5$ \\
+    问题一 & 基学习器与校准 & 折内调参：Ridge $\alpha\in[10^0,10^6]$、PLS 2--20 成分、ET/RF 500 棵（叶节点 $\in\{1,2,4\}$）、LGBM 400 棵（lr 0.03、叶子 15）；stack 元学习器 RidgeCV；保序 + q01/q99 min-max \\
+    问题二 & 图与稳定性 & $K=10$；$\alpha=0.3$；$B=500$；入选频率仅报告不筛选；机制先验 $\lambda=0.5$ \\
     问题三 & 生成与缺陷约束 & 70 个校准化合物；log1p；Ledoit--Wolf；每风格 300 条；style cap $\max(\tau_j,q_{g,j})$ \\
     评价 & 指标与实现 & 宏平均 $R^2$/RMSE/MAE/Spearman；QWK；MMD；RF 风格分类器 \\
     \bottomrule
@@ -120,7 +120,7 @@ latexmk -xelatex main.tex
     模块 & 功能 & 主要输出 \\
     \midrule
     数据读取与对齐 & \texttt{src/data\_utils.py}、\texttt{src/01\_profile.py}、\texttt{src/02\_external.py} & 对齐数据、变换表、EDA 图 \\
-    问题一 & \texttt{src/q1.py}：岭回归/PLS/ET/RF/LGBM 等权融合、保序校准、缺失模拟 & 评分表、指标表、\texttt{img/q1\_*} \\
+    问题一 & \texttt{src/q1.py}：岭回归/PLS/ET/RF/LGBM 等权融合、保序校准、缺失模拟 & \texttt{data/q1/oof\_predictions.csv}（250 行，\texttt{beer} + 50 个 \texttt{pred\_*} + 50 个 \texttt{grade\_*}）、\texttt{cv\_results.csv}、\texttt{model\_summary.json}、\texttt{img/q1\_*} \\
     问题二 & \texttt{src/q2.py}：共表达图、五方法融合、500 次 bootstrap、机制先验 & Top-3 表、网络图、稳定性表 \\
     问题三 & \texttt{src/q3.py}：条件 copula、OT、style cap、感官画像 & 生成谱、雷达图、评价表 \\
     概念图 & \texttt{src/00\_figures.py}：路线图、预处理流程图、Q1 框架图 & \texttt{img/fig\_*} \\
