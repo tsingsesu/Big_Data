@@ -29,6 +29,12 @@ IMG = ROOT / "img"
 EXT = ROOT / "data" / "external"
 IMG.mkdir(exist_ok=True)
 
+from matplotlib import font_manager
+_cjk_font = Path('/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc')
+if _cjk_font.exists():
+    font_manager.fontManager.addfont(str(_cjk_font))
+plt.rcParams.update({'font.family': 'Noto Sans CJK JP', 'axes.unicode_minus': False, 'pdf.fonttype': 42})
+
 plt.rcParams.update({"font.size": 8, "savefig.dpi": 300, "figure.dpi": 150})
 
 
@@ -45,10 +51,68 @@ def safe_r(x, y, method="pearson"):
     return float(r), float(p)
 
 
+def map_style(style):
+    if style=='Lager - India Pale Lager (IPL)':return 'Hoppy'
+    if style=='Lager - American Amber / Red':return 'Amber'
+    if style.startswith(('Lager -','Pilsner -')):return 'Pils/Lager'
+    if style.startswith(('Stout -','Porter -')):return 'Stout/Porter'
+    if style.startswith('Wheat Beer -'):return 'Wheat'
+    if style.startswith('IPA -') or style in ['Pale Ale - American','Pale Ale - English','Pale Ale - Belgian']:return 'Hoppy'
+    exact={
+      'Blond':['Blonde Ale - American','Blonde Ale - Belgian','Kölsch'],
+      'Amber':['Altbier','Red Ale - American Amber / Red','Red Ale - Irish'],
+      'Brown':['Brown Ale - American','Brown Ale - Belgian Dark','Brown Ale - English','Mild Ale - English Dark','Mild Ale - English Pale','Old Ale'],
+      'Strong ale':['Strong Ale - American','Strong Ale - English','Strong Ale - Belgian Dark','Strong Ale - Belgian Pale','Quadrupel (Quad)','Barleywine - American','Barleywine - English','Red Ale - Imperial','Bock - Doppelbock','Bock - Eisbock'],
+      'Tripel':['Tripel'],'Dubbel':['Dubbel'],'Lambic':['Lambic - Traditional','Lambic - Gueuze'],
+      'Kriek':['Lambic - Fruit'],'Faro':['Lambic - Faro'],
+      'Saison':['Farmhouse Ale - Saison','Farmhouse Ale - Bière de Garde','Farmhouse Ale - Sahti'],
+      'Christmas':['Winter Warmer','Herb and Spice Beer','Pumpkin Beer','Chile Beer'],
+      'Low/No alcohol':['Low Alcohol Beer'],'Fruitbeer':['Fruit and Field Beer'],
+      'West Flanders ale':['Sour - Flanders Red Ale'],'Flanders old brown':['Sour - Flanders Oud Bruin'],
+      'Brett/cofermented':['Brett Beer','Wild Ale'],'Scotch':['Scotch Ale / Wee Heavy','Scottish Ale'],
+      'Brut':['Bière de Champagne / Bière Brut']}
+    return next((k for k,v in exact.items() if style in v),None)
+
+
+def build_prototypes():
+    import json,hashlib,io,zipfile,urllib.request
+    EXT.mkdir(exist_ok=True)
+    path=EXT/'beer_data_set.csv'
+    if not path.exists():
+        url='https://www.kaggle.com/api/v1/datasets/download/stephenpolozoff/top-beer-information'
+        with urllib.request.urlopen(url,timeout=60) as response:blob=response.read(20_000_000)
+        with zipfile.ZipFile(io.BytesIO(blob)) as z:
+            for member in z.namelist():
+                if Path(member).name in ['beer_data_set.csv','Beer Descriptors Simplified.xlsx']:
+                    (EXT/Path(member).name).write_bytes(z.read(member))
+    raw=pd.read_csv(path);cols=['Astringency','Body','Alcohol','Bitter','Sweet','Sour','Salty','Fruits','Hoppy','Spices','Malty']
+    mapping=raw[['Style']].drop_duplicates().sort_values('Style');mapping['attachment_style']=mapping.Style.map(map_style)
+    mapping.to_csv(EXT/'style_mapping.csv',index=False)
+    raw['style']=raw.Style.map(map_style);total=raw[cols].sum(axis=1)
+    keep=total.ge(50)&raw['style'].notna();fraction=raw.loc[keep,cols].div(total[keep],axis=0)
+    fraction['风格']=raw.loc[keep,'style'];p=fraction.groupby('风格')[cols].mean()
+    p.insert(0,'n_kept',fraction.groupby('风格').size());p=p.rename(columns={'Astringency':'Astr','Alcohol':'Alc'}).reset_index()
+    p.to_csv(EXT/'style_prototypes.csv',index=False,float_format='%.12g')
+    assert np.allclose(p.drop(columns=['风格','n_kept']).sum(axis=1),1.)
+    meta={'n_raw':len(raw),'n_raw_styles':raw.Style.nunique(),'n_mapped_styles':mapping.attachment_style.notna().sum(),
+        'n_mapped_rows':int(raw['style'].notna().sum()),'n_quality_rows_all':int(total.ge(50).sum()),
+        'n_mapped_quality_rows':int(keep.sum()),'n_target_styles':len(p),
+        'raw_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),
+        'source':'https://www.kaggle.com/datasets/stephenpolozoff/top-beer-information',
+        'license_recorded':'CC BY 4.0; project 2026-10-24 API retrieval record, not re-verified online',
+        'role':'style-level external validation only; not Q1 or Q3 training input',
+        'mapping':'hand-authored mutually exclusive semantic mapping; source table exported',
+        'normalization':'11 word counts / row total; total>=50'}
+    meta={k:int(v) if isinstance(v,np.integer) else v for k,v in meta.items()}
+    (EXT/'provenance.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2))
+    print('[external]',json.dumps(meta,ensure_ascii=False),flush=True)
+    return p
+
+
 def main() -> None:
     D = du.load_all()
     df4, df7 = D["df4"], D["df7"]
-    proto = pd.read_csv(EXT / "style_prototypes.csv").rename(columns={"风格": "style"})
+    proto = build_prototypes().rename(columns={"风格": "style"})
     styles = proto["style"].tolist()
 
     to4 = [

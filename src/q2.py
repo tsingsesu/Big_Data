@@ -11,17 +11,17 @@ Outputs:
 
 Design notes
 ------------
-* 2.csv is used as the compound-compound Pearson correlation matrix.
+* 2.csv is verified as Spearman; the given graph is fixed during bootstrap.
 * 1.csv supplies the 250 x 231 abundance matrix; 4.csv supplies 50 sensory targets.
 * Five ranking methods are kept side by side for audit:
   A marginal Spearman (BH-FDR within each target)
-  B per-target ElasticNet (inner 4-fold CV over alpha / l1_ratio)
+  B per-target ElasticNet with train-only preprocessing and grouped 3-fold pipeline CV
   C per-target ExtraTrees impurity importance
-  D per-target LightGBM out-of-fold mean |SHAP| via pred_contrib=True
+  D per-target LightGBM descriptive mean |SHAP|, identical point/bootstrap fits
   E network-smoothed marginal correlation (own + 1-hop neighbours)
-* Final Top-3 is Borda mean-rank fusion of A-E.
+* Primary Top-3 restricts A-E Borda fusion to 214 chemical candidates; all-indicator results are diagnostic.
 * Stability: 500 bootstrap resamples of the 250 beers; A-E are rerun with
-  fixed/fast settings and the fused Top-3 selection frequency is recorded.
+  identical estimator budgets, refit preprocessing and retuned ElasticNet; the graph is fixed.
 * 6.csv is used as an external consistency check only for the 44 compounds
   that can be matched by name.  It is NOT an independent data source: it is
   computed from the same 250 beers, so method A reproduces it almost exactly.
@@ -62,11 +62,14 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import ElasticNet, ElasticNetCV
 from sklearn.metrics import adjusted_rand_score
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, GridSearchCV, GroupKFold
 from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import Ridge
+from sklearn.metrics import r2_score
 from statsmodels.stats.multitest import multipletests
 
-from data_utils import TARGET_CN, load_all
+from data_utils import TARGET_CN, load_all, provenance
 
 warnings.filterwarnings("ignore")
 
@@ -78,11 +81,11 @@ IMG.mkdir(parents=True, exist_ok=True)
 
 SEED = 42
 N_BOOT = int(os.environ.get("Q2_NBOOT", "500"))
-N_JOBS = int(os.environ.get("Q2_NJOBS", str(min(20, os.cpu_count() or 4))))
-N_TREES_FULL = 300
-N_TREES_BOOT = 60
-LGB_FULL = 150
-LGB_BOOT = 60
+N_JOBS = int(os.environ.get("Q2_NJOBS", str(min(12, os.cpu_count() or 4))))
+N_TREES_FULL = 100
+N_TREES_BOOT = N_TREES_FULL
+LGB_FULL = 100
+LGB_BOOT = LGB_FULL
 NET_LAMBDA = 0.30
 
 # ---------------------------------------------------------------------------
@@ -98,8 +101,14 @@ CAT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100",
 BLUE_SEQ = LinearSegmentedColormap.from_list(
     "blue_seq", ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"]
 )
+from matplotlib import font_manager
+_cjk_font = Path('/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc')
+if _cjk_font.exists():
+    font_manager.fontManager.addfont(str(_cjk_font))
+plt.rcParams.update({'font.family': 'Noto Sans CJK JP', 'axes.unicode_minus': False, 'pdf.fonttype': 42})
+
 plt.rcParams.update({
-    "font.family": "DejaVu Sans",
+    "font.family": "Noto Sans CJK JP",
     "font.size": 8,
     "axes.titlesize": 10,
     "axes.labelsize": 8.5,
@@ -602,21 +611,22 @@ def smooth_scores(S: np.ndarray, W: np.ndarray, lam: float = NET_LAMBDA) -> np.n
     return (1.0 - lam) * S + lam * (W @ S)
 
 
-def _elasticnet_target(j, X, yv, alphas, l1s):
-    warnings.filterwarnings("ignore", category=ConvergenceWarning)
-    model = ElasticNetCV(
-        l1_ratio=l1s, alphas=alphas, cv=4, max_iter=5000,
-        tol=1e-3, n_jobs=1, random_state=SEED, selection="cyclic",
-    )
-    model.fit(X, yv[:, j])
-    return j, model.coef_.copy(), float(model.alpha_), float(model.l1_ratio_), float(model.score(X, yv[:, j]))
+def _elasticnet_target(j, X, yv, alphas, l1s, groups=None):
+    pipe=Pipeline([("impute",SimpleImputer(strategy="median",keep_empty_features=True)),
+        ("scale",StandardScaler()),("model",ElasticNet(max_iter=10000,tol=1e-3,random_state=SEED))])
+    cv=(list(GroupKFold(3).split(X,groups=groups)) if groups is not None
+        else list(GroupKFold(3).split(X,groups=np.arange(len(X)))))
+    search=GridSearchCV(pipe,{"model__alpha":alphas,"model__l1_ratio":l1s},
+        cv=cv,scoring="neg_mean_squared_error",n_jobs=1)
+    search.fit(X,yv[:,j]);m=search.best_estimator_.named_steps["model"]
+    return j,m.coef_.copy(),float(m.alpha),float(m.l1_ratio),float(r2_score(yv[:,j],search.predict(X)))
 
 
 def elastic_net_scores(X, y, n_jobs):
     n_t = y.shape[1]
-    alphas = np.logspace(-3, 0.7, 8)
+    alphas = [0.03, 0.1, 0.3]
     res = Parallel(n_jobs=n_jobs, batch_size=1)(
-        delayed(_elasticnet_target)(j, X, y, alphas, [0.1, 0.5, 0.9])
+        delayed(_elasticnet_target)(j, X, y, alphas, [0.3, 0.7])
         for j in range(n_t)
     )
     coef = np.zeros((X.shape[1], n_t))
@@ -649,21 +659,12 @@ def extra_trees_scores(X, y, n_estimators, n_jobs, seed=SEED):
 
 
 def _lgb_oof_target(j, X, y, n_splits=5, n_estimators=LGB_FULL, seed=SEED):
-    kf = KFold(n_splits=n_splits, shuffle=True, random_state=seed)
-    acc = np.zeros((X.shape[0], X.shape[1]))
-    cnt = np.zeros(X.shape[0])
-    for tr, va in kf.split(X):
-        model = lgb.LGBMRegressor(
-            n_estimators=n_estimators, num_leaves=15, learning_rate=0.05,
-            feature_fraction=0.7, subsample=0.8, subsample_freq=1,
-            min_child_samples=10, verbose=-1, n_jobs=1,
-            random_state=seed + j, force_col_wise=True,
-        )
-        model.fit(X[tr], y[tr, j])
-        contrib = model.predict(X[va], pred_contrib=True)[:, :-1]
-        acc[va] += np.abs(contrib)
-        cnt[va] += 1
-    return j, (acc / np.maximum(cnt, 1)[:, None]).mean(axis=0)
+    """Descriptive in-sample attribution, identically used in point and bootstrap fits."""
+    model=lgb.LGBMRegressor(n_estimators=n_estimators,num_leaves=15,learning_rate=.05,
+        feature_fraction=.7,subsample=.8,subsample_freq=1,min_child_samples=10,
+        verbose=-1,n_jobs=1,random_state=seed+j,force_col_wise=True)
+    model.fit(X,y[:,j]);contrib=model.predict(X,pred_contrib=True)[:,:-1]
+    return j,np.abs(contrib).mean(axis=0)
 
 
 def lightgbm_shap_scores(X, y, n_jobs, n_estimators=LGB_FULL):
@@ -687,8 +688,8 @@ def run_full_methods(data: dict, net: dict) -> dict:
           f"{(q < 0.05).sum()} target-feature pairs q<0.05, {time.time()-t0:.1f}s", flush=True)
 
     t0 = time.time()
-    B, alpha, l1, r2 = elastic_net_scores(Xs, y, N_JOBS)
-    print(f"[method B] ElasticNetCV done, mean in-sample R2={np.mean(r2):.3f}, "
+    B, alpha, l1, r2 = elastic_net_scores(data["X"].values, y, N_JOBS)
+    print(f"[method B] ElasticNet pipeline CV done, descriptive in-sample R2={np.mean(r2):.3f}, "
           f"alpha median={np.median(alpha):.3g}, {time.time()-t0:.1f}s", flush=True)
 
     t0 = time.time()
@@ -697,7 +698,7 @@ def run_full_methods(data: dict, net: dict) -> dict:
 
     t0 = time.time()
     D = lightgbm_shap_scores(Xs, y, N_JOBS, LGB_FULL)
-    print(f"[method D] LightGBM OOF SHAP {LGB_FULL} trees x 5 folds done, {time.time()-t0:.1f}s", flush=True)
+    print(f"[method D] LightGBM descriptive SHAP {LGB_FULL} trees done, {time.time()-t0:.1f}s", flush=True)
 
     E = smooth_scores(S, net["W"], NET_LAMBDA)
     print(f"[method E] network smoothing lambda={NET_LAMBDA} done", flush=True)
@@ -742,81 +743,55 @@ _BOOT = {}
 
 
 def _bootstrap_one(b):
-    warnings.filterwarnings("ignore", category=ConvergenceWarning)
-    rng = np.random.default_rng(SEED + 100000 + b)
-    n = _BOOT["Xs"].shape[0]
-    idx = rng.integers(0, n, n)
-    Xb = _BOOT["Xs"][idx]
-    yb = _BOOT["y"][idx]
-    n_feat, n_targets = _BOOT["n_feat"], _BOOT["n_targets"]
-
-    Sb = spearman_scores(Xb, yb)
-
-    Bb = np.zeros((n_feat, n_targets))
-    for j in range(n_targets):
-        model = ElasticNet(
-            alpha=_BOOT["alpha"][j], l1_ratio=_BOOT["l1"][j],
-            max_iter=3000, tol=1e-3, random_state=SEED, selection="cyclic",
-        )
-        model.fit(Xb, yb[:, j])
-        Bb[:, j] = model.coef_
-
-    Cb = np.zeros((n_feat, n_targets))
-    Db = np.zeros((n_feat, n_targets))
-    for j in range(n_targets):
-        et = ExtraTreesRegressor(
-            n_estimators=N_TREES_BOOT, max_depth=8, max_features="sqrt",
-            min_samples_leaf=5, n_jobs=1, random_state=SEED + b * 1000 + j,
-        )
-        et.fit(Xb, yb[:, j])
-        Cb[:, j] = et.feature_importances_
-
-        gm = lgb.LGBMRegressor(
-            n_estimators=LGB_BOOT, num_leaves=15, learning_rate=0.05,
-            feature_fraction=0.7, subsample=0.8, subsample_freq=1,
-            min_child_samples=10, verbose=-1, n_jobs=1,
-            random_state=SEED + b * 1000 + j, force_col_wise=True,
-        )
-        gm.fit(Xb, yb[:, j])
-        contrib = gm.predict(Xb, pred_contrib=True)[:, :-1]
-        Db[:, j] = np.abs(contrib).mean(axis=0)
-
-    Eb = smooth_scores(Sb, _BOOT["W"], NET_LAMBDA)
-    ranks = [
-        rank_features(Sb, True),
-        rank_features(Bb, True),
-        rank_features(Cb, False),
-        rank_features(Db, False),
-        rank_features(Eb, True),
-    ]
-    fused = np.mean(np.stack(ranks), axis=0)
-    masks = [top3_mask(r) for r in ranks] + [top3_mask(fused)]
-    # (method, feature, target) -> (method, target, feature) for accumulation
-    return np.stack(masks).transpose(0, 2, 1).astype(np.uint8)
+    rng=np.random.default_rng(SEED+100000+b)
+    idx=rng.integers(0,len(_BOOT["X_raw"]),len(_BOOT["X_raw"]))
+    raw=_BOOT["X_raw"][idx];yb=_BOOT["y"][idx]
+    Xb=StandardScaler().fit_transform(SimpleImputer(strategy="median",keep_empty_features=True).fit_transform(raw))
+    nf,nt=_BOOT["n_feat"],_BOOT["n_targets"]
+    Sb=spearman_scores(Xb,yb);Bb=np.zeros((nf,nt));Cb=np.zeros((nf,nt));Db=np.zeros((nf,nt))
+    for j in range(nt):
+        _,coef,_,_,_=_elasticnet_target(j,raw,yb,[.03,.1,.3],[.3,.7],groups=idx)
+        Bb[:,j]=coef
+        Cb[:,j]=_et_target(j,Xb,yb,N_TREES_FULL,SEED+j)[1]
+        Db[:,j]=_lgb_oof_target(j,Xb,yb,n_estimators=LGB_FULL)[1]
+    Eb=smooth_scores(Sb,_BOOT["W"],NET_LAMBDA)
+    ranks=[rank_features(Sb,True),rank_features(Bb,True),rank_features(Cb,False),
+           rank_features(Db,False),rank_features(Eb,True)]
+    fused=np.mean(ranks,axis=0);score=1-(fused-1)/(nf-1)
+    masks=[top3_mask(r) for r in ranks]+[top3_mask(fused)]
+    for lam in [0.,.1,.2,.5]:
+        masks.append(top3_mask(rank_features(score+lam*_BOOT["prior"],False)))
+    masks.append(top3_mask(np.mean(ranks[:4],axis=0)))
+    only=fused.copy();only[~_BOOT["chemical_mask"]]=np.inf;masks.append(top3_mask(only))
+    return b,np.stack(masks).transpose(0,2,1).astype(np.uint8)
 
 
-def run_bootstrap(data: dict, net: dict, methods: dict, n_boot: int) -> dict:
-    n_feat, n_targets = methods["fused_rank"].shape
-    _BOOT.clear()
-    _BOOT.update({
-        "Xs": data["Xs"], "y": data["y_arr"], "W": net["W"],
-        "alpha": methods["alpha"], "l1": methods["l1"],
-        "n_feat": n_feat, "n_targets": n_targets,
-    })
-    t0 = time.time()
-    masks_sum = np.zeros((6, n_targets, n_feat), dtype=np.int32)
-    # Fork inherits _BOOT copy-on-write; avoids re-pickling X/y for every job.
-    ctx = mp.get_context("fork")
+def run_bootstrap(data,net,methods,n_boot):
+    import hashlib
+    nf,nt=methods["fused_rank"].shape;prior,_=build_domain_prior(data)
+    pm=np.zeros((nf,nt))
+    for j,t in enumerate(data["y"].columns):
+        for f,w in prior[t].items():pm[data["feats"].index(f),j]=w
+    chemical=~data["fm"].chemical_class.isin(["Physicochemical","Derived index"]).values
+    _BOOT.clear();_BOOT.update(X_raw=data["X"].values,y=data["y_arr"],W=net["W"],
+        n_feat=nf,n_targets=nt,prior=pm,chemical_mask=chemical)
+    labels=["A","B","C","D","E","FUSED"]+[f"DOMAIN_{x}" for x in [0.,.1,.2,.5]]+["FUSED_NO_E","COMPOUND_ONLY"]
+    counts=np.zeros((len(labels),nt,nf),dtype=np.int32);done=set();path=OUT/'bootstrap_checkpoint.npz'
+    fingerprint=hashlib.sha256(json.dumps({'provenance':provenance(),'n_boot':n_boot,
+        'trees':N_TREES_FULL,'shap_trees':LGB_FULL},sort_keys=True).encode()).hexdigest()
+    if path.exists():
+        with np.load(path,allow_pickle=False) as old:
+            if str(old['fingerprint'])==fingerprint and np.all(old['done']<n_boot):
+                counts=old['counts'];done=set(old['done'].tolist())
+    print(f'[bootstrap] same estimators and tuning in every replicate; resume {len(done)}/{n_boot}',flush=True)
+    t0=time.time();ctx=mp.get_context('fork')
     with ctx.Pool(processes=N_JOBS) as pool:
-        for i, m in enumerate(pool.imap_unordered(_bootstrap_one, range(n_boot), chunksize=1), start=1):
-            masks_sum += m
-            if i % 50 == 0 or i == n_boot:
-                elapsed = time.time() - t0
-                print(f"[bootstrap] {i}/{n_boot} replicates done, {elapsed:.1f}s "
-                      f"({elapsed / i:.2f}s/rep)", flush=True)
-    freq = masks_sum / float(n_boot)
-    labels = ["A", "B", "C", "D", "E", "FUSED"]
-    return {lab: freq[i] for i, lab in enumerate(labels)}, time.time() - t0
+        for b,m in pool.imap_unordered(_bootstrap_one,[i for i in range(n_boot) if i not in done],chunksize=1):
+            counts+=m;done.add(b)
+            if len(done)%10==0 or len(done)==n_boot:
+                np.savez_compressed(path,counts=counts,done=np.array(sorted(done)),fingerprint=fingerprint)
+                print(f'[bootstrap] {len(done)}/{n_boot}; elapsed {time.time()-t0:.1f}s',flush=True)
+    return {lab:counts[i]/n_boot for i,lab in enumerate(labels)},time.time()-t0
 
 
 # ---------------------------------------------------------------------------
@@ -975,11 +950,11 @@ def make_tables(data: dict, net: dict, methods: dict, jac_long: pd.DataFrame,
                 "freq_C": float(boot_freq["C"][j, fi]),
                 "freq_D": float(boot_freq["D"][j, fi]),
                 "freq_E": float(boot_freq["E"][j, fi]),
-                "rank_A": int(ranks["A"][fi, j]),
-                "rank_B": int(ranks["B"][fi, j]),
-                "rank_C": int(ranks["C"][fi, j]),
-                "rank_D": int(ranks["D"][fi, j]),
-                "rank_E": int(ranks["E"][fi, j]),
+                "rank_A": float(ranks["A"][fi, j]),
+                "rank_B": float(ranks["B"][fi, j]),
+                "rank_C": float(ranks["C"][fi, j]),
+                "rank_D": float(ranks["D"][fi, j]),
+                "rank_E": float(ranks["E"][fi, j]),
                 "spearman_r": float(methods["scores"]["A"][fi, j]),
                 "fdr_q": float(methods["q"][fi, j]),
                 "en_alpha": float(methods["alpha"][j]),
@@ -987,7 +962,7 @@ def make_tables(data: dict, net: dict, methods: dict, jac_long: pd.DataFrame,
                 "community": nodes.loc[f, "community"],
             }
             row["methods"] = ";".join(
-                f"{m}{int(row['rank_' + m])}" for m in METHODS)
+                f"{m}{row['rank_' + m]:g}" for m in METHODS)
             top_rows.append(row)
             stab_rows.append({
                 "target": target, "rank": rank, "feature": f,
@@ -1009,15 +984,15 @@ def make_tables(data: dict, net: dict, methods: dict, jac_long: pd.DataFrame,
                 "compound_2csv": fm.loc[f, "compound_2csv"],
                 "A_spearman": float(methods["scores"]["A"][fi, j]),
                 "A_q": float(methods["q"][fi, j]),
-                "A_rank": int(ranks["A"][fi, j]),
+                "A_rank": float(ranks["A"][fi, j]),
                 "B_coef": float(methods["scores"]["B"][fi, j]),
-                "B_rank": int(ranks["B"][fi, j]),
+                "B_rank": float(ranks["B"][fi, j]),
                 "C_importance": float(methods["scores"]["C"][fi, j]),
-                "C_rank": int(ranks["C"][fi, j]),
+                "C_rank": float(ranks["C"][fi, j]),
                 "D_mean_abs_shap": float(methods["scores"]["D"][fi, j]),
-                "D_rank": int(ranks["D"][fi, j]),
+                "D_rank": float(ranks["D"][fi, j]),
                 "E_smoothed": float(methods["scores"]["E"][fi, j]),
-                "E_rank": int(ranks["E"][fi, j]),
+                "E_rank": float(ranks["E"][fi, j]),
                 "fused_rank": float(methods["fused_rank"][fi, j]),
                 "fused_score": float(methods["fused_score"][fi, j]),
                 "consensus_signed": float(methods["consensus_signed"][fi, j]),
@@ -1079,11 +1054,11 @@ def case_table(data: dict, maps: dict, methods: dict, boot_freq: dict,
                 "fused_score": float(methods["fused_score"][fi, j]),
                 "signed_score": float(methods["consensus_signed"][fi, j]),
                 "freq_fused": float(boot_freq["FUSED"][j, fi]),
-                "rank_A": int(methods["ranks"]["A"][fi, j]),
-                "rank_B": int(methods["ranks"]["B"][fi, j]),
-                "rank_C": int(methods["ranks"]["C"][fi, j]),
-                "rank_D": int(methods["ranks"]["D"][fi, j]),
-                "rank_E": int(methods["ranks"]["E"][fi, j]),
+                "rank_A": float(methods["ranks"]["A"][fi, j]),
+                "rank_B": float(methods["ranks"]["B"][fi, j]),
+                "rank_C": float(methods["ranks"]["C"][fi, j]),
+                "rank_D": float(methods["ranks"]["D"][fi, j]),
+                "rank_E": float(methods["ranks"]["E"][fi, j]),
                 "corr6_r": c6r,
                 "in_final_top3": rank <= 3,
             })
@@ -1334,7 +1309,7 @@ def domain_tables(data: dict, maps: dict, methods: dict, boot_freq: dict,
             sel = tops[:, j]
             data_sel = set(data_top[:, j].tolist())
             overlap_data = len(set(sel.tolist()) & data_sel) / 3.0
-            stab = float(np.mean([boot_freq["FUSED"][j, f] for f in sel]))
+            stab = float(np.mean([boot_freq[f"DOMAIN_{lam}"][j, f] for f in sel]))
             mean_data_rank = float(np.mean([data_rank[f, j] for f in sel]))
             n_direct = int(sum(prior_mat[f, j] >= 1.0 for f in sel))
             # 6.csv: final overlap (only matchable compounds) and sign
@@ -1363,6 +1338,7 @@ def domain_tables(data: dict, maps: dict, methods: dict, boot_freq: dict,
                 "rank3_feature": feats[int(sel[2])],
                 "overlap_with_data_top3": overlap_data,
                 "mean_stability_fused": stab,
+                "frequency_scope": "own_prior_augmented_selector",
                 "mean_data_fused_rank": mean_data_rank,
                 "n_direct_prior_in_top3": n_direct,
                 "top3_overlap_6csv_final": overlap_final,
@@ -1400,13 +1376,14 @@ def domain_tables(data: dict, maps: dict, methods: dict, boot_freq: dict,
                                "specific" if w >= 0.7 else
                                "broad" if w >= 0.4 else
                                "proxy" if w >= 0.3 else "none"),
-                "stability_freq": float(boot_freq["FUSED"][j, f]),
+                "stability_freq": float(boot_freq[f"DOMAIN_{lam_main}"][j, f]),
+                "pure_selector_frequency": float(boot_freq["FUSED"][j,f]),
                 "data_in_top3": int(f in data_sel),
-                "rank_A": int(methods["ranks"]["A"][f, j]),
-                "rank_B": int(methods["ranks"]["B"][f, j]),
-                "rank_C": int(methods["ranks"]["C"][f, j]),
-                "rank_D": int(methods["ranks"]["D"][f, j]),
-                "rank_E": int(methods["ranks"]["E"][f, j]),
+                "rank_A": float(methods["ranks"]["A"][f, j]),
+                "rank_B": float(methods["ranks"]["B"][f, j]),
+                "rank_C": float(methods["ranks"]["C"][f, j]),
+                "rank_D": float(methods["ranks"]["D"][f, j]),
+                "rank_E": float(methods["ranks"]["E"][f, j]),
                 "spearman_r": float(methods["scores"]["A"][f, j]),
                 "corr6_r": c6r,
             }
@@ -1511,7 +1488,8 @@ def plot_network(net: dict, path_stem: str = "q2_network"):
 
 def plot_top3_stability(top3: pd.DataFrame, n_boot: int = N_BOOT,
                         path_stem: str = "q2_top3_stability"):
-    targets = top3["target"].drop_duplicates().tolist()
+    examples = ["A_malt_all", "A_hops_citrus", "A_esters_fruity", "bitterness", "diacetyl", "dms", "X4vg", "t2n", "stale_hops"]
+    targets = [t for t in examples if t in set(top3.target)]
     mat = np.full((len(targets), 3), np.nan)
     labels = np.empty((len(targets), 3), dtype=object)
     for i, t in enumerate(targets):
@@ -1522,10 +1500,10 @@ def plot_top3_stability(top3: pd.DataFrame, n_boot: int = N_BOOT,
             if len(name) > 22:
                 name = name[:20] + "…"
             labels[i, k] = f"{name}\n{r.stability_freq:.2f}"
-    fig, ax = plt.subplots(figsize=(9.2, 14.0))
+    fig, ax = plt.subplots(figsize=(11.0, 7.8))
     im = ax.imshow(mat, aspect="auto", cmap=BLUE_SEQ, vmin=0, vmax=1)
     ax.set_xticks(range(3), ["第 1 名", "第 2 名", "第 3 名"])
-    ax.set_yticks(range(len(targets)), [TARGET_CN.get(t, t) for t in targets], fontsize=6.4)
+    ax.set_yticks(range(len(targets)), [TARGET_CN.get(t, t) for t in targets], fontsize=9)
     ax.tick_params(axis="x", top=True, labeltop=True, bottom=False, labelbottom=False)
     for i in range(len(targets)):
         for k in range(3):
@@ -1533,7 +1511,7 @@ def plot_top3_stability(top3: pd.DataFrame, n_boot: int = N_BOOT,
                 continue
             txt = labels[i, k]
             color = "white" if mat[i, k] > 0.55 else INK
-            ax.text(k, i, txt, ha="center", va="center", fontsize=5.0,
+            ax.text(k, i, txt, ha="center", va="center", fontsize=8.0,
                     color=color, linespacing=0.95)
     ax.set_xticks(np.arange(-0.5, 3, 1), minor=True)
     ax.set_yticks(np.arange(-0.5, len(targets), 1), minor=True)
@@ -1544,7 +1522,7 @@ def plot_top3_stability(top3: pd.DataFrame, n_boot: int = N_BOOT,
     cb = fig.colorbar(im, ax=ax, fraction=0.025, pad=0.02)
     cb.set_label("bootstrap 入选频率（融合 Top-3）", fontsize=8)
     cb.outline.set_visible(False)
-    ax.set_title(f"最终 Top-3 化合物及其 bootstrap 稳定性（{n_boot} 次重采样）",
+    ax.set_title(f"代表维度 Top-3 化合物及其 bootstrap 稳定性（{n_boot} 次重采样）",
                  loc="left", fontsize=12, fontweight="bold", pad=28)
     _save(fig, path_stem)
 
@@ -1770,7 +1748,10 @@ def build_summary(data, net, methods, boot_freq, boot_sec, jac_mat,
     return {
         "generated": time.strftime("%Y-%m-%d %H:%M:%S"),
         "runtime_sec": round(elapsed, 1),
-        "bootstrap": {"n_boot": n_boot, "seconds": round(boot_sec, 1)},
+        "bootstrap": {"n_boot": n_boot, "seconds": round(boot_sec, 1),
+            "scope":"median/scaling refit, EN pipeline retuned, same ET and SHAP fits; given 2.csv graph fixed",
+            "trees":N_TREES_FULL,"shap_trees":LGB_FULL,"shap_scope":"descriptive_in_sample_both_point_and_bootstrap"},
+        "provenance":provenance(),
         "data": {
             "n_samples": int(data["X"].shape[0]),
             "n_features": int(data["X"].shape[1]),
@@ -1789,11 +1770,7 @@ def build_summary(data, net, methods, boot_freq, boot_sec, jac_mat,
             "mean_intra_abs_r_edges": round(float(net["stats"]["mean_intra_abs_r_edges"]), 4),
             "mean_intra_abs_r_allpairs": round(float(net["stats"]["mean_intra_abs_r_allpairs"]), 4),
             "ari_top5_vs_top10": round(float(net["ari_top5_top10"]), 4),
-            "selection_reason": ("top10 keeps all 231 compounds (no isolates), gives every "
-                                 "compound a balanced 1-hop neighbourhood for method E, and "
-                                 "retains strong modular structure (Q=0.586). |r|>=0.5 leaves "
-                                 "48 isolates; top5 has higher Q (0.703) but only 865 edges and "
-                                 "is more sensitive to single-pair correlations."),
+            "selection_reason": "Prespecified top10 descriptive graph; weak forced edges and isolates in alternative graphs are reported. Not optimized or inferred to improve prediction.",
             "hubs_top15": hubs,
         },
         "top3": {
@@ -1806,7 +1783,7 @@ def build_summary(data, net, methods, boot_freq, boot_sec, jac_mat,
             "n_targets_all3_freq_ge_0.8": n_all3_80,
             "n_targets_any_freq_ge_0.8": n_any3_80,
             "stability_thresholds": stability_thresholds,
-            "mean_freq_by_method": {
+            "mean_freq_by_method_on_fused_top3": {
                 m: round(float(boot_freq[m][np.arange(50), topk_indices(methods["fused_rank"], 3)].mean()), 4)
                 for m in ["A", "B", "C", "D", "E", "FUSED"]
             },
@@ -1832,10 +1809,7 @@ def build_summary(data, net, methods, boot_freq, boot_sec, jac_mat,
             "delta_rank_corr": round(float(e_corr - a_corr), 4),
             "mean_top3_overlap_A": round(float(a_ov), 4),
             "mean_top3_overlap_E": round(float(e_ov), 4),
-            "conclusion": ("No improvement is possible because A is already at the "
-                           "6.csv ceiling; E moves away monotonically with lambda. "
-                           "E is kept as a family-aware ranking / audit method, not "
-                           "as evidence of better external validity."),
+            "conclusion": "Same-source correlation reconstruction is alignment checking, not independent validation; network usefulness is assessed separately by subset CV and graph sensitivity.",
         },
         "enrichment": {
             "n_significant_q05_top3": int(len(sig3)),
@@ -1845,10 +1819,7 @@ def build_summary(data, net, methods, boot_freq, boot_sec, jac_mat,
         "cases": cases,
         "domain_informed": {
             "lambda_main": domain["lambda_main"],
-            "selection_rule": ("lambda=0.5 is the smallest prespecified grid value at which "
-                               "the eponymous compounds of diacetyl, DMS and T2N all enter "
-                               "the domain-informed Top-3; it is a strong-prior scenario, "
-                               "not a causal estimate or an optimum."),
+            "selection_rule": "lambda=0.5 is a fixed strong-prior scenario. It is not tuned to force eponymous chemicals into Top-3, nor claimed optimal.",
             "prior_weights": {"direct": 1.0, "specific": 0.7,
                               "broad_family": 0.4, "physicochemical_proxy": 0.3},
             "sensitivity_aggregate": domain["aggregate"].to_dict("records"),
@@ -1876,6 +1847,68 @@ def build_summary(data, net, methods, boot_freq, boot_sec, jac_mat,
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+def subset_validation(data,net):
+    """Evaluate 3-feature sets chosen strictly inside each training fold; graph is supplied prior."""
+    rows=[];X=data["X"];Y=data["y_arr"]
+    for fold,(tr,te) in enumerate(KFold(5,shuffle=True,random_state=SEED).split(X)):
+        print(f'[subset CV] fold {fold+1}/5',flush=True)
+        raw=X.iloc[tr].reset_index(drop=True)
+        z=StandardScaler().fit_transform(SimpleImputer(strategy="median",keep_empty_features=True).fit_transform(raw))
+        inner={**data,"X":raw,"Xs":z,"y_arr":Y[tr]}
+        result=run_full_methods(inner,net)
+        schemes={"marginal":result["ranks"]["A"],"fused5":result["fused_rank"],
+                 "fused4_no_network":np.mean([result["ranks"][m] for m in METHODS[:4]],axis=0)}
+        compound_rank=result["fused_rank"].copy()
+        compound_rank[data["fm"].chemical_class.isin(["Physicochemical","Derived index"]).values]=np.inf
+        schemes["compound_only"]=compound_rank
+        for name,rank in schemes.items():
+            for j,t in enumerate(data["y"].columns):
+                cols=np.argsort(rank[:,j],kind='stable')[:3]
+                pipe=Pipeline([('impute',SimpleImputer(strategy='median',keep_empty_features=True)),
+                               ('scale',StandardScaler()),('ridge',Ridge(alpha=10.))])
+                pipe.fit(X.iloc[tr,cols],Y[tr,j]);pred=pipe.predict(X.iloc[te,cols])
+                rows.append(dict(fold=fold,method=name,target=t,r2=r2_score(Y[te,j],pred),
+                    rmse=float(np.sqrt(np.mean((Y[te,j]-pred)**2))),
+                    features=';'.join(data['feats'][c] for c in cols),
+                    scope='training_only_top3_selection_fixed_given_graph; ridge_alpha10'))
+    out=pd.DataFrame(rows);out.to_csv(OUT/'top3_prediction_cv.csv',index=False)
+    return out.groupby('method')[['r2','rmse']].mean().to_dict('index')
+
+
+def additional_tables(data,net,methods,boot_freq):
+    rows=[];ranks={"fused4_no_network":np.mean([methods['ranks'][m] for m in METHODS[:4]],axis=0)}
+    chemical=~data['fm'].chemical_class.isin(['Physicochemical','Derived index']).values
+    cr=methods['fused_rank'].copy();cr[~chemical]=np.inf;ranks['compound_only']=cr
+    for scheme,r in ranks.items():
+        key='FUSED_NO_E' if scheme=='fused4_no_network' else 'COMPOUND_ONLY'
+        for j,t in enumerate(data['y'].columns):
+            for order,i in enumerate(np.argsort(r[:,j],kind='stable')[:3],1):
+                rows.append(dict(scheme=scheme,target=t,rank=order,feature=data['feats'][i],
+                    chemical_class=data['fm'].iloc[i].chemical_class,stability_freq=boot_freq[key][j,i]))
+    pd.DataFrame(rows).to_csv(OUT/'top3_alternatives.csv',index=False)
+    records=[]
+    for lam in [0.,.1,.2,.5]:
+        for j,t in enumerate(data['y'].columns):
+            for i,f in enumerate(data['feats']):
+                records.append(dict(lambda_prior=lam,target=t,feature=f,frequency=boot_freq[f'DOMAIN_{lam}'][j,i]))
+    pd.DataFrame(records).to_csv(OUT/'mechanism_bootstrap_freq.csv',index=False)
+    # Directly measure Top-3 sensitivity, rather than inferring it from community ARI.
+    sensitivities=[]
+    for scheme,k,thr in [('top5',5,None),('top10',10,None),('abs_r_ge_0.5',None,.5)]:
+        corr=pd.DataFrame(data['corr2'].values,index=data['feats'],columns=data['feats'])
+        graph,_=build_graph(corr,data['feats'],'topk' if k else 'abs_threshold',k=k,threshold=thr)
+        W=_row_normalised_adjacency(graph,data['feats'])
+        for lam in [0.,.1,.3,.6]:
+            erank=rank_features(smooth_scores(methods['scores']['A'],W,lam),True)
+            fused=np.mean([methods['ranks'][m] for m in METHODS[:4]]+[erank],axis=0)
+            for j,t in enumerate(data['y'].columns):
+                ref=set(np.argsort(methods['fused_rank'][:,j])[:3]);sel=set(np.argsort(fused[:,j])[:3])
+                sensitivities.append(dict(scheme=scheme,lambda_smoothing=lam,target=t,
+                    top3_jaccard=len(ref&sel)/len(ref|sel)))
+    pd.DataFrame(sensitivities).to_csv(OUT/'network_top3_sensitivity.csv',index=False)
+    return pd.DataFrame(rows)
+
+
 def main():
     t_start = time.time()
     print("=" * 78, flush=True)
@@ -1899,6 +1932,10 @@ def main():
     print(f"[jaccard] mean pairwise={jac_mat[np.triu_indices(5, 1)].mean():.3f}", flush=True)
 
     boot_freq, boot_sec = run_bootstrap(data, net, methods, N_BOOT)
+    alternatives=additional_tables(data,net,methods,boot_freq)
+    primary=alternatives[alternatives.scheme.eq("compound_only")].copy()
+    primary=primary.merge(data["fm"][["feature","compound_2csv","chemical_name"]],on="feature",validate="many_to_one")
+    primary["scope"]="214 chemical candidates; 13 physicochemical and 4 derived indices excluded"
     top3_probe = topk_indices(methods["fused_rank"], 3)
     probe_freq = np.mean([boot_freq["FUSED"][j, top3_probe[:, j]] for j in range(50)])
     print(f"[bootstrap] mean fused stability of final Top-3 = {probe_freq:.3f} "
@@ -1919,8 +1956,9 @@ def main():
     domain = domain_tables(data, maps, methods, boot_freq, prior)
 
     # ---- write CSV ----
-    tables["top3"].to_csv(OUT / "top3.csv", index=False, encoding="utf-8-sig")
-    tables["stability"].to_csv(OUT / "stability.csv", index=False, encoding="utf-8-sig")
+    tables["top3"].to_csv(OUT / "top3_indicators.csv", index=False, encoding="utf-8-sig")
+    primary.to_csv(OUT / "top3.csv", index=False, encoding="utf-8-sig")
+    primary[["target","rank","feature","stability_freq","scope"]].to_csv(OUT / "stability.csv", index=False, encoding="utf-8-sig")
     tables["boot_freq"].to_csv(OUT / "bootstrap_freq.csv", index=False, encoding="utf-8-sig")
     tables["jaccard"].to_csv(OUT / "jaccard.csv", index=False, encoding="utf-8-sig")
     tables["audit"].to_csv(OUT / "method_rankings.csv", index=False, encoding="utf-8-sig")
@@ -1941,7 +1979,7 @@ def main():
     # ---- figures ----
     t0 = time.time()
     plot_network(net)
-    plot_top3_stability(tables["top3"], N_BOOT)
+    plot_top3_stability(primary, N_BOOT)
     plot_jaccard(jac_mat, jac_long)
     plot_cases(case_df)
     plot_benchmark(bench)
@@ -1952,8 +1990,26 @@ def main():
     elapsed = time.time() - t_start
     summary = build_summary(data, net, methods, boot_freq, boot_sec, jac_mat,
                             bench, enrich, tables["top3"], case_df, domain, N_BOOT, elapsed)
+    summary["indicator_top3"]=summary["top3"]
+    f=primary.stability_freq;g=primary.groupby("target").stability_freq
+    summary["top3"]={"n_targets":50,"n_entries":150,"candidate_count":214,
+        "candidate_scope":str(primary.scope.iloc[0]),"mean_stability":float(f.mean()),
+        "median_stability":float(f.median()),"n_entries_freq_ge_0.8":int((f>=.8).sum()),
+        "n_entries_freq_ge_0.5":int((f>=.5).sum()),
+        "n_targets_all3_freq_ge_0.8":int((g.min()>=.8).sum()),
+        "n_targets_all3_freq_ge_0.5":int((g.min()>=.5).sum())}
+    summary["jaccard"]["scope"]="all 231 indicators, descriptive method agreement"
+    summary["top3_prediction_cv"]=subset_validation(data,net)
+    summary["schema_version"]=2
+    def safe_json(x):
+        if isinstance(x,dict):return {str(k):safe_json(v) for k,v in x.items()}
+        if isinstance(x,(list,tuple)):return [safe_json(v) for v in x]
+        if isinstance(x,(float,np.floating)):return float(x) if np.isfinite(x) else None
+        if isinstance(x,np.integer):return int(x)
+        return x
+    summary=safe_json(summary)
     with open(OUT / "summary.json", "w", encoding="utf-8") as f:
-        json.dump(summary, f, ensure_ascii=False, indent=2)
+        json.dump(summary, f, ensure_ascii=False, indent=2, allow_nan=False)
     print("[summary] summary.json written", flush=True)
 
     # ---- console report ----

@@ -7,7 +7,7 @@
 
 约定：
 - 所有表以 `beer`（1-250）对齐；`beer_id` 在 4/7.csv 中被存成科学计数法，不能用于连接。
-- `1.csv` 不是整表 log10：70 个可校准化合物中 37 列 log10、33 列线性；其余列按负值判断。
+- `1.csv` 不是整表 log10：70 个可校准化合物中 37 列 log10、33 列线性；其余 161 列底数未确认，不做浓度反变换。
 - 原始附件只读，派生数据写到 data/（已 gitignore）。
 """
 
@@ -92,50 +92,32 @@ def load_raw() -> dict[str, pd.DataFrame]:
 
 
 def _classify_transform(df1: pd.DataFrame, cal: pd.DataFrame) -> pd.DataFrame:
-    """逐列判断 1.csv 的数值是 log10 还是线性浓度。
-
-    对 70 个可校准列：比较 10^x 与 x 哪个更接近 8.xlsx 的校准浓度；
-    其余列：有负值判为 log10，否则记为 unknown（建模时用分位数变换兜底）。
-    """
-    features = [c for c in df1.columns if c not in ID_COLS]
-    cal_cols = [c for c in cal.columns if c not in ID_COLS]
-    common = [c for c in features if c in cal_cols]
-
+    """Compare linear/log10/ln on positive calibrated values; never invert unknown columns."""
+    x, c = df1.set_index("beer"), cal.set_index("beer")
     rows = []
-    x = df1.set_index("beer")
-    c = cal.set_index("beer")
-    for feat in features:
-        rec = {
-            "feature": feat,
-            "in_cal_dataset": feat in cal_cols,
-            "transform": "unknown",
-            "transform_source": "unresolved",
-        }
-        if feat in common:
-            a = pd.to_numeric(x[feat], errors="coerce")
-            b = pd.to_numeric(c[feat], errors="coerce")
-            m = a.notna() & b.notna() & (b > 0)
-            if m.sum() >= 10:
-                log_ratio = b[m] / np.power(10.0, a[m].clip(-12, 12))
-                lin_ratio = b[m] / a[m].replace(0, np.nan)
-                med_log = float(np.nanmedian(log_ratio))
-                med_lin = float(np.nanmedian(lin_ratio))
-                d_log = abs(np.log10(med_log)) if med_log > 0 else 99
-                d_lin = abs(np.log10(med_lin)) if med_lin > 0 else 99
-                if d_log < 0.15 and d_log <= d_lin:
-                    rec["transform"] = "log10"
-                    rec["transform_source"] = "calibrated_table"
-                elif d_lin < 0.15 and d_lin < d_log:
-                    rec["transform"] = "linear"
-                    rec["transform_source"] = "calibrated_table"
-                rec["median_ratio_log10"] = med_log
-                rec["median_ratio_linear"] = med_lin
-        else:
-            vals = pd.to_numeric(df1[feat], errors="coerce")
-            # 未校准列：GC-MS 丰度基本是 log10；有负值直接判定，全正但值域 <12 也按 log10
-            if (vals < 0).any() or float(vals.max()) < 12:
-                rec["transform"] = "log10"
-                rec["transform_source"] = "inferred_from_range"
+    for feat in [f for f in df1 if f not in ID_COLS]:
+        rec = {"feature": feat, "in_cal_dataset": feat in c,
+               "transform": "unknown", "transform_source": "unresolved",
+               "range_hypothesis": "none"}
+        a = pd.to_numeric(x[feat], errors="coerce")
+        if feat in c:
+            v = pd.to_numeric(c[feat], errors="coerce")
+            m = a.notna() & v.notna() & (v > 0)
+            candidates = {"linear": a, "log10": 10.0**a.clip(-100,100),
+                          "ln": np.exp(a.clip(-100,100))}
+            errors = {}
+            for name, pred in candidates.items():
+                errors[name] = float(np.median(np.abs(pred[m]-v[m])/v[m]))
+                rec["median_relative_error_"+name] = errors[name]
+            best = min(errors, key=errors.get)
+            if errors[best] < 0.01:
+                rec.update(transform=best, transform_source="calibrated_positive_values")
+            zeros = v.eq(0) & a.notna()
+            rec["calibrated_zero_count"] = int(zeros.sum())
+            rec["zero_inversion_mismatch_count"] = int((candidates[best][zeros].abs()>1e-8).sum())
+            rec["positive_match_count"] = int(m.sum())
+        elif (a<0).any() or float(a.max())<12:
+            rec["range_hypothesis"] = "log_like_base_unverified"
         rows.append(rec)
     return pd.DataFrame(rows)
 
@@ -217,23 +199,64 @@ def apply_grade_cutpoints(z: pd.DataFrame | np.ndarray, cutpoints: pd.DataFrame)
     return out
 
 
-def make_preprocessor():
-    """缺失值中位数填补 + 分位数正态化；应在交叉验证训练折内 fit。"""
-    from sklearn.impute import SimpleImputer
-    from sklearn.pipeline import Pipeline
+def make_preprocessor(add_indicator=False):
+    """Fit all learned operations inside each CV split; optional all-column indicators."""
+    from sklearn.impute import SimpleImputer, MissingIndicator
+    from sklearn.pipeline import Pipeline, FeatureUnion
     from sklearn.preprocessing import QuantileTransformer
+    values = Pipeline([
+        ("imputer", SimpleImputer(strategy="median", keep_empty_features=True)),
+        ("quantile", QuantileTransformer(n_quantiles=100,
+            output_distribution="normal", random_state=42)),
+    ])
+    if add_indicator:
+        return FeatureUnion([("values", values),
+            ("missing", MissingIndicator(features="all", error_on_new=False))])
+    return values
 
-    return Pipeline(
-        [
-            ("imputer", SimpleImputer(strategy="median")),
-            (
-                "quantile",
-                QuantileTransformer(
-                    n_quantiles=200, output_distribution="normal", random_state=42
-                ),
-            ),
-        ]
-    )
+
+def scoring_card_map():
+    """52 named entries; unlabeled acetaldehyde is explicit, never silently omitted."""
+    rows=[]
+    for prefix, side, score_col in [("A", "Aroma", "Q"),("F", "Flavour", "AG")]:
+        for group, positions, names in [
+            ("malt", [7,10,12,14,16], ["all","grain","bread","cara","burn"]),
+            ("hops", [20,23,25,27,29], ["all","citrus","tropical","noble","woody"]),
+            ("esters", [33,36,38,40,42], ["all","ethac","isoaa","flower","fruity"])]:
+            for pos,name in zip(positions,names):
+                rows.append(dict(side=side, cell=f"{score_col}{pos}",
+                    item=f"{prefix}_{group}_{name}", target=f"{prefix}_{group}_{name}"))
+        rows.append(dict(side=side,cell=f"{score_col}45",
+                         item=prefix+"_acetaldehyde",target=None))
+    for side,col,items in [
+        ("Aroma","Q",[(50,"body"),(54,"bitternes"),(58,"co2"),(62,"aftertaste"),
+          (68,"dms"),(72,"metallic"),(76,"X4vg"),(82,"orange"),(86,"coriander"),
+          (90,"clove"),(94,"overall")]),
+        ("Flavour","AG",[(50,"alcohol"),(54,"sweetness"),(58,"acidity"),
+          (68,"t2n"),(72,"diacetyl"),(76,"stale_hops"),(82,"lactic"),
+          (86,"acetic"),(90,"barnyard")])]:
+        for pos,t in items:
+            rows.append(dict(side=side,cell=f"{col}{pos}",item=t,target=t))
+    out=pd.DataFrame(rows)
+    out["status"]=np.where(out.target.notna(),"continuous_label_available_relative_grade_only",
+                           "unidentifiable_no_sensory_label")
+    assert len(out)==52 and out.target.dropna().nunique()==50
+    return out
+
+
+def provenance(paths=()):
+    """Input/source fingerprints and installed package versions for each result set."""
+    import hashlib, importlib, importlib.metadata, platform
+    inputs=list(ATTACH.glob("*.csv"))+list(ATTACH.glob("*.xlsx"))
+    sources=list((ROOT/"src").glob("*.py"))
+    return {"seed":42,"python":platform.python_version(),
+        "packages":{n:importlib.import_module(module).__version__ for n,module in
+            {"numpy":"numpy","pandas":"pandas","scipy":"scipy","scikit-learn":"sklearn",
+             "lightgbm":"lightgbm","networkx":"networkx"}.items()},
+        "package_metadata":{n:importlib.metadata.version(n) for n in
+            ["numpy","pandas","scipy","scikit-learn","lightgbm","networkx"]},
+        "sha256":{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in inputs+sources+list(paths)}}
 
 
 def load_all() -> dict:
@@ -255,6 +278,9 @@ def load_all() -> dict:
     X = df1[features].apply(pd.to_numeric, errors="coerce")
     y = df4[targets].apply(pd.to_numeric, errors="coerce")
     X_cal = cal[cal_features].apply(pd.to_numeric, errors="coerce")
+
+    observed=X.corr(method="spearman").to_numpy()
+    assert np.allclose(observed, raw["corr2"].to_numpy(),atol=1e-8), "Feature/correlation positional alignment failed"
 
     return {
         **raw,

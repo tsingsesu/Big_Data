@@ -142,7 +142,7 @@ def roadmap():
         (0.34, 0.09),
         0.30,
         0.21,
-        "问题三  风格生成\n条件 copula / 最优传输\nPils→Tripel 迁移\n缺陷约束 + 感官画像",
+        "问题三  风格生成\n条件 copula / 正确高斯 OT\nPils→Tripel 迁移\n缺陷约束 + 感官画像",
         8.0,
     )
     box(
@@ -150,7 +150,7 @@ def roadmap():
         (0.74, 0.35),
         0.24,
         0.30,
-        "验证与论文\n交叉验证 / bootstrap\nMMD / 风格分类器\nLaTeX + 可复现代码",
+        "验证与论文\n交叉验证 / bootstrap\n独立留出 MMD² / 实测画像\nLaTeX + 可复现代码",
         7.8,
         fill=LIGHT,
     )
@@ -176,7 +176,7 @@ def preprocess():
     texts = [
         "8 张原始表\n1.csv … 8.xlsx",
         "以 beer 对齐\n（不用 beer_id）\n核对 250 个样本",
-        "逐列变换\n37 列 log10\n33 列线性\n161 列推断 log10",
+        "逐列变换\n37 列 log10\n33 列线性\n161 列底数未确认",
         "缺失掩码\n自然缺失 73 格\n训练折内插补",
         "模型输入\nX 250×231\ny 250×50\n22 个风格",
     ]
@@ -203,14 +203,14 @@ def q1_framework():
     ax.set_axis_off()
     title(ax, "问题一建模框架", y=0.94)
 
-    box(ax, (0.08, 0.70), 0.50, 0.18, "基线\n逐维均值 / 岭回归\n（无非线性）", 8.8)
-    box(ax, (0.08, 0.42), 0.50, 0.18, "改进\n多输出 PLS / 岭回归\n+ 缺失指示 + 风格先验", 8.8)
+    box(ax, (0.08, 0.70), 0.50, 0.18, "基线\n逐维均值 / 岭回归\n＋风格均值对照", 8.8)
+    box(ax, (0.08, 0.42), 0.50, 0.18, "改进\n五类学习器与小融合\n缺失指示/风格独立消融", 8.8)
     box(
         ax,
         (0.08, 0.14),
         0.50,
         0.18,
-        "最终\n五模型等权融合\n+ 保序校准 + 稳健 0–6",
+        "最终\n外层训练内选模型\n训练折锚定相对 0–6",
         8.8,
         fill=LIGHT,
     )
@@ -229,81 +229,107 @@ def q1_framework():
 
 
 
-def paper_result_figures():
-    """从 data/q1–q3 的已保存结果重绘论文中的 8 张数据图（标签中文、颜色保持原样）。"""
-    data = ROOT / "data"
-    if not (data / "q1" / "cv_results.csv").exists():
-        print("未找到 data/q1–q3 结果，跳过数据图重绘。")
-        return
+def validate_results():
+    """Check mathematical constraints and artifact consistency, not merely file existence."""
+    import hashlib
+    from data_utils import load_all,scoring_card_map,provenance
+    from q1 import grade_metrics_per_target
+    from q3 import gaussian_mapping,ConcentrationTransform,DEFECTS,UNIT_SCENARIOS
+    d=load_all();checks=[]
+    def passed(name):checks.append(name);print('[validate]',name,flush=True)
+    assert len(scoring_card_map())==52
+    cards=pd.read_csv(ROOT/'data/q1/card_scores.csv')
+    assert len(cards)==250*52 and cards.relative_grade.isna().sum()==500
+    assert cards.relative_grade.dropna().between(0,6).all()
+    passed('52 card items retained; 50 supervised, 2 acetaldehyde explicitly unavailable')
+    assert grade_metrics_per_target(np.array([[0],[1],[2],[3]]),np.ones((4,1),int))['qwk'][0]==0
+    passed('constant prediction with varying reference has defined zero QWK')
+    for q,repeats in [('q1',3),('q3',5)]:
+        splits=pd.read_csv(ROOT/f'data/{q}/splits.csv')
+        keys=['repeat','fold'] if q=='q1' else ['repeat']
+        for _,group in splits.groupby(keys):
+            tr=set(group.loc[group.scope=='train','beer']);te=set(group.loc[group.scope=='test','beer'])
+            assert tr.isdisjoint(te) and len(tr|te)==250
+        assert splits['repeat'].nunique()==repeats
+    passed('all Q1 outer folds and Q3 style holdouts have disjoint beer IDs')
+    q1=json.loads((ROOT/'data/q1/model_summary.json').read_text())
+    cv=pd.read_csv(ROOT/'data/q1/cv_results.csv')
+    actual=cv[(cv.model=='selected_pipeline')&(cv.target=='MACRO')].r2.mean()
+    assert np.isclose(actual,q1['models']['selected_pipeline']['macro_mean_std_over_folds']['r2']['mean'])
+    passed('Q1 summary equals fold table; all 15 selected-pipeline folds present')
+    freq=pd.read_csv(ROOT/'data/q2/bootstrap_freq.csv')
+    for col in [c for c in freq if c.startswith('freq_')]:
+        assert freq[col].between(0,1).all() and np.allclose(freq.groupby('target')[col].sum(),3)
+    mf=pd.read_csv(ROOT/'data/q2/mechanism_bootstrap_freq.csv')
+    assert np.allclose(mf.groupby(['lambda_prior','target']).frequency.sum(),3)
+    merged=mf[mf.lambda_prior==0].merge(freq,on=['target','feature'])
+    assert np.allclose(merged.frequency,merged.freq_fused)
+    passed('each bootstrap selector has exactly three expected selections; zero prior equals pure selector')
+    q2=json.loads((ROOT/'data/q2/summary.json').read_text());assert q2['bootstrap']['n_boot']==500
+    primary=pd.read_csv(ROOT/'data/q2/top3.csv')
+    assert len(primary)==150 and primary.groupby('target').size().eq(3).all()
+    assert not primary.chemical_class.isin(['Physicochemical','Derived index']).any()
+    assert primary.stability_freq.between(0,1).all()
+    assert np.isclose(primary.stability_freq.mean(),q2['top3']['mean_stability'])
+    passed('Q2 150 primary chemical entries exclude physicochemical/derived indices and use all 500 resamples')
+    a=np.array([[2.,.6],[.6,1.]]);b=np.array([[1.,-.3],[-.3,3.]])
+    ot=gaussian_mapping(a,b);wc=gaussian_mapping(a,b,False)
+    assert np.allclose(ot,ot.T) and np.allclose(ot@a@ot.T,b)
+    assert np.trace(a+b-2*ot@a)<=np.trace(a+b-2*wc@a)+1e-8
+    passed('noncommuting Gaussian OT is symmetric, matches covariance, and costs no more than WC')
+    x=np.array([[.2,2.],[.4,3.],[.5,4.],[.8,6.]])
+    z1=ConcentrationTransform().fit(x).transform(x)
+    x[:,0]*=1000;z2=ConcentrationTransform().fit(x).transform(x)
+    assert np.allclose(z1,z2)
+    passed('dimensionless concentration geometry is invariant to consistent unit conversion')
+    profiles=pd.read_csv(ROOT/'data/q3/transfer_profiles.csv')
+    for scenario,t2n in UNIT_SCENARIOS.items():
+        sub=profiles[profiles.unit_scenario==scenario]
+        source=sub[sub.variant=='source'].set_index('sample_id')
+        strict=sub[sub.variant=='strict'].set_index('sample_id').loc[source.index]
+        excess=sub[sub.variant=='excess'].set_index('sample_id').loc[source.index]
+        for name,(col,tau) in DEFECTS.items():
+            tau=t2n if name=='T2N' else tau
+            assert np.all(strict[col]<=source[col]+1e-9) and np.all(strict[col]<=tau+1e-9)
+            assert np.all(np.maximum(excess[col]-tau,0)<=np.maximum(source[col]-tau,0)+1e-9)
+    passed('exported spectra satisfy strict and excess constraints in both unit scenarios')
+    metrics=pd.read_csv(ROOT/'data/q3/metrics.csv')
+    assert len(metrics)==5*3*10 and np.isfinite(metrics.select_dtypes('number')).all().all()
+    assert metrics['scope'].eq('heldout_real_reference_all_parameters_train_only').all()
+    gen=pd.read_csv(ROOT/'data/q3/generated_profiles.csv')
+    assert len(gen)==3*8*300 and np.isfinite(gen[d['cal_features']]).all().all()
+    assert gen[d['cal_features']].ge(0).all().all()
+    passed('Q3 heldout metrics and final descriptive spectra have distinct scopes and finite values')
+    for q,file in [('q1','model_summary.json'),('q2','summary.json'),('q3','summary.json')]:
+        report=json.loads((ROOT/'data'/q/file).read_text())
+        for path,sha in report['provenance']['sha256'].items():
+            if path.startswith('附件/'):
+                assert hashlib.sha256((ROOT/path).read_bytes()).hexdigest()==sha
+    passed('all result summaries match the unchanged raw attachment fingerprints')
+    out={'passed':True,'checks':checks,'provenance':provenance(),
+         'limits':['No original absolute sensory grades','T2N unit not resolved','No stale_hops guarantee','No brewing feasibility guarantee']}
+    (ROOT/'data/processed/revision_validation.json').write_text(json.dumps(out,ensure_ascii=False,indent=2))
+    return out
 
-    import q1
-    import q2
-    import q3
 
-    # q1/q2/q3 模块在导入时会设置各自的 rcParams；这里统一改成中文字体。
-    plt.rcParams["font.family"] = "Noto Serif CJK JP"
-    plt.rcParams["axes.unicode_minus"] = False
-
-    # ---- Q1 ----
-    cv = pd.read_csv(data / "q1" / "cv_results.csv")
-    q1.plot_target_heatmap(cv, "blend_avg")
-    miss = pd.read_csv(data / "q1" / "missingness.csv")
-    q1.plot_missingness(miss, "blend_avg")
-
-    # ---- Q2 ----
-    nodes = pd.read_csv(data / "q2" / "network_nodes.csv")
-    edges = pd.read_csv(data / "q2" / "network_edges.csv")
-    G = nx.Graph()
-    for _, r in nodes.iterrows():
-        G.add_node(r["feature"])
-    for _, r in edges.iterrows():
-        G.add_edge(r["source"], r["target"], weight=float(r["r"]))
-    s2 = json.loads((data / "q2" / "summary.json").read_text(encoding="utf-8"))
-    net = {"G": G, "nodes": nodes, "stats": {"modularity": s2["network"]["modularity"]}}
-    q2.plot_network(net)
-    top3 = pd.read_csv(data / "q2" / "top3.csv")
-    q2.plot_top3_stability(top3, n_boot=int(s2["bootstrap"]["n_boot"]))
-    jac = pd.read_csv(data / "q2" / "jaccard.csv")
-    methods = q2.METHODS
-    mat = np.zeros((len(methods), len(methods)))
-    for i, a in enumerate(methods):
-        for j, b in enumerate(methods):
-            sub = jac[(jac.method_i == a) & (jac.method_j == b)]
-            mat[i, j] = float(sub["jaccard"].mean()) if len(sub) else (1.0 if a == b else np.nan)
-    for i in range(len(methods)):
-        mat[i, i] = 1.0
-        for j in range(i + 1, len(methods)):
-            mat[j, i] = mat[i, j]
-    q2.plot_jaccard(mat, jac)
-
-    # ---- Q3 ----
-    s3 = json.loads((data / "q3" / "summary.json").read_text(encoding="utf-8"))
-    gen_metrics = {}
-    for key, val in s3["generation"]["metrics"].items():
-        model, style = key.split("|", 1)
-        gen_metrics[(model, style)] = val
-    q3.plot_mmd_classifier(gen_metrics)
-    tr = s3["transfer"]
-    q3.plot_transfer_defects(
-        tr["metrics"], tr["pils_stale_proxy_p75"], tr["tripel_stale_proxy_p75"]
-    )
-    ports = pd.read_csv(data / "q3" / "portraits.csv")
-    target_cols = [c for c in ports.columns if c not in ("kind", "model", "style", "sample_id")]
-    real_med = {
-        st: ports[(ports.kind == "real") & (ports["style"] == st)][target_cols].median().values
-        for st in q3.TARGET_STYLES
-    }
-    gen_med = {}
-    for st in q3.TARGET_STYLES:
-        for model in ["copula", "ot", "ot_constrained"]:
-            sub = ports[(ports.kind == "generated") & (ports.model == model) & (ports["style"] == st)]
-            gen_med[(model, st)] = sub[target_cols].median().values
-    q3.plot_radar({"targets": target_cols}, gen_med, real_med)
+def main():
+    """Single sequential entry point; no parallel user terminals or hidden logs."""
+    import argparse,subprocess,sys
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--pipeline',action='store_true',help='run profile, external, Q1, Q2, Q3 sequentially, then concept figures')
+    parser.add_argument('--validate',action='store_true',help='verify final tables, identities and physical proxy constraints')
+    args=parser.parse_args()
+    if args.validate:
+        validate_results();return
+    if args.pipeline:
+        for script in ['01_profile.py','02_external.py','q1.py','q2.py','q3.py']:
+            cmd=[sys.executable,str(ROOT/'src'/script)]
+            if script=='q1.py':cmd.append('--resume')
+            print('[pipeline]',script,flush=True)
+            subprocess.run(cmd,cwd=ROOT,check=True)
+        validate_results()
+    roadmap();preprocess();q1_framework()
+    print('概念图已更新；结果图由各问题脚本与结果一起生成。',flush=True)
 
 
-if __name__ == "__main__":
-    roadmap()
-    preprocess()
-    q1_framework()
-    paper_result_figures()
-    print("已输出概念图（中文黑白）与数据图（中文标签、保留原配色）")
+if __name__=='__main__':main()

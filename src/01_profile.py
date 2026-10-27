@@ -36,6 +36,12 @@ IMG.mkdir(exist_ok=True)
 OUT.mkdir(parents=True, exist_ok=True)
 
 sns.set_theme(style="whitegrid", context="paper", palette="colorblind")
+from matplotlib import font_manager
+_cjk_font = Path('/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc')
+if _cjk_font.exists():
+    font_manager.fontManager.addfont(str(_cjk_font))
+plt.rcParams.update({'font.family': 'Noto Sans CJK JP', 'axes.unicode_minus': False, 'pdf.fonttype': 42})
+
 plt.rcParams.update({"figure.dpi": 150, "savefig.dpi": 300, "font.size": 9})
 
 
