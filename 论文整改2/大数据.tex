@@ -25,6 +25,8 @@
 
 % ==================== 图表 ====================
 \usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{longtable}
@@ -140,7 +142,7 @@
 \end{center}
 
 针对商用啤酒的化学特征、感官响应与风格生成问题，本文从尺度核验与任务可识别性出发，建立由简单基线到模型比较的流程。
-附件实测 \textbf{250 款酒、231 个化学与理化特征、50 个标准化感官响应}；70 个可校准特征中 \textbf{37 列支持 log10、33 列支持线性}，
+附件实测 \textbf{250 种啤酒、231 个化学与理化特征、50 个标准化感官响应}；70 个可校准特征中 \textbf{37 列支持 log10、33 列支持线性}，
 其余 161 列不作未经验证的浓度反演。外部评论数据仅用于 22 个风格的语义校验，不作逐酒标签补充。
 
 问题一采用\textbf{训练内预处理、选参与选型的嵌套交叉验证}，比较 Ridge、PLS2、ExtraTrees、RandomForest、LightGBM 及融合。
@@ -242,30 +244,54 @@ Ehrlich 降解生成酯类与高级醇；酒花添加带来萜烯、萜醇与异
 
 \subsection{技术路线}
 
-三问采用同一套组织方式：先给出可复现的简单基线，再针对基线的具体缺陷逐层改进，最后在同一数据划分上用对照说明每一层改进是否必要。三问的技术路线见表~\ref{tab:roadmap}。
+本文按“数据处理—感官预测—关联分析—风格生成与迁移”的顺序展开。
+首先统一样本、评分项目与特征尺度；问题一建立化合物到感官响应及相对等级的映射，
+问题二分析各感官维度对应的化合物候选及其稳定性，问题三进一步研究给定风格的谱生成、感官画像与缺陷约束迁移。
+各问内部由基线与候选方法展开，再用对应的验证说明结果的适用范围，研究思路见图~\ref{fig:roadmap}。
 
-\begin{table}[H]
-  \centering
-  \caption{三问的技术路线}
-  \label{tab:roadmap}
-  \footnotesize
-  \begin{tabularx}{\textwidth}{@{}l >{\hsize=0.82\hsize}X >{\hsize=1.12\hsize}X >{\hsize=1.06\hsize}X@{}}
-    \toprule
-    问题 & 基线 & 改进 & 最终方案 \\
-    \midrule
-    问题一 & 总体均值与风格均值 & 多输出正则化与树模型比较 & 训练内选型的等权融合与相对等级 \\
-    问题二 & 边际关联排序 & Top-10 并集加权图与一跳平滑 & 五类排序的秩融合与全流程重采样 \\
-    问题三 & 经验行重采样与噪声注入 & 条件高斯 copula 与收缩相关 & 高斯最优传输与超阈值程度约束 \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-三问共享同一份原始数据与 \file{beer} 对齐结果，但本文按不同任务进行对应的预处理：问题一的插补与分位数变换在每个内层、外层训练集内重新估计；问题二在每次重采样中重新插补、缩放与选参；问题三在每个风格留出的训练部分拟合尺度、协方差与分位数上限。这一点与“统一预处理后再建模”的做法不同，目的是让每一问的结论只依赖它自己的训练信息。
-
-全文安排如下：第~\ref{sec:preprocess}~章给出符号约定、尺度核验、缺失处理与外部数据的使用范围；
-第~\ref{sec:q1}~章至第~\ref{sec:q3}~章分别回答问题一至问题三；
-第~\ref{sec:conclusion}~章总结结论、建议与局限。
-%有图就删去上面一段，暂时保留
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  >=Stealth,
+  stage/.style={rectangle,draw=black,line width=0.55pt,minimum height=1.05cm,text width=1.4cm,align=center,font=\fontsize{9}{12}\selectfont,inner sep=3pt},
+  methodnode/.style={rectangle,draw=black,line width=0.45pt,minimum height=1.05cm,text width=2.85cm,align=center,font=\fontsize{9}{12}\selectfont,inner sep=3pt},
+  pathline/.style={->,line width=0.55pt}
+]
+\node[stage] (data) at (0,0) {数据\\处理};
+\node[methodnode] (n00) at (3.0,0) {样本对齐\\评分项目映射};
+\draw[pathline] (data) -- (n00);
+\node[methodnode] (n01) at (6.4,0) {逐列尺度核验\\校准与原始特征区分};
+\draw[pathline] (n00) -- (n01);
+\node[methodnode] (n02) at (9.8,0) {训练内缺失处理\\按任务插补与变换};
+\draw[pathline] (n01) -- (n02);
+\node[stage] (q1) at (0,-2.05) {问题一\\感官分级};
+\draw[pathline] (data) -- (q1);
+\node[methodnode] (n10) at (3.0,-2.05) {总体与风格基线\\正则化及树模型比较};
+\draw[pathline] (q1) -- (n10);
+\node[methodnode] (n11) at (6.4,-2.05) {训练内选型与融合\\连续感官响应预测};
+\draw[pathline] (n10) -- (n11);
+\node[methodnode] (n12) at (9.8,-2.05) {相对0--6分级\\缺失压力测试};
+\draw[pathline] (n11) -- (n12);
+\node[stage] (q2) at (0,-4.1) {问题二\\风味关联};
+\draw[pathline] (q1) -- (q2);
+\node[methodnode] (n20) at (3.0,-4.1) {给定相关图\\化合物社区结构};
+\draw[pathline] (q2) -- (n20);
+\node[methodnode] (n21) at (6.4,-4.1) {五类方法秩融合\\逐维Top-3化合物};
+\draw[pathline] (n20) -- (n21);
+\node[methodnode] (n22) at (9.8,-4.1) {500次重采样\\稳定性与化学审查};
+\draw[pathline] (n21) -- (n22);
+\node[stage] (q3) at (0,-6.15) {问题三\\生成迁移};
+\draw[pathline] (q2) -- (q3);
+\node[methodnode] (n30) at (3.0,-6.15) {风格条件生成\\copula与收缩相关};
+\draw[pathline] (q3) -- (n30);
+\node[methodnode] (n31) at (6.4,-6.15) {化合物谱与感官画像\\分层留出对照};
+\draw[pathline] (n30) -- (n31);
+\node[methodnode] (n32) at (9.8,-6.15) {高斯最优传输\\超阈值程度约束};
+\draw[pathline] (n31) -- (n32);
+\end{tikzpicture}
+\caption{论文研究思路与技术路线}
+\label{fig:roadmap}
+\end{figure}
 
 % ==================== 2 数据预处理 ====================
 \section{数据预处理}

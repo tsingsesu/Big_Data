@@ -312,13 +312,90 @@ def validate_results():
     return out
 
 
+def paper_figures(roadmap_only=False):
+    """Export the in-paper TikZ diagram and R/Gephi result figures."""
+    import hashlib,subprocess,tempfile,shutil,re
+    from PIL import Image,ImageChops
+    from data_utils import load_all,TARGET_CN
+    from q3 import ConcentrationTransform
+    dest=IMG/'img_used';dest.mkdir(exist_ok=True)
+    work=ROOT/'data/processed/paper_plot_data';work.mkdir(exist_ok=True)
+    # The preview is rendered from the exact TikZ included in section 1.4.
+    source=ROOT/'论文整改2/大数据.tex';tex=source.read_text()
+    tikz=re.search(r'\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}',tex,re.S).group()
+    with tempfile.TemporaryDirectory(dir=ROOT/'tmp',prefix='paper-render-') as td:
+        td=Path(td);doc=r'''\documentclass[UTF8]{ctexart}
+\usepackage[paperwidth=14.5cm,paperheight=8.8cm,margin=3mm]{geometry}
+\usepackage{tikz}\usetikzlibrary{arrows.meta,positioning,calc}
+\begin{document}\pagestyle{empty}\noindent
+'''+tikz+r'\end{document}'
+        (td/'route.tex').write_text(doc)
+        subprocess.run(['xelatex','-interaction=batchmode','-halt-on-error','route.tex'],cwd=td,check=True)
+        subprocess.run(['/usr/bin/pdftoppm','-r','450','-png','-singlefile',str(td/'route.pdf'),str(td/'route')],check=True)
+        im=Image.open(td/'route.png').convert('RGB');box=ImageChops.difference(im,Image.new('RGB',im.size,'white')).getbbox()
+        box=(max(0,box[0]-20),max(0,box[1]-20),min(im.width,box[2]+20),min(im.height,box[3]+20))
+        im.crop(box).save(dest/'01_技术路线.png',dpi=(450,450))
+    if roadmap_only:return
+    D=load_all();targets=D['targets'];label=lambda t:TARGET_CN.get(t,t).replace('-总体','').replace('4-乙烯基愈创木酚','4VG').replace('反-2-壬烯醛','T2N')
+    pd.DataFrame({'target':targets,'label':[label(t) for t in targets],'order':range(50)}).to_csv(work/'targets.csv',index=False)
+    cv=pd.read_csv(ROOT/'data/q1/cv_results.csv')
+    cv[cv.target.ne('MACRO')].groupby(['target','model'],sort=False)[['r2','rmse','mae','spearman']].mean().reset_index().to_csv(work/'q1_metrics.csv',index=False)
+    cols=D['cal_features'];pre=ConcentrationTransform().fit(D['X_cal'].values)
+    obs=D['X_cal'].copy();obs.insert(0,'style',np.asarray(D['styles']));obs.to_csv(work/'calibrated.csv',index=False)
+    gen=pd.read_csv(ROOT/'data/q3/generated_profiles.csv');meta=D['feature_meta'].set_index('feature');rows=[]
+    for style in ['Tripel','Kriek','Lambic']:
+        real=D['X_cal'].loc[np.asarray(D['styles'])==style].values
+        fake=gen[gen['style'].eq(style)&gen.generator.eq('copula')][cols].values
+        for kind,values in [('real',real),('generated',fake)]:
+            for c,v in zip(cols,np.median(pre.transform(values),axis=0)):
+                name=str(meta.loc[c,'compound_2csv']);rows.append(dict(feature=c,compound=name,style=style,kind=kind,value=v))
+    pd.DataFrame(rows).to_csv(work/'chemical_medians.csv',index=False)
+    ports=pd.read_csv(ROOT/'data/q3/portraits.csv');rows=[]
+    for style in ['Tripel','Kriek','Lambic']:
+        for kind,model in [('real','observed'),('generated','copula')]:
+            values=ports[ports['style'].eq(style)&ports.kind.eq(kind)&ports.model.eq(model)][targets]
+            q=values.quantile([.25,.5,.75])
+            for t in targets:rows.append(dict(style=style,kind=kind,target=t,q25=q.loc[.25,t],median=q.loc[.5,t],q75=q.loc[.75,t]))
+    pd.DataFrame(rows).to_csv(work/'sensory_profiles.csv',index=False)
+    # Per-beer proxy errors and profile deviations share a fixed observed Tripel reference.
+    reference=ports[ports.kind.eq('real')&ports['style'].eq('Tripel')][targets].median()
+    rows=[];errors=[]
+    for model,g in ports[ports.kind.eq('transfer')].groupby('model'):
+        for t in targets:rows.append(dict(model=model,target=t,delta=g[t].median()-reference[t]))
+        rmse=np.sqrt(((g[targets]-reference)**2).mean(axis=1))
+        for i,v in zip(g.sample_id,rmse):errors.append(dict(model=model,beer=int(i),rmse=v))
+    pd.DataFrame(rows).to_csv(work/'transfer_deltas.csv',index=False);pd.DataFrame(errors).to_csv(work/'transfer_beer_errors.csv',index=False)
+    # Gephi's own graphstore and ForceAtlas2 provide the network layout.
+    nodes=pd.read_csv(ROOT/'data/q2/network_nodes.csv');edges=pd.read_csv(ROOT/'data/q2/network_edges.csv')
+    nodes[['feature']].to_csv(work/'gephi_nodes.tsv',sep='\t',index=False)
+    edges[['source','target','abs_r']].to_csv(work/'gephi_edges.tsv',sep='\t',index=False)
+    gephi=Path('/home/tsingsesu/桌面/gephi-0.11.3');layout=work/'gephi_layout.csv'
+    config={'node_sha':hashlib.sha256((work/'gephi_nodes.tsv').read_bytes()).hexdigest(),'edge_sha':hashlib.sha256((work/'gephi_edges.tsv').read_bytes()).hexdigest(),'java_sha':hashlib.sha256((ROOT/'src/GephiLayout.java').read_bytes()).hexdigest(),'seed':42,'iterations':1200,'threads':1}
+    key=work/'gephi_layout_config.json'
+    if not layout.exists() or not key.exists() or json.loads(key.read_text())!=config:
+        jars=[str(p) for p in gephi.rglob('*.jar') if 'locale' not in p.parts]
+        with tempfile.TemporaryDirectory(dir=ROOT/'tmp',prefix='gephi-build-') as td:
+            subprocess.run(['javac','-d',td,str(ROOT/'src/GephiLayout.java')],check=True)
+            java=str(next(gephi.glob('jre-x64/*/bin/java')))
+            subprocess.run([java,'-Djava.awt.headless=true','-cp',':'.join([td]+jars),'GephiLayout',str(work/'gephi_nodes.tsv'),str(work/'gephi_edges.tsv'),str(layout)],check=True)
+        key.write_text(json.dumps(config,indent=2))
+    subprocess.run(['Rscript',str(ROOT/'src/paper_figures.R'),str(ROOT)],check=True)
+    data_inputs=list((ROOT/'data/q1').glob('*.csv'))+list((ROOT/'data/q2').glob('*.csv'))+list((ROOT/'data/q3').glob('*.csv'))
+    report={'date':'2026-10-29','tools':{'01':'TikZ embedded in section 1.4','03':'retained original PNG','05':'Gephi 0.11.3 ForceAtlas2 layout and R rendering','other_figures':'R 4.6.1 base graphics and Cairo'},'sources':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in [source,Path(__file__),ROOT/'src/paper_figures.R',ROOT/'src/GephiLayout.java']},'input_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in data_inputs},'output_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in dest.glob('*.png')},'formats':['png'],'titles':False,'seed':42,'no_new_model_fitting':True}
+    (ROOT/'data/processed/paper_figures.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+    print('TikZ、R 与 Gephi 论文用图已更新。',flush=True)
+
+
 def main():
     """Single sequential entry point; no parallel user terminals or hidden logs."""
     import argparse,subprocess,sys
     parser=argparse.ArgumentParser()
     parser.add_argument('--pipeline',action='store_true',help='run profile, external, Q1, Q2, Q3 sequentially, then concept figures')
     parser.add_argument('--validate',action='store_true',help='verify final tables, identities and physical proxy constraints')
+    parser.add_argument('--paper',nargs='?',const='all',choices=['all','roadmap'],help='export PNG paper figures; use --paper roadmap for the exposition diagram only')
     args=parser.parse_args()
+    if args.paper:
+        paper_figures(roadmap_only=args.paper=='roadmap');return
     if args.validate:
         validate_results();return
     if args.pipeline:

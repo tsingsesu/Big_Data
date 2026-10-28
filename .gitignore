@@ -16,8 +16,7 @@ cache/
 
 # 日志 / 临时
 *.log
-tmp/
-temp/
+
 
 # LaTeX 中间文件
 *.aux
