@@ -8,15 +8,7 @@
 
 \usepackage{fancyhdr}
 \usepackage{lastpage}
-\pagestyle{fancy}
-\fancyhf{}
-\cfoot{第\,\thepage\,页\quad 共\,\pageref{LastPage}\,页}
-\renewcommand{\headrulewidth}{0pt}
-\fancypagestyle{plain}{%
-  \fancyhf{}%
-  \cfoot{第\,\thepage\,页\quad 共\,\pageref{LastPage}\,页}%
-  \renewcommand{\headrulewidth}{0pt}%
-}
+
 
 % ==================== 数学 ====================
 \usepackage{amsmath}
@@ -176,6 +168,8 @@ Tripel、Kriek、Lambic 三风格等权平均的 copula $\mathrm{MMD}^2$ 为 \te
 
 \newpage
 \pagestyle{fancy}
+\fancyhead{} % 清空页眉所有文字
+\renewcommand{\headrulewidth}{0pt} % 去掉页眉那条横线
 \pagenumbering{arabic}
 \setcounter{page}{1}
 
