@@ -1,0 +1,12 @@
+# Python 3.10.12；在独立虚拟环境安装，不修改系统环境。
+numpy==2.2.6
+scipy==1.15.3
+pandas==2.2.3
+scikit-learn==1.5.2
+networkx==3.3
+statsmodels==0.14.4
+lightgbm==4.5.0
+openpyxl==3.1.5
+joblib==1.6.0
+Pillow==12.3.0
+tqdm==4.66.5

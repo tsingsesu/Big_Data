@@ -17,20 +17,20 @@
 ```text
 提交文件夹/
 ├── 支撑材料/                     准备压缩上传的目录
-│   ├── README.md                 本说明的随包副本
-│   ├── requirements.txt          Python 依赖版本
+│   ├── 使用说明.md                 本说明的随包说明
+│   ├── 依赖清单.txt          Python 依赖版本
 │   ├── 文件清单.json             随包文件的 SHA256 校验值
 │   ├── 环境与验收.json           环境、裁剪范围与实际验证记录
 │   ├── src/
-│   │   ├── 00_figures.py          统一运行、重绘与校验入口
-│   │   ├── data_utils.py          附件读取、对齐、元数据、变换与分级工具
-│   │   ├── 01_profile.py          数据概况、变换表和跨表一致性统计
-│   │   ├── 02_external.py         外部数据清洗、风格映射及外部校验
-│   │   ├── q1.py                 问题一求解与验证
-│   │   ├── q2.py                 问题二网络、Top-3和稳定性分析
-│   │   ├── q3.py                 问题三条件生成与约束迁移
-│   │   ├── paper_figures.R       仅保留03、05、17–21的绘图代码
-│   │   └── GephiLayout.java      Gephi ForceAtlas2布局适配器
+│   │   ├── 00_统一运行.py          统一运行、重绘与校验入口
+│   │   ├── 公共数据处理.py          附件读取、对齐、元数据、变换与分级工具
+│   │   ├── 01_数据预处理.py          数据概况、变换表和跨表一致性统计
+│   │   ├── 02_外部数据处理.py         外部数据清洗、风格映射及外部校验
+│   │   ├── 问题一_感官评分.py                 问题一求解与验证
+│   │   ├── 问题二_化合物关联.py                 问题二网络、Top-3和稳定性分析
+│   │   ├── 问题三_风味生成与迁移.py                 问题三条件生成与约束迁移
+│   │   ├── 论文配图.R       仅保留03、05、17–21的绘图代码
+│   │   └── 化合物网络布局.java      Gephi ForceAtlas2布局适配器
 │   ├── data/
 │   │   ├── q1/                  完整评分、OOF预测、划分及评价结果
 │   │   ├── q2/                  完整候选、网络、频率与合理性诊断
@@ -51,53 +51,53 @@
 
 |内容|主要文件|口径|
 |---|---|---|
-|Q1完整评分|`data/q1/card_scores.csv`|250款酒×52个卡片位置，共13000行；相对等级，不是恢复出的原始人工分数|
-|Q1连续预测与等级|`data/q1/oof_predictions.csv`|250款酒的OOF连续预测及等级；卡片映射见`card_mapping.csv`|
-|Q1验证|`cv_results.csv`、`grade_metrics.csv`、`missingness.csv`、`splits.csv`、`model_summary.json`|保留每折、缺失情景、模型对照与汇总|
-|Q2正式Top-3|`data/q2/top3.csv`|50个感官维度×3，共150项；仅化学候选|
-|Q2共表达网络|`network_nodes.csv`、`network_edges.csv`、`network_communities.csv`|231节点、1683边、8社区|
-|Q2稳定性与诊断|`stability.csv`、`bootstrap_freq.csv`、`jaccard.csv`、`method_rankings.csv`、`summary.json`等|正式化学候选与全指标诊断有不同作用域，勿混用|
-|Q3生成化合物谱|`data/q3/generated_profiles.csv`|3风格×8方法×300条，共7200条70维生成谱|
-|Q3感官画像|`data/q3/portraits.csv`|实测、生成和迁移画像，通过`kind`、`model`、`sample_id`区分|
-|Q3迁移化合物谱|`data/q3/transfer_profiles.csv`|11款源酒×6方案×2种T2N单位情景，共132条|
-|Q3验证与约束|`metrics.csv`、`sensory_cv.csv`、`transfer_metrics.csv`、`splits.csv`、`summary.json`等|独立留出指标与全量拟合后的描述性产物分开保存|
+|Q1完整评分|`data/q1/完整评分卡.csv`|250款酒×52个卡片位置，共13000行；相对等级，不是恢复出的原始人工分数|
+|Q1连续预测与等级|`data/q1/折外预测.csv`|250款酒的OOF连续预测及等级；卡片映射见`评分卡栏位映射.csv`|
+|Q1验证|`交叉验证结果.csv`、`等级评价指标.csv`、`缺失情景评价.csv`、`样本划分.csv`、`模型结果汇总.json`|保留每折、缺失情景、模型对照与汇总|
+|Q2正式Top-3|`data/q2/前三关键化合物.csv`|50个感官维度×3，共150项；仅化学候选|
+|Q2共表达网络|`网络节点.csv`、`网络连边.csv`、`网络社区.csv`|231节点、1683边、8社区|
+|Q2稳定性与诊断|`关键化合物稳定性.csv`、`自助重采样入选频率.csv`、`方法间入选集合相似度.csv`、`各方法候选排名.csv`、`结果汇总.json`等|正式化学候选与全指标诊断有不同作用域，勿混用|
+|Q3生成化合物谱|`data/q3/生成化合物谱.csv`|3风格×8方法×300条，共7200条70维生成谱|
+|Q3感官画像|`data/q3/感官画像.csv`|实测、生成和迁移画像，通过`kind`、`model`、`sample_id`区分|
+|Q3迁移化合物谱|`data/q3/迁移化合物谱.csv`|11款源酒×6方案×2种T2N单位情景，共132条|
+|Q3验证与约束|`生成评价指标.csv`、`感官预测交叉验证.csv`、`迁移评价指标.csv`、`样本划分.csv`、`结果汇总.json`等|独立留出指标与全量拟合后的描述性产物分开保存|
 
 A题没有提供独立计算结果上传表的固定列模板，本次保留完整CSV而不另造“官方格式”。若报名系统另有结果文件模板，队长按其要求选择或整理这些结果后上传。
 
 ## 如何运行
 
-所有命令都在 **`提交文件夹/支撑材料/`** 中执行；若阅读解压后的随包README，即在该README所在目录执行。已验证环境为Linux、Python 3.10.12；Python依赖固定在`requirements.txt`。
+所有命令都在 **`提交文件夹/支撑材料/`** 中执行；若阅读解压后的随包使用说明，即在该说明所在目录执行。已验证环境为Linux、Python 3.10.12；Python依赖固定在`依赖清单.txt`。
 
 建议在独立虚拟环境准备依赖，不修改机器的系统Python：
 
 ```bash
 python3 -m venv ../运行环境
 source ../运行环境/bin/activate
-python -m pip install -r requirements.txt
+python -m pip install -r 依赖清单.txt
 ```
 
 赛题原始数据不在上传包中。将官方1–8附件放在一个目录，通过`--attachments`指定；下例的`/path/to/官方附件`需要替换成真实路径。也可设置`BEER_ATTACHMENT_DIR`，程序只读该目录。
 
 ```bash
 # 快速核对本次交付文件，无需官方附件
-python src/00_figures.py --verify
+python src/00_统一运行.py --verify
 
 # 核对已有数值结果、数据划分与缺陷约束
-python src/00_figures.py --validate --attachments /path/to/官方附件
+python src/00_统一运行.py --validate --attachments /path/to/官方附件
 
 # 仅运行核心数据处理与外部校验
-python src/00_figures.py --profile --attachments /path/to/官方附件
+python src/00_统一运行.py --profile --attachments /path/to/官方附件
 
 # 每问独立运行；均使用正式实验默认参数
-python src/00_figures.py --question q1 --attachments /path/to/官方附件
-python src/00_figures.py --question q2 --attachments /path/to/官方附件
-python src/00_figures.py --question q3 --attachments /path/to/官方附件
+python src/00_统一运行.py --question q1 --attachments /path/to/官方附件
+python src/00_统一运行.py --question q2 --attachments /path/to/官方附件
+python src/00_统一运行.py --question q3 --attachments /path/to/官方附件
 
 # 仅重绘保留的七图，也可写 --figures 03,05
-python src/00_figures.py --figures --attachments /path/to/官方附件
+python src/00_统一运行.py --figures --attachments /path/to/官方附件
 
 # 一条命令从预处理到三问求解、七图及结果校验
-python src/00_figures.py --pipeline --attachments /path/to/官方附件
+python src/00_统一运行.py --pipeline --attachments /path/to/官方附件
 ```
 
 完整重算会覆盖相应`data/`结果，建议在解压副本中运行。Q1默认3次重复×5折，Q2默认500次bootstrap，Q3默认5次风格内留出、每风格每方法生成300条；均保留随机种子42。Q1保留恢复计算逻辑，Q2并行数可用`Q2_NJOBS`控制。不要将缩减次数的调试结果当作正式结果。
@@ -107,24 +107,26 @@ python src/00_figures.py --pipeline --attachments /path/to/官方附件
 若只用随包的已保存绘图数据重绘七图、不重新计算派生数据，可直接运行，无需赛题原始附件：
 
 ```bash
-Rscript src/paper_figures.R . 03,05,17,18,19,20,21
+Rscript src/论文配图.R . 03,05,17,18,19,20,21
 ```
 
 重新计算Gephi布局的命令为：
 
 ```bash
-python src/00_figures.py --figures 05 --rebuild-layout --attachments /path/to/官方附件
+python src/00_统一运行.py --figures 05 --rebuild-layout --attachments /path/to/官方附件
 ```
 
 ## 外部数据与结果解释
 
-外部数据为Stephen Polozoff的[Beer Information – Tasting Profiles](https://www.kaggle.com/datasets/stephenpolozoff/top-beer-information)，公开许可为[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。2026-10-29复核Kaggle元数据为版本3。保留原外部CSV及字段说明，新增了风格映射、质量筛选、词频比例化与风格聚合：5558行中4760行能映射，质量筛选后4492行用于22种风格的外部校验；不进入Q1或Q3训练。原实验记录见`data/external/provenance.json`，本次许可复核见`source_metadata.json`。
+外部数据为Stephen Polozoff的[Beer Information – Tasting Profiles](https://www.kaggle.com/datasets/stephenpolozoff/top-beer-information)，公开许可为[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。2026-10-29复核Kaggle元数据为版本3。保留原外部CSV及字段说明，新增了风格映射、质量筛选、词频比例化与风格聚合：5558行中4760行能映射，质量筛选后4492行用于22种风格的外部校验；不进入Q1或Q3训练。原实验记录见`data/external/数据来源记录.json`，本次许可复核见`外部来源与许可.json`。
 
 必须保留以下解释：Q1有50项可监督响应，两项乙醛没有感官标签，不能补造分数；Q2的候选关联不等于因果；Q3的T2N单位仍保留双情景，四类直接化合物的约束不代表已保证stale hops，感官代理预测不等于真实品评。05的C1–C8为按规模降序编号的Louvain社区，节点大小随度增加；20/21雷达图采用统一实测参考下的百分位，19的前两主成分仅解释约28.3%。
 
+支撑材料内全部文件采用中文名称；目录层级保留原结构。Python导入、R读写、Java类名与命令已同步更新。三问结果中的历史程序指纹仍记录原实验文件名，不改写历史来源；旧名与中文名的对应关系见`环境与验收.json`。
+
 ## 本次整理验证
 
-已在现有项目依赖中运行预处理、外部校验、数值验收及七图重绘；七图与开发目录最新图片逐字节一致。88个核心函数或类与原程序保持相同AST，旧绘图函数已移除，主流程仅裁剪旧图调用及调整可移植路径。原始数据、原模型结果和队友论文均未改动。
+已在现有项目依赖中运行预处理、外部校验、数值验收及七图重绘；七图与开发目录最新图片逐字节一致。88个核心函数或类在规范化文件名后计算逻辑与改名前一致，旧绘图函数已移除，主流程仅裁剪旧图调用及调整可移植路径；中文文件名的入口分发、模块导入和外部ZIP文件名映射均已核验。原始数据、原模型结果和队友论文均未改动。
 
 本次未重新训练完整Q1–Q3实验，未做从零安装依赖的验证，也未在打包阶段重新运行Gephi引擎。`文件清单.json`用于核对交付快照；完整重算后运行时间、程序指纹等可能变化，应再用`--validate`检查数值，不把重新生成校验值当作结果验证。
 
