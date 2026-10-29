@@ -1,6 +1,3 @@
-# AI辅助：OpenAI Codex，OpenAI，2026-10-29；具体模型版本待参赛队核对。
-# 本次仅整理运行入口、路径和可视化范围，核心计算保留原程序；更早的AI参与见使用详情说明。
-"""数据预处理；加--plots可在三问计算完成后准备七张论文图的数据。"""
 import sys
 from pathlib import Path
 import numpy as np

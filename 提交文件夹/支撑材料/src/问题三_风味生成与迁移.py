@@ -1,11 +1,3 @@
-# AI辅助：OpenAI Codex，OpenAI，2026-10-29；具体模型版本待参赛队核对。
-# 本次仅整理运行入口、路径和可视化范围，核心计算保留原程序；更早的AI参与见使用详情说明。
-"""Q3: train-only conditional generation and constrained Gaussian transport.
-
-在支撑材料目录、已安装依赖的独立Python环境中运行。
-Default: five repeated within-style holdouts; final all-data spectra are descriptive.
-T2N units are unresolved: retain both attachment-mg/L and alternative-ug/L scenarios.
-"""
 from __future__ import annotations
 import argparse, time, warnings
 from pathlib import Path
@@ -51,7 +43,6 @@ def gaussian_mapping(source_cov, target_cov, optimal=True):
     return inv @ sqrt_psd(s @ target_cov @ s) @ inv
 
 class ConcentrationTransform:
-    """Training median imputation, dimensionless log1p(c/c0), training z-score."""
 
     def fit(self, X):
         X = np.asarray(X, float)

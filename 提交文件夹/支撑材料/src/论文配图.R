@@ -1,5 +1,3 @@
-# AI辅助：OpenAI Codex，OpenAI，2026-10-29；具体模型版本待参赛队核对。
-# 只保留03、05、17–21；模型计算与本文件分离。
 args <- commandArgs(trailingOnly=TRUE)
 root <- normalizePath(args[1]); setwd(root)
 selected <- if(length(args)>1) strsplit(args[2],",",fixed=TRUE)[[1]] else c("03","05","17","18","19","20","21")

@@ -1,6 +1,3 @@
-# AI辅助：OpenAI Codex，OpenAI，2026-10-29；具体模型版本待参赛队核对。
-# 本次仅整理运行入口、路径和可视化范围，核心计算保留原程序；更早的AI参与见使用详情说明。
-"""外部风格级数据校验；外部数据不进入Q1/Q3训练，不生成额外图片。"""
 from pathlib import Path
 import numpy as np
 import pandas as pd

@@ -150,7 +150,7 @@ points(p$x,p$y,pch=21,bg=pal[match(n$community,g)],col=adjustcolor("#344B58",.7)
 keynames<-c("DMS","X2.3.butanedione","X4VG","ethanol..v.v.")
 keylabels<-c("DMS","双乙酰","4VG","乙醇")
 for(i in seq_along(keynames)) {
- j<-match(keynames[i],n$feature);if(!is.na(j))text(p$x[j],p$y[j],keylabels[i],pos=ifelse(p$x[j]>0,4,2),cex=.65,offset=.6)
+ j<-match(keynames[i],n$feature);if(!is.na(j))text(p$x[j],p$y[j],keylabels[i],pos=ifelse(p$x[j]>0,4,2),cex=.65*1.4,offset=.6)
 }
 legend("bottomleft",legend=paste(g,as.integer(table(factor(n$community,g))),sep=" · "),col=pal,pch=16,bty="n",ncol=4,cex=.62,xpd=NA)
 par(mar=c(3.0,4.7,.25,.4));ct<-table(n$chemical_class,n$community)
@@ -682,17 +682,18 @@ if("21" %in% selected) {
                 z[z$kind=="transfer"&z$model=="attachment_mg_L_source",],
                 z[z$kind=="real"&z$style=="Tripel",],
                 z[z$kind=="transfer"&z$model=="attachment_mg_L_raw",])
+ transfer_colors<-c("#176FC1","#E58620","#159579","#9361B5")
  openfig("21_Q3迁移画像与缺陷",8.8,7.3);par(oma=c(.2,.25,.65,.25))
  layout(rbind(c(1,2),c(3,3),c(4,5),c(6,6)),heights=c(3.45,.55,2.65,.55))
  par(cex=1)
  for(k in 1:2) {
   values<-t(sapply(profiles,function(a)a$percentile[match(dims[[k]],a$target)]))
-  radar_panel(values,labels[[k]],c(blue,orange,green,"#929BA0"),lty=c(1,1,2,3),
-              fill=c(adjustcolor(blue,.12),adjustcolor(orange,.07),NA,NA))
+  radar_panel(values,labels[[k]],transfer_colors,lty=c(1,1,2,3),
+              fill=c(adjustcolor(transfer_colors[1],.12),adjustcolor(transfer_colors[2],.07),NA,NA))
   mtext(c("a  香气与风味","b  口感与整体")[k],3,line=.1,cex=.98)
  }
  par(mar=c(0,0,0,0));plot.new()
- legend("center",legend=c("主约束迁移","源酒","Tripel 参考","原始 OT"),col=c(blue,orange,green,"#929BA0"),
+ legend("center",legend=c("主约束迁移","源酒","Tripel 参考","原始 OT"),col=transfer_colors,
         lty=c(1,1,2,3),lwd=c(1.8,1.35,1.35,1.35),bty="n",horiz=TRUE,cex=.86)
  for(k in 1:2) {
   scenario<-c("attachment_mg_L","alternative_ug_L")[k]
@@ -706,14 +707,14 @@ if("21" %in% selected) {
   })
   par(mar=c(2.8,3.7,1.7,.65))
   mid<-barplot(t(counts),beside=TRUE,names.arg=c("DMS","双乙酰","4VG","T2N"),
-               col=c("#AEB7BD",blue),border=NA,ylim=c(0,13),yaxt="n",cex.names=.85,space=c(.15,.9))
+               col=transfer_colors[c(4,1)],border=NA,ylim=c(0,13),yaxt="n",cex.names=.85,space=c(.15,.9))
   axis(2,at=c(0,3,6,9,11),las=1,cex.axis=.78)
-  text(mid,as.numeric(t(counts))+.55,as.integer(t(counts)),cex=.9,col=rep(c("#697780",blue),4))
+  text(mid,as.numeric(t(counts))+.55,as.integer(t(counts)),cex=.9,col=rep(transfer_colors[c(4,1)],4))
   mtext("恶化酒样数",2,line=2.35,cex=.84,las=0)
   mtext(c("c  T2N 按附件 mg/L","d  T2N 按替代 μg/L")[k],3,line=.4,adj=0,cex=.94)
  }
  par(mar=c(0,0,0,0));plot.new()
- legend("center",legend=c("原始 OT","主约束迁移"),fill=c("#AEB7BD",blue),border=NA,bty="n",horiz=TRUE,cex=.88)
+ legend("center",legend=c("原始 OT","主约束迁移"),fill=transfer_colors[c(4,1)],border=NA,bty="n",horiz=TRUE,cex=.88)
  closefig()
 }
 cat("R version: ",R.version.string,"; graphics: Cairo\n")

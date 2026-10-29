@@ -1,31 +1,3 @@
-# AI辅助：OpenAI Codex，OpenAI，2026-10-29；具体模型版本待参赛队核对。
-# 本次仅整理运行入口、路径和可视化范围，核心计算保留原程序；更早的AI参与见使用详情说明。
-"""Q2: compound co-expression network -> sensory Top-3 compounds + stability + chemistry.
-
-Run:
-    python src/问题二_化合物关联.py
-
-Outputs:
-    data/q2/*.csv
-    绘图数据由01_数据预处理.py --plots准备，图形由论文配图.R生成。
-
-Design notes
-------------
-* 2.csv is verified as Spearman; the given graph is fixed during bootstrap.
-* 1.csv supplies the 250 x 231 abundance matrix; 4.csv supplies 50 sensory targets.
-* Five ranking methods are kept side by side for audit:
-  A marginal Spearman (BH-FDR within each target)
-  B per-target ElasticNet with train-only preprocessing and grouped 3-fold pipeline CV
-  C per-target ExtraTrees impurity importance
-  D per-target LightGBM descriptive mean |SHAP|, identical point/bootstrap fits
-  E network-smoothed marginal correlation (own + 1-hop neighbours)
-* Primary Top-3 restricts A-E Borda fusion to 214 chemical candidates; all-indicator results are diagnostic.
-* Stability: 500 bootstrap resamples of the 250 beers; A-E are rerun with
-  identical estimator budgets, refit preprocessing and retuned ElasticNet; the graph is fixed.
-* 6.csv is used as an external consistency check only for the 44 compounds
-  that can be matched by name.  It is NOT an independent data source: it is
-  computed from the same 250 beers, so method A reproduces it almost exactly.
-"""
 from __future__ import annotations
 import json
 import multiprocessing as mp

@@ -1,16 +1,5 @@
-# AI辅助：OpenAI Codex，OpenAI，2026-10-29；具体模型版本待参赛队核对。
-# 本次仅整理运行入口、路径和可视化范围，核心计算保留原程序；更早的AI参与见使用详情说明。
-"""数据加载与预处理：统一读取附件 1-8，构建建模用 X / y / 风格 / 元数据。
-
-用法：
-    from 公共数据处理 import load_all
-    D = load_all()
-    X, y = D["X"], D["y"]
-
-约定：
-- 所有表以 `beer`（1-250）对齐；`beer_id` 在 4/7.csv 中被存成科学计数法，不能用于连接。
-- `1.csv` 不是整表 log10：70 个可校准化合物中 37 列 log10、33 列线性；其余 161 列底数未确认，不做浓度反变换。
-- 原始附件只读，派生数据写到 data/（已 gitignore）。
+"""
+数据加载与预处理：统一读取附件 1-8，构建建模用 X / y / 风格 / 元数据。
 """
 
 from __future__ import annotations
@@ -30,7 +19,6 @@ PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 ID_COLS = ["beer", "beer_id", "tasting_category_fine"]
 STYLE_COL = "tasting_category_fine"
 
-# 图表用中文标签：感官维度与模型名（逻辑不变，仅显示用）
 TARGET_CN = {
     "A_malt_all": "麦芽香-总体", "A_malt_grain": "麦芽香-谷物",
     "A_malt_bread": "麦芽香-面包", "A_malt_cara": "麦芽香-焦糖",
@@ -133,7 +121,6 @@ def build_meta(raw: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
     compounds = list(raw["corr2"].columns)
     assert len(features) == len(compounds) == 231, (len(features), len(compounds))
 
-    # 1.csv 的特征顺序与 2.csv 的化合物顺序逐位一致（已核对 212 个可匹配名称）
     feats = pd.DataFrame({"feature": features, "compound_2csv": compounds})
 
     meta_cols = [
@@ -156,7 +143,6 @@ def build_meta(raw: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
     transforms = _classify_transform(df1, raw["cal"])
     feats = feats.merge(transforms, on="feature", how="left", validate="one_to_one")
 
-    # 目标元数据：只取 trained panel（4.csv 的 50 个目标）
     tmeta = snames[snames["dataset"] == "Trained panel"][
         ["R_name", "Category", "CleanName_Paper", "CleanName_PanelFeedback", "DataType"]
     ].drop_duplicates("R_name")

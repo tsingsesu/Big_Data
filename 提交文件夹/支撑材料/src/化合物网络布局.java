@@ -1,4 +1,3 @@
-// AI辅助：OpenAI Codex，OpenAI，2026-10-29；具体模型版本待参赛队核对。
 import java.nio.file.*;
 import java.nio.charset.StandardCharsets;
 import java.lang.reflect.*;

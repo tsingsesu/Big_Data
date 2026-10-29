@@ -1,16 +1,3 @@
-# AI辅助：OpenAI Codex，OpenAI，2026-10-29；具体模型版本待参赛队核对。
-# 本次仅整理运行入口、路径和可视化范围，核心计算保留原程序；更早的AI参与见使用详情说明。
-"""Q1: 数据缺失条件下的感官评分。
-
-把 1.csv 的 231 个化学特征映射到 4.csv 的 50 个感官维度：
-- 连续预测：RepeatedKFold(5 folds x 3 repeats)，折内 fit 预处理器；
-- 基线：均值、Ridge、PLS；主模型：ExtraTrees、RandomForest、LightGBM、OOF 堆叠；
-- 0-6 分级：训练折稳健 min-max（预设主方案）、quantile、Gaussian latent（敏感性）；
-- 缺失鲁棒性：自然缺失 + MCAR 5/10/20/30% + 分位数驱动 MAR。
-
-运行：
-    python src/问题一_感官评分.py
-"""
 from __future__ import annotations
 import json
 import time
