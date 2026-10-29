@@ -9,9 +9,9 @@ blue <- "#376E91"; orange <- "#BD7546"; green <- "#45857A"; gray <- "#A9AFB5"
 div <- colorRampPalette(c("#365D80","#F7F7F4","#BB754B"))(151)
 shortlabel <- function(x,n) {x<-gsub("[()（）]","",x);ifelse(nchar(x)>n,paste0(substr(x,1,n-1),"…"),x)}
 seqcol <- colorRampPalette(c("#F5F7F8","#A9C8D9","#325E82"))(151)
-openfig <- function(name,w=7.6,h=8.5,pointsize=11) {
+openfig <- function(name,w=7.6,h=8.5) {
   png(file.path(out,paste0(name,".png")),width=w,height=h,units="in",res=450,
-      type="cairo",family="Noto Serif CJK SC",pointsize=pointsize,bg="white")
+      type="cairo",family="Noto Serif CJK SC",pointsize=11,bg="white")
   par(col.axis="#20272D",col.lab="#20272D",fg="#20272D",las=1,tcl=-.2,lwd=.65,
       mgp=c(1.8,.45,0),cex.axis=.8,cex.lab=.85,xaxs="i",yaxs="i")
 }
@@ -80,8 +80,9 @@ closefig()
 if("03" %in% selected) {
  cards<-read("data/q1/card_scores.csv");mapping<-read("data/q1/card_mapping.csv")
  gradecol<-c("#F7FAFC","#CCE2F0","#91BCD8","#5594BD","#256C9F","#104571","#041A36")
- openfig("03_Q1评分示例",7.6*1.4,7.4*1.4,pointsize=11*1.4);par(family="Noto Sans CJK SC")
+ openfig("03_Q1评分示例",7.6,7.4)
  layout(matrix(c(1,2,3,3),2,2,byrow=TRUE),heights=c(6.8,.6))
+ par(cex=1,oma=c(.15,0,.25,0))
  for(side in c("Aroma","Flavour")) {
   mp<-mapping[mapping$side==side,];d<-cards[cards$side==side & cards$beer%in%1:3,]
   M<-matlong(d,"item","beer","relative_grade",mp$item,as.character(1:3))
@@ -89,7 +90,7 @@ if("03" %in% selected) {
   labels[is.na(labels)]<-"乙醛"
   par(mar=c(2.5,7.2,2.2,.5));heat(M,labels,NULL,c(0,6),gradecol)
   axis(1,at=1:3,labels=paste("Beer",1:3),tick=FALSE,las=1,cex.axis=.85)
-  mtext(paste(side,"卡片栏位"),3,line=.7,cex=1.0,font=2)
+  mtext(paste(side,"卡片栏位"),3,line=.7,cex=.95)
   for(i in seq_len(nrow(M)))for(j in 1:3)text(j,i,ifelse(is.finite(M[i,j]),as.character(as.integer(M[i,j])),"NA"),cex=.9,col=ifelse(is.finite(M[i,j]) && M[i,j]>=4,"white","#12202A"))
  }
  par(mar=c(2,.2,.2,.2));plot.new();plot.window(xlim=c(-1.4,8.4),ylim=c(0,1))
@@ -145,7 +146,7 @@ pad <- function(x) range(x)+c(-1,1)*diff(range(x))*.035
 par(mar=c(.9,.15,.15,.15));plot(p$x,p$y,type="n",axes=FALSE,xlab="",ylab="",asp=1,xlim=pad(p$x),ylim=pad(p$y))
 a<-match(e$source,n$feature);b<-match(e$target,n$feature)
 segments(p$x[a],p$y[a],p$x[b],p$y[b],col=adjustcolor("#71808A",.16),lwd=.25+.55*e$abs_r)
-points(p$x,p$y,pch=21,bg=pal[match(n$community,g)],col=adjustcolor("#344B58",.7),lwd=.55,cex=.78+.18*sqrt(n$degree))
+points(p$x,p$y,pch=21,bg=pal[match(n$community,g)],col=adjustcolor("#344B58",.7),lwd=.55,cex=1.4*(.42+.10*sqrt(n$degree)))
 keynames<-c("DMS","X2.3.butanedione","X4VG","ethanol..v.v.")
 keylabels<-c("DMS","双乙酰","4VG","乙醇")
 for(i in seq_along(keynames)) {
