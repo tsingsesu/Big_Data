@@ -9,9 +9,9 @@ blue <- "#376E91"; orange <- "#BD7546"; green <- "#45857A"; gray <- "#A9AFB5"
 div <- colorRampPalette(c("#365D80","#F7F7F4","#BB754B"))(151)
 shortlabel <- function(x,n) {x<-gsub("[()（）]","",x);ifelse(nchar(x)>n,paste0(substr(x,1,n-1),"…"),x)}
 seqcol <- colorRampPalette(c("#F5F7F8","#A9C8D9","#325E82"))(151)
-openfig <- function(name,w=7.6,h=8.5) {
+openfig <- function(name,w=7.6,h=8.5,pointsize=11) {
   png(file.path(out,paste0(name,".png")),width=w,height=h,units="in",res=450,
-      type="cairo",family="Noto Serif CJK SC",pointsize=11,bg="white")
+      type="cairo",family="Noto Serif CJK SC",pointsize=pointsize,bg="white")
   par(col.axis="#20272D",col.lab="#20272D",fg="#20272D",las=1,tcl=-.2,lwd=.65,
       mgp=c(1.8,.45,0),cex.axis=.8,cex.lab=.85,xaxs="i",yaxs="i")
 }
@@ -79,21 +79,21 @@ closefig()
 # 03: the saved scoring cards, with a short grade legend only.
 if("03" %in% selected) {
  cards<-read("data/q1/card_scores.csv");mapping<-read("data/q1/card_mapping.csv")
- gradecol<-c("#F3F7FA","#DCEAF3","#B6D3E4","#86B6CC","#5897B8","#337FA3","#195274")
- openfig("03_Q1评分示例",7.6,7.4);par(family="Noto Sans CJK SC")
+ gradecol<-c("#F7FAFC","#CCE2F0","#91BCD8","#5594BD","#256C9F","#104571","#041A36")
+ openfig("03_Q1评分示例",7.6*1.4,7.4*1.4,pointsize=11*1.4);par(family="Noto Sans CJK SC")
  layout(matrix(c(1,2,3,3),2,2,byrow=TRUE),heights=c(6.8,.6))
  for(side in c("Aroma","Flavour")) {
   mp<-mapping[mapping$side==side,];d<-cards[cards$side==side & cards$beer%in%1:3,]
   M<-matlong(d,"item","beer","relative_grade",mp$item,as.character(1:3))
   labels<-labs[match(mp$target,targets)];labels[grepl("_all$",mp$item)]<-paste0(labels[grepl("_all$",mp$item)],"-总体")
   labels[is.na(labels)]<-"乙醛"
-  par(mar=c(2.5,9.7,.4,.4));heat(M,labels,NULL,c(0,6),gradecol)
+  par(mar=c(2.5,7.2,2.2,.5));heat(M,labels,NULL,c(0,6),gradecol)
   axis(1,at=1:3,labels=paste("Beer",1:3),tick=FALSE,las=1,cex.axis=.85)
-  mtext(paste(side,"卡片栏位"),2,line=8.6,cex=.9,las=0)
-  for(i in seq_len(nrow(M)))for(j in 1:3)text(j,i,ifelse(is.finite(M[i,j]),as.character(as.integer(M[i,j])),"NA"),cex=.9,col=ifelse(is.finite(M[i,j]) && M[i,j]>=4,"white","#223442"))
+  mtext(paste(side,"卡片栏位"),3,line=.7,cex=1.0,font=2)
+  for(i in seq_len(nrow(M)))for(j in 1:3)text(j,i,ifelse(is.finite(M[i,j]),as.character(as.integer(M[i,j])),"NA"),cex=.9,col=ifelse(is.finite(M[i,j]) && M[i,j]>=4,"white","#12202A"))
  }
  par(mar=c(2,.2,.2,.2));plot.new();plot.window(xlim=c(-1.4,8.4),ylim=c(0,1))
- rect(0:6,.5,1:7,.9,col=gradecol,border="white",lwd=.4)
+ rect(0:6+.035,.5,1:7-.035,.9,col=gradecol,border="white",lwd=.5)
  axis(1,at=(0:6)+.5,labels=0:6,pos=.5,cex.axis=.8);mtext("相对等级",1,line=.6,cex=.9)
  closefig()
 }
