@@ -35,7 +35,7 @@ public class GephiLayout {
         call(layout,"setScalingRatio",new Class<?>[]{Double.class},30.0);
         call(layout,"setGravity",new Class<?>[]{Double.class},1.0);
         call(layout,"setBarnesHutOptimize",new Class<?>[]{Boolean.class},false);
-        call(layout,"setLinLogMode",new Class<?>[]{Boolean.class},true);
+        call(layout,"setLinLogMode",new Class<?>[]{Boolean.class},false);
         call(layout,"setInitialisationSeed",new Class<?>[]{long.class},42L);
         call(layout,"initAlgo",new Class<?>[]{});
         for(int i=0;i<1200;i++)call(layout,"goAlgo",new Class<?>[]{});

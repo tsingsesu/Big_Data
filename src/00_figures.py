@@ -312,7 +312,7 @@ def validate_results():
     return out
 
 
-def paper_figures(roadmap_only=False):
+def paper_figures(roadmap_only=False, selected=None):
     """Export the in-paper TikZ diagram and R/Gephi result figures."""
     import hashlib,subprocess,tempfile,shutil,re
     from PIL import Image,ImageChops
@@ -320,22 +320,25 @@ def paper_figures(roadmap_only=False):
     from q3 import ConcentrationTransform
     dest=IMG/'img_used';dest.mkdir(exist_ok=True)
     work=ROOT/'data/processed/paper_plot_data';work.mkdir(exist_ok=True)
+    selected = set(selected or (["01"] if roadmap_only else [f"{i:02d}" for i in range(1,17) if i != 2]))
     # The preview is rendered from the exact TikZ included in section 1.4.
-    source=ROOT/'论文整改2/大数据.tex';tex=source.read_text()
-    tikz=re.search(r'\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}',tex,re.S).group()
-    with tempfile.TemporaryDirectory(dir=ROOT/'tmp',prefix='paper-render-') as td:
-        td=Path(td);doc=r'''\documentclass[UTF8]{ctexart}
-\usepackage[paperwidth=14.5cm,paperheight=8.8cm,margin=3mm]{geometry}
-\usepackage{tikz}\usetikzlibrary{arrows.meta,positioning,calc}
-\begin{document}\pagestyle{empty}\noindent
-'''+tikz+r'\end{document}'
-        (td/'route.tex').write_text(doc)
-        subprocess.run(['xelatex','-interaction=batchmode','-halt-on-error','route.tex'],cwd=td,check=True)
-        subprocess.run(['/usr/bin/pdftoppm','-r','450','-png','-singlefile',str(td/'route.pdf'),str(td/'route')],check=True)
-        im=Image.open(td/'route.png').convert('RGB');box=ImageChops.difference(im,Image.new('RGB',im.size,'white')).getbbox()
-        box=(max(0,box[0]-20),max(0,box[1]-20),min(im.width,box[2]+20),min(im.height,box[3]+20))
-        im.crop(box).save(dest/'01_技术路线.png',dpi=(450,450))
-    if roadmap_only:return
+    source=ROOT/'论文整改2/大数据.tex'
+    if '01' in selected:
+        source=ROOT/'论文整改2/大数据.tex';tex=source.read_text()
+        tikz=re.search(r'\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}',tex,re.S).group()
+        with tempfile.TemporaryDirectory(dir=ROOT/'tmp',prefix='paper-render-') as td:
+            td=Path(td);doc=r'''\documentclass[UTF8]{ctexart}
+    \usepackage[paperwidth=14.5cm,paperheight=12.2cm,margin=3mm]{geometry}
+    \usepackage{tikz}\usetikzlibrary{arrows.meta,positioning,calc}
+    \begin{document}\pagestyle{empty}\noindent
+    '''+tikz+r'\end{document}'
+            (td/'route.tex').write_text(doc)
+            subprocess.run(['xelatex','-interaction=batchmode','-halt-on-error','route.tex'],cwd=td,check=True)
+            subprocess.run(['/usr/bin/pdftoppm','-r','450','-png','-singlefile',str(td/'route.pdf'),str(td/'route')],check=True)
+            im=Image.open(td/'route.png').convert('RGB');box=ImageChops.difference(im,Image.new('RGB',im.size,'white')).getbbox()
+            box=(max(0,box[0]-20),max(0,box[1]-20),min(im.width,box[2]+20),min(im.height,box[3]+20))
+            im.crop(box).save(dest/'01_技术路线.png',dpi=(450,450))
+    if selected == {'01'}:return
     D=load_all();targets=D['targets'];label=lambda t:TARGET_CN.get(t,t).replace('-总体','').replace('4-乙烯基愈创木酚','4VG').replace('反-2-壬烯醛','T2N')
     pd.DataFrame({'target':targets,'label':[label(t) for t in targets],'order':range(50)}).to_csv(work/'targets.csv',index=False)
     cv=pd.read_csv(ROOT/'data/q1/cv_results.csv')
@@ -348,7 +351,7 @@ def paper_figures(roadmap_only=False):
         fake=gen[gen['style'].eq(style)&gen.generator.eq('copula')][cols].values
         for kind,values in [('real',real),('generated',fake)]:
             for c,v in zip(cols,np.median(pre.transform(values),axis=0)):
-                name=str(meta.loc[c,'compound_2csv']);rows.append(dict(feature=c,compound=name,style=style,kind=kind,value=v))
+                name=str(meta.loc[c,'compound_2csv']);rows.append(dict(feature=c,compound=name,unit=meta.loc[c,'unit'],style=style,kind=kind,value=v))
     pd.DataFrame(rows).to_csv(work/'chemical_medians.csv',index=False)
     ports=pd.read_csv(ROOT/'data/q3/portraits.csv');rows=[]
     for style in ['Tripel','Kriek','Lambic']:
@@ -365,6 +368,35 @@ def paper_figures(roadmap_only=False):
         rmse=np.sqrt(((g[targets]-reference)**2).mean(axis=1))
         for i,v in zip(g.sample_id,rmse):errors.append(dict(model=model,beer=int(i),rmse=v))
     pd.DataFrame(rows).to_csv(work/'transfer_deltas.csv',index=False);pd.DataFrame(errors).to_csv(work/'transfer_beer_errors.csv',index=False)
+    # Representative generated rows are selected near their own generated centre,
+    # without selecting for agreement with the observed target distribution.
+    chemistry_examples=[];sensory_examples=[]
+    for style in ['Tripel','Kriek','Lambic']:
+        candidates=gen[gen['style'].eq(style)&gen.generator.eq('copula')]
+        z=pre.transform(candidates[cols].values)
+        choice=int(np.argmin(((z-np.median(z,axis=0))**2).sum(axis=1)))
+        example=candidates.iloc[choice];sample=example.sample_id
+        chemistry_examples.append(dict(style=style,sample_id=sample,**{c:float(example[c]) for c in cols}))
+        portrait=ports[ports.kind.eq('generated')&ports.model.eq('copula')&ports['style'].eq(style)&ports.sample_id.eq(sample)]
+        if len(portrait)!=1:raise ValueError('Generated spectrum/portrait sample identity is not unique')
+        sensory_examples.append(dict(style=style,sample_id=sample,**{t:float(portrait.iloc[0][t]) for t in targets}))
+    pd.DataFrame(chemistry_examples).to_csv(work/'generated_example_chemistry.csv',index=False)
+    pd.DataFrame(sensory_examples).to_csv(work/'generated_example_sensory.csv',index=False)
+    transfer=pd.read_csv(ROOT/'data/q3/transfer_profiles.csv');rows=[]
+    target_reference=D['X_cal'].loc[np.asarray(D['styles'])=='Tripel'].median()
+    for scenario,group in transfer.groupby('unit_scenario'):
+        for sample_id in sorted(group.sample_id.unique()):
+            source_row=group[group.sample_id.eq(sample_id)&group.variant.eq('source')].iloc[0]
+            moved_row=group[group.sample_id.eq(sample_id)&group.variant.eq('excess')].iloc[0]
+            for feature in cols:
+                unit=meta.loc[feature,'unit']
+                unit='—' if pd.isna(unit) else str(unit).replace('ug/L','μg/L')
+                if feature=='X.E..2.nonenal' and scenario=='alternative_ug_L':unit='μg/L'
+                rows.append(dict(unit_scenario=scenario,beer=int(sample_id),feature=feature,
+                                 compound=meta.loc[feature,'compound_2csv'],unit=unit,
+                                 source=float(source_row[feature]),transferred=float(moved_row[feature]),
+                                 tripel_reference=float(target_reference[feature])))
+    pd.DataFrame(rows).to_csv(work/'transfer_concentrations.csv',index=False)
     # Gephi's own graphstore and ForceAtlas2 provide the network layout.
     nodes=pd.read_csv(ROOT/'data/q2/network_nodes.csv');edges=pd.read_csv(ROOT/'data/q2/network_edges.csv')
     nodes[['feature']].to_csv(work/'gephi_nodes.tsv',sep='\t',index=False)
@@ -379,10 +411,15 @@ def paper_figures(roadmap_only=False):
             java=str(next(gephi.glob('jre-x64/*/bin/java')))
             subprocess.run([java,'-Djava.awt.headless=true','-cp',':'.join([td]+jars),'GephiLayout',str(work/'gephi_nodes.tsv'),str(work/'gephi_edges.tsv'),str(layout)],check=True)
         key.write_text(json.dumps(config,indent=2))
-    subprocess.run(['Rscript',str(ROOT/'src/paper_figures.R'),str(ROOT)],check=True)
+    subprocess.run(['Rscript',str(ROOT/'src/paper_figures.R'),str(ROOT),','.join(sorted(selected-{'01'}))],check=True)
     data_inputs=list((ROOT/'data/q1').glob('*.csv'))+list((ROOT/'data/q2').glob('*.csv'))+list((ROOT/'data/q3').glob('*.csv'))
-    report={'date':'2026-10-29','tools':{'01':'TikZ embedded in section 1.4','03':'retained original PNG','05':'Gephi 0.11.3 ForceAtlas2 layout and R rendering','other_figures':'R 4.6.1 base graphics and Cairo'},'sources':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in [source,Path(__file__),ROOT/'src/paper_figures.R',ROOT/'src/GephiLayout.java']},'input_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in data_inputs},'output_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in dest.glob('*.png')},'formats':['png'],'titles':False,'seed':42,'no_new_model_fitting':True}
-    (ROOT/'data/processed/paper_figures.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+    report={'date':'2026-10-29','tools':{'01':'TikZ embedded in section 1.4','03':'R/Cairo scoring-card plot with shortened legend','05':'Gephi 0.11.3 ForceAtlas2 layout and R rendering','other_figures':'R 4.6.1 base graphics and Cairo'},'sources':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in [source,Path(__file__),ROOT/'src/paper_figures.R',ROOT/'src/GephiLayout.java']},'input_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in data_inputs},'output_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in dest.glob('*.png')},'formats':['png'],'titles':False,'seed':42,'no_new_model_fitting':True}
+    manifest=ROOT/'data/processed/paper_figures.json'
+    previous=json.loads(manifest.read_text()) if manifest.exists() else {}
+    previous.update(report)
+    previous['last_rendered_figures']=sorted(selected)
+    previous.setdefault('quality_review',{}).update(status='pending',pending_figures=sorted(selected))
+    manifest.write_text(json.dumps(previous,ensure_ascii=False,indent=2))
     print('TikZ、R 与 Gephi 论文用图已更新。',flush=True)
 
 
@@ -392,10 +429,12 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--pipeline',action='store_true',help='run profile, external, Q1, Q2, Q3 sequentially, then concept figures')
     parser.add_argument('--validate',action='store_true',help='verify final tables, identities and physical proxy constraints')
-    parser.add_argument('--paper',nargs='?',const='all',choices=['all','roadmap'],help='export PNG paper figures; use --paper roadmap for the exposition diagram only')
+    parser.add_argument('--paper',nargs='?',const='all',help='export PNG paper figures except preserved 02; use roadmap or comma-separated IDs such as 09,12,13,14,15,16; 09b retains the interval view')
     args=parser.parse_args()
     if args.paper:
-        paper_figures(roadmap_only=args.paper=='roadmap');return
+        selected = None if args.paper in {'all','roadmap'} else set(args.paper.split(','))
+        if selected is not None and not selected <= ({f'{i:02d}' for i in range(1,17)}|{'09b'}):parser.error('figure IDs must be 01 to 16 or 09b')
+        paper_figures(roadmap_only=args.paper=='roadmap',selected=selected);return
     if args.validate:
         validate_results();return
     if args.pipeline:

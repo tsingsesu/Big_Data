@@ -244,52 +244,74 @@ Ehrlich 降解生成酯类与高级醇；酒花添加带来萜烯、萜醇与异
 
 \subsection{技术路线}
 
-本文按“数据处理—感官预测—关联分析—风格生成与迁移”的顺序展开。
-首先统一样本、评分项目与特征尺度；问题一建立化合物到感官响应及相对等级的映射，
-问题二分析各感官维度对应的化合物候选及其稳定性，问题三进一步研究给定风格的谱生成、感官画像与缺陷约束迁移。
-各问内部由基线与候选方法展开，再用对应的验证说明结果的适用范围，研究思路见图~\ref{fig:roadmap}。
+本文围绕“化学表征—感官预测—关联解释—风格构造”展开研究，技术路线如图~\ref{fig:roadmap} 所示。
+经样本对齐、尺度核验与评分项目映射形成统一数据基础后，问题一建立化学特征到感官响应的预测映射，并给出相对等级；
+问题二结合化合物网络与实测化学—感官配对，识别各维度的关键关联候选；
+问题三在70个校准指标上分别开展风格条件生成与缺陷约束迁移，再由另行训练的感官代理形成画像。
+三问依次推进预测、解释与分布构造，共享经核验的数据基础，并分别检验预测稳健性、选择稳定性及生成与迁移质量。
 
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[
   >=Stealth,
-  stage/.style={rectangle,draw=black,line width=0.55pt,minimum height=1.05cm,text width=1.4cm,align=center,font=\fontsize{9}{12}\selectfont,inner sep=3pt},
-  methodnode/.style={rectangle,draw=black,line width=0.45pt,minimum height=1.05cm,text width=2.85cm,align=center,font=\fontsize{9}{12}\selectfont,inner sep=3pt},
-  pathline/.style={->,line width=0.55pt}
+  every node/.style={font=\fontsize{9}{11.5}\selectfont},
+  process/.style={rectangle,draw=black,line width=0.45pt,minimum height=0.68cm,text width=2.85cm,align=center,inner sep=3pt},
+  compact/.style={process,minimum height=0.6cm},
+  pathline/.style={->,line width=0.5pt},
+  annotation/.style={font=\fontsize{8}{10}\selectfont,align=center}
 ]
-\node[stage] (data) at (0,0) {数据\\处理};
-\node[methodnode] (n00) at (3.0,0) {样本对齐\\评分项目映射};
-\draw[pathline] (data) -- (n00);
-\node[methodnode] (n01) at (6.4,0) {逐列尺度核验\\校准与原始特征区分};
-\draw[pathline] (n00) -- (n01);
-\node[methodnode] (n02) at (9.8,0) {训练内缺失处理\\按任务插补与变换};
-\draw[pathline] (n01) -- (n02);
-\node[stage] (q1) at (0,-2.05) {问题一\\感官分级};
-\draw[pathline] (data) -- (q1);
-\node[methodnode] (n10) at (3.0,-2.05) {总体与风格基线\\正则化及树模型比较};
-\draw[pathline] (q1) -- (n10);
-\node[methodnode] (n11) at (6.4,-2.05) {训练内选型与融合\\连续感官响应预测};
-\draw[pathline] (n10) -- (n11);
-\node[methodnode] (n12) at (9.8,-2.05) {相对0--6分级\\缺失压力测试};
-\draw[pathline] (n11) -- (n12);
-\node[stage] (q2) at (0,-4.1) {问题二\\风味关联};
-\draw[pathline] (q1) -- (q2);
-\node[methodnode] (n20) at (3.0,-4.1) {给定相关图\\化合物社区结构};
-\draw[pathline] (q2) -- (n20);
-\node[methodnode] (n21) at (6.4,-4.1) {五类方法秩融合\\逐维Top-3化合物};
-\draw[pathline] (n20) -- (n21);
-\node[methodnode] (n22) at (9.8,-4.1) {500次重采样\\稳定性与化学审查};
-\draw[pathline] (n21) -- (n22);
-\node[stage] (q3) at (0,-6.15) {问题三\\生成迁移};
-\draw[pathline] (q2) -- (q3);
-\node[methodnode] (n30) at (3.0,-6.15) {风格条件生成\\copula与收缩相关};
-\draw[pathline] (q3) -- (n30);
-\node[methodnode] (n31) at (6.4,-6.15) {化合物谱与感官画像\\分层留出对照};
-\draw[pathline] (n30) -- (n31);
-\node[methodnode] (n32) at (9.8,-6.15) {高斯最优传输\\超阈值程度约束};
-\draw[pathline] (n31) -- (n32);
+\node[process,text width=11.9cm,minimum height=0.95cm] (data) at (0,0)
+  {\textbf{数据预处理与统一表征}\\化学特征与感官响应\quad 化合物相关矩阵\quad 风格标签与感官阈值};
+
+\draw[line width=0.4pt] (-6.0,-1.2) rectangle (6.0,-3.35);
+\node[anchor=west,font=\fontsize{9}{11.5}\selectfont\bfseries] at (-5.8,-1.48)
+  {Q1\quad 感官响应预测与等级表达};
+\node[process] (xy) at (-4.35,-2.25) {化学特征与感官响应};
+\node[process] (predict) at (-0.65,-2.25) {化学—感官预测映射};
+\node[compact] (response) at (3.65,-1.98) {连续感官响应};
+\node[compact] (grade) at (3.65,-2.85) {相对0--6等级};
+\draw[pathline] (xy) -- (predict);
+\draw[pathline] (predict) -- (response.west);
+\draw[pathline] (response) -- (grade);
+\node[annotation] (cv) at (-0.65,-3.0) {嵌套交叉验证与缺失压力};
+\draw[densely dashed,line width=0.4pt] (predict.south) -- (cv.north);
+
+\draw[line width=0.4pt] (-6.0,-3.75) rectangle (6.0,-6.5);
+\node[anchor=west,font=\fontsize{9}{11.5}\selectfont\bfseries] at (-5.8,-4.03)
+  {Q2\quad 化合物关联结构与关键候选};
+\node[process] (network) at (-4.35,-4.75) {化合物关联网络};
+\node[process] (paired) at (-4.35,-5.75) {实测化学—感官配对};
+\node[process] (ranking) at (-0.65,-5.05) {多方法关联排序\\平均秩融合};
+\node[compact] (top) at (3.65,-4.75) {逐维Top-3候选};
+\node[compact] (stability) at (3.65,-5.8) {重采样稳定性\\化学合理性审查};
+\draw[pathline] (network.east) -- (ranking.west);
+\draw[pathline] (paired.east) -- (ranking.west);
+\draw[pathline] (ranking.east) -- (top.west);
+\draw[pathline] (top) -- (stability);
+
+\draw[line width=0.4pt] (-6.0,-6.75) rectangle (6.0,-10.75);
+\node[anchor=west,font=\fontsize{9}{11.5}\selectfont\bfseries] at (-5.8,-7.03)
+  {Q3\quad 校准子谱的风格生成与约束迁移};
+\node[process] (generate) at (-4.35,-7.95) {风格条件copula};
+\node[process] (spectrum) at (-0.65,-7.95) {目标风格化合物谱};
+\node[process] (ot) at (-4.35,-9.2) {{\fontsize{8}{10}\selectfont Pils/Lager$\rightarrow$Tripel}\\高斯最优传输};
+\node[process] (constraint) at (-0.65,-9.2) {直接缺陷约束投影\\超阈值程度不增加};
+\node[compact] (transfer) at (-0.65,-10.22) {约束迁移化合物谱};
+\node[process] (proxy) at (3.65,-8.6) {感官代理预测};
+\node[process] (portrait) at (3.65,-10.0) {生成与迁移感官画像};
+\draw[pathline] (generate) -- (spectrum);
+\draw[pathline] (ot) -- (constraint);
+\draw[pathline] (constraint) -- (transfer);
+\draw[pathline] (spectrum.east) -- (proxy.west);
+\draw[pathline] (transfer.east) -- (1.55,-10.22) |- (proxy.west);
+\draw[pathline] (proxy) -- (portrait);
+
+\draw[line width=0.5pt] (data.west) -- (-6.6,0) -- (-6.6,-9.0);
+\draw[pathline] (-6.6,-2.25) -- (-6.0,-2.25);
+\draw[pathline] (-6.6,-5.05) -- (-6.0,-5.05);
+\draw[pathline] (-6.6,-9.0) -- (-6.0,-9.0);
 \end{tikzpicture}
-\caption{论文研究思路与技术路线}
+\caption{数据基础与三问建模关系}
 \label{fig:roadmap}
 \end{figure}
 
