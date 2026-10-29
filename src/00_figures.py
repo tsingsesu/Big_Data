@@ -320,7 +320,7 @@ def paper_figures(roadmap_only=False, selected=None):
     from q3 import ConcentrationTransform
     dest=IMG/'img_used';dest.mkdir(exist_ok=True)
     work=ROOT/'data/processed/paper_plot_data';work.mkdir(exist_ok=True)
-    selected = set(selected or (["01"] if roadmap_only else [f"{i:02d}" for i in range(1,17) if i != 2]))
+    selected = set(selected or (["01"] if roadmap_only else [f"{i:02d}" for i in range(1,22) if i != 2]))
     # The preview is rendered from the exact TikZ included in section 1.4.
     source=ROOT/'论文整改2/大数据.tex'
     if '01' in selected:
@@ -397,6 +397,51 @@ def paper_figures(roadmap_only=False, selected=None):
                                  source=float(source_row[feature]),transferred=float(moved_row[feature]),
                                  tripel_reference=float(target_reference[feature])))
     pd.DataFrame(rows).to_csv(work/'transfer_concentrations.csv',index=False)
+    if selected & {'20','21'}:
+        # A single observed empirical reference gives all radar axes comparable percentiles.
+        radar_targets=['A_malt_all','A_hops_all','A_esters_all','F_malt_all','F_hops_all',
+                       'F_esters_all','acidity','bitternes','sweetness','alcohol','body','overall']
+        observed=ports[ports.kind.eq('real')&ports.model.eq('observed')]
+        radar_rows=[]
+        def radar_group(frame,kind,style,model):
+            values=frame[radar_targets].median()
+            for target in radar_targets:
+                reference_values=observed[target].dropna().to_numpy()
+                value=float(values[target])
+                percentile=100*(np.sum(reference_values<value)+.5*np.sum(reference_values==value))/len(reference_values)
+                radar_rows.append(dict(kind=kind,style=style,model=model,target=target,
+                                       response=value,percentile=float(percentile),n=len(frame),reference_n=len(reference_values)))
+        for style in ['Tripel','Kriek','Lambic']:
+            radar_group(observed[observed['style'].eq(style)],'real',style,'observed')
+            radar_group(ports[ports.kind.eq('generated')&ports.model.eq('copula')&ports['style'].eq(style)],
+                        'generated',style,'copula')
+        for model,frame in ports[ports.kind.eq('transfer')].groupby('model'):
+            radar_group(frame,'transfer','Tripel',model)
+        pd.DataFrame(radar_rows).to_csv(work/'radar_profiles.csv',index=False)
+    if '19' in selected:
+        from sklearn.decomposition import PCA
+        import sklearn
+        z=pre.transform(D['X_cal'].values)
+        pca=PCA(n_components=2,svd_solver='full',random_state=42).fit(z)
+        projected=[]
+        def add_projection(values,styles,samples,dataset):
+            xy=pca.transform(pre.transform(values))
+            projected.append(pd.DataFrame(dict(dataset=dataset,style=np.asarray(styles),sample_id=np.asarray(samples),
+                                              pc1=xy[:,0],pc2=xy[:,1])))
+        add_projection(D['X_cal'].values,D['styles'],D['meta']['beer'],'real')
+        for method in ['copula','ot_rank']:
+            group=gen[gen.generator.eq(method)]
+            add_projection(group[cols].values,group['style'],group.sample_id,method)
+        for variant in ['source','excess']:
+            group=transfer[transfer.unit_scenario.eq('attachment_mg_L')&transfer.variant.eq(variant)]
+            add_projection(group[cols].values,group['style'],group.sample_id,'transfer_'+variant)
+        pd.concat(projected,ignore_index=True).to_csv(work/'pca_points.csv',index=False)
+        config=dict(fit_scope='250 observed beers only; generated and transferred rows only projected',
+                    n_fit=len(z),features=cols,svd_solver='full',seed=42,sklearn=sklearn.__version__,
+                    explained_variance_ratio=pca.explained_variance_ratio_.tolist(),components=pca.components_.tolist(),
+                    pca_mean=pca.mean_.tolist(),feature_median=pre.median.tolist(),feature_c0=pre.c0.tolist(),
+                    feature_mean=pre.mean.tolist(),feature_sd=pre.sd.tolist(),transfer_unit_scenario='attachment_mg_L')
+        (work/'pca_config.json').write_text(json.dumps(config,ensure_ascii=False,indent=2))
     # Gephi's own graphstore and ForceAtlas2 provide the network layout.
     nodes=pd.read_csv(ROOT/'data/q2/network_nodes.csv');edges=pd.read_csv(ROOT/'data/q2/network_edges.csv')
     nodes[['feature']].to_csv(work/'gephi_nodes.tsv',sep='\t',index=False)
@@ -413,9 +458,10 @@ def paper_figures(roadmap_only=False, selected=None):
         key.write_text(json.dumps(config,indent=2))
     subprocess.run(['Rscript',str(ROOT/'src/paper_figures.R'),str(ROOT),','.join(sorted(selected-{'01'}))],check=True)
     data_inputs=list((ROOT/'data/q1').glob('*.csv'))+list((ROOT/'data/q2').glob('*.csv'))+list((ROOT/'data/q3').glob('*.csv'))
-    report={'date':'2026-10-29','tools':{'01':'TikZ embedded in section 1.4','03':'R/Cairo scoring-card plot with shortened legend','05':'Gephi 0.11.3 ForceAtlas2 layout and R rendering','other_figures':'R 4.6.1 base graphics and Cairo'},'sources':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in [source,Path(__file__),ROOT/'src/paper_figures.R',ROOT/'src/GephiLayout.java']},'input_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in data_inputs},'output_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in dest.glob('*.png')},'formats':['png'],'titles':False,'seed':42,'no_new_model_fitting':True}
+    report={'date':'2026-10-29','tools':{'01':'TikZ embedded in section 1.4','03':'R/Cairo scoring-card plot with shortened legend','05':'Gephi 0.11.3 ForceAtlas2 layout and R rendering','other_figures':'R 4.6.1 base graphics and Cairo'},'sources':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in [source,Path(__file__),ROOT/'src/paper_figures.R',ROOT/'src/GephiLayout.java']},'input_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in data_inputs},'output_sha256':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in dest.glob('*.png')},'formats':['png'],'titles':False,'seed':42,'model_experiments_rerun':False,'descriptive_pca_fitted_on_observed_only':'19' in selected}
     manifest=ROOT/'data/processed/paper_figures.json'
     previous=json.loads(manifest.read_text()) if manifest.exists() else {}
+    previous.pop('no_new_model_fitting',None)
     previous.update(report)
     previous['last_rendered_figures']=sorted(selected)
     previous.setdefault('quality_review',{}).update(status='pending',pending_figures=sorted(selected))
@@ -429,11 +475,11 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--pipeline',action='store_true',help='run profile, external, Q1, Q2, Q3 sequentially, then concept figures')
     parser.add_argument('--validate',action='store_true',help='verify final tables, identities and physical proxy constraints')
-    parser.add_argument('--paper',nargs='?',const='all',help='export PNG paper figures except preserved 02; use roadmap or comma-separated IDs such as 09,12,13,14,15,16; 09b retains the interval view')
+    parser.add_argument('--paper',nargs='?',const='all',help='export PNG paper figures except preserved 02; use roadmap or comma-separated IDs such as 17,18,19,20,21; 09b,10b,15b,16b reproduce retained original views')
     args=parser.parse_args()
     if args.paper:
         selected = None if args.paper in {'all','roadmap'} else set(args.paper.split(','))
-        if selected is not None and not selected <= ({f'{i:02d}' for i in range(1,17)}|{'09b'}):parser.error('figure IDs must be 01 to 16 or 09b')
+        if selected is not None and not selected <= ({f'{i:02d}' for i in range(1,22)}|{'09b','10b','15b','16b'}):parser.error('figure IDs must be 01 to 21 or 09b,10b,15b,16b')
         paper_figures(roadmap_only=args.paper=='roadmap',selected=selected);return
     if args.validate:
         validate_results();return

@@ -1,7 +1,7 @@
 # Publication figures from saved results. Base R and Cairo; no model refitting.
 args <- commandArgs(trailingOnly=TRUE)
 root <- normalizePath(args[1]); setwd(root)
-selected <- if(length(args)>1) strsplit(args[2],",",fixed=TRUE)[[1]] else sprintf("%02d",3:16)
+selected <- if(length(args)>1) strsplit(args[2],",",fixed=TRUE)[[1]] else sprintf("%02d",3:21)
 out <- file.path(root,"img/img_used"); dat <- "data/processed/paper_plot_data"
 set.seed(42)
 read <- function(p) read.csv(p,check.names=FALSE,stringsAsFactors=FALSE)
@@ -274,12 +274,12 @@ if("09b" %in% selected) {
  mtext("标准化感官响应",1,outer=TRUE,line=.5,cex=.85)
  closefig()
 }
-# 10: individual source beers across constraints, not just zero violation counts.
-if("10" %in% selected) {
+# 10b retains the original comparison of alternative transfer schemes.
+if("10b" %in% selected) {
 tr<-read("data/q3/transfer_profiles.csv")
 variants<-c("source","raw","excess","strict","style");vn<-c("源酒","原始OT","主约束","严格约束","风格上限")
 cc<-c("DMS","X2.3.butanedione","X4VG","X.E..2.nonenal");cn<-c("DMS","双乙酰","4VG","T2N")
-openfig("10_Q3迁移缺陷",7.6,6.1);par(mfrow=c(2,2),mar=c(3.2,4,.7,.5))
+openfig("10b_Q3迁移缺陷_原方案对照",7.6,6.1);par(mfrow=c(2,2),mar=c(3.2,4,.7,.5))
 for(j in 1:4) {
  scenarios<-if(j==4)c("attachment_mg_L","alternative_ug_L") else "attachment_mg_L"
  upper<-0
@@ -300,6 +300,69 @@ for(j in 1:4) {
  box(bty="l")
 }
 closefig()
+}
+
+# 10: paired results; chemical admissibility and sensory reference distance.
+if("10" %in% selected) {
+ tr<-read("data/q3/transfer_profiles.csv")
+ err<-read(file.path(dat,"transfer_beer_errors.csv"))
+ features<-c("DMS","X2.3.butanedione","X4VG","X.E..2.nonenal","X.E..2.nonenal")
+ scenarios<-c(rep("attachment_mg_L",4),"alternative_ug_L")
+ thresholds<-c(17.25,.09,.1,.0001,.1)
+ panel_labels<-c("a  DMS","b  双乙酰","c  4VG","d  T2N · mg/L","e  T2N · μg/L")
+ ids<-sort(unique(tr$sample_id));methods<-c("raw","excess");colors<-c(orange,blue);symbols<-c(17,21)
+ openfig("10_Q3迁移缺陷",8.2,9.4)
+ par(oma=c(0,0,.55,0))
+ layout(rbind(matrix(1:6,3,2,byrow=TRUE),c(7,7)),heights=c(2.85,2.85,2.85,.65))
+ for(j in 1:6) {
+  par(mar=c(3.1,3.5,1.55,.65))
+  if(j<=5) {
+   z<-tr[tr$unit_scenario==scenarios[j],]
+   source<-z[z$variant=="source",];source<-source[match(ids,source$sample_id),]
+   x<-source[[features[j]]]/thresholds[j]
+   yy<-sapply(methods,function(method) {
+    moved<-z[z$variant==method,];moved[[features[j]]][match(ids,moved$sample_id)]/thresholds[j]
+   })
+   top<-max(c(x,yy,1));limit<-log10(1+top)*1.08
+   plot.new();plot.window(xlim=c(-limit*.035,limit),ylim=c(-limit*.035,limit))
+   xx<-seq(0,limit,length.out=300);boundary<-pmax(xx,log10(2))
+   polygon(c(0,xx,limit),c(0,boundary,0),col="#F0F6F3",border=NA)
+   ticks<-c(0,.1,1,10,100,1000,10000);ticks<-ticks[log10(1+ticks)<=limit]
+   chosen<-0
+   for(tick in ticks[-1])if(log10(1+tick)-log10(1+tail(chosen,1))>=limit*.085)chosen<-c(chosen,tick)
+   axis(1,at=log10(1+chosen),labels=chosen,cex.axis=.72)
+   axis(2,at=log10(1+chosen),labels=chosen,las=1,cex.axis=.72)
+   abline(h=log10(2),v=log10(2),col="#CBD3D5",lty=3,lwd=.65)
+   abline(a=0,b=1,col="#99A4AA",lty=2,lwd=.8)
+   lines(xx,boundary,col=green,lwd=1.2)
+   for(k in 1:2)points(log10(1+x),log10(1+yy[,k]),pch=symbols[k],col=colors[k],
+                       bg=adjustcolor(colors[k],.55),cex=if(k==1).85 else 1.05,lwd=.9)
+   mtext(panel_labels[j],3,line=.35,adj=0,cex=.9)
+   mtext("源酒 OAV",1,line=1.95,cex=.8);mtext("迁移后 OAV",2,line=2.25,cex=.8,las=0)
+  } else {
+   # Same 11 beers and fixed 50-dimensional observed Tripel reference as figure 11.
+   base<-err[err$model=="attachment_mg_L_source",];base<-base[match(ids,base$beer),]
+   yy<-sapply(methods,function(method) {
+    moved<-err[err$model==paste0("attachment_mg_L_",method),];moved$rmse[match(ids,moved$beer)]
+   })
+   upper<-max(c(base$rmse,yy))*1.1
+   plot.new();plot.window(xlim=c(0,upper),ylim=c(0,upper))
+   polygon(c(0,upper,upper),c(0,0,upper),col="#F0F6F3",border=NA)
+   axis(1,cex.axis=.72);axis(2,las=1,cex.axis=.72)
+   abline(a=0,b=1,col="#99A4AA",lty=2,lwd=.8)
+   for(k in 1:2)points(base$rmse,yy[,k],pch=symbols[k],col=colors[k],
+                       bg=adjustcolor(colors[k],.55),cex=if(k==1).85 else 1.05,lwd=.9)
+   mtext("f  Tripel 画像参考",3,line=.35,adj=0,cex=.9)
+   mtext("源酒参考距离 RMSE",1,line=1.95,cex=.8)
+   mtext("迁移后参考距离 RMSE",2,line=2.25,cex=.8,las=0)
+  }
+  box(bty="l")
+ }
+ par(mar=c(0,0,0,0));plot.new()
+ legend("center",legend=c("原始 OT","主约束","前后相等","主约束边界"),
+        col=c(orange,blue,"#99A4AA",green),pch=c(17,21,NA,NA),pt.bg=c(orange,blue,NA,NA),
+        lty=c(NA,NA,2,1),lwd=c(NA,NA,.8,1.2),bty="n",horiz=TRUE,cex=.88)
+ closefig()
 }
 
 # 11: all sensory deviations plus individual-beer proxy errors in both scenarios.
@@ -394,21 +457,262 @@ concentration_table<-function(filename,compound,units,values,headings,subheading
  segments(0,nr+1.5,10,nr+1.5,col="#49555E",lwd=.8)
  closefig()
 }
-if("15" %in% selected) {
+if("15b" %in% selected) {
  d<-read(file.path(dat,"transfer_concentrations.csv"));beer<-min(d$beer)
  main<-d[d$beer==beer & d$unit_scenario=="attachment_mg_L",];main<-main[match(profile_features,main$feature),]
  alt<-d[d$beer==beer & d$unit_scenario=="alternative_ug_L" & d$feature=="X.E..2.nonenal",]
  main$compound[main$feature=="X.E..2.nonenal"]<-"E-2-nonenal · 情景一";alt$compound<-"E-2-nonenal · 情景二"
  tab<-rbind(main[1:4,],alt,main[5:12,])
- concentration_table("15_Q3迁移前后化合物谱",tab$compound,tab$unit,
+ concentration_table("15b_Q3迁移浓度表",tab$compound,tab$unit,
                      as.matrix(tab[,c("source","transferred","tripel_reference")]),
                      c(paste("源酒",beer),"主约束迁移后","Tripel 参考"),separate=5)
+}
+if("16b" %in% selected) {
+ examples<-read(file.path(dat,"generated_example_chemistry.csv"));examples<-examples[match(styles,examples$style),]
+ meta<-read(file.path(dat,"chemical_medians.csv"));meta<-meta[!duplicated(meta$feature),];meta<-meta[match(profile_features,meta$feature),]
+ units<-gsub("ug/L","μg/L",meta$unit,fixed=TRUE);units[is.na(units)|units==""]<-"—"
+ concentration_table("16b_Q3生成浓度表",meta$compound,units,t(as.matrix(examples[,profile_features])),styles,
+                     paste0("#",sub(".*_","",examples$sample_id)),separate=4,value_colors=c(blue,orange,green))
+}
+profile_labels<-c("DMS","双乙酰","4VG","T2N","乙酸乙酯","乙酸异戊酯",
+                  "己酸乙酯","辛酸乙酯","乙酸苯乙酯","甘油","乙酸","乳酸")
+if("15" %in% selected) {
+ d<-read(file.path(dat,"transfer_concentrations.csv"));beer<-min(d$beer)
+ main<-d[d$beer==beer & d$unit_scenario=="attachment_mg_L",];main<-main[match(profile_features,main$feature),]
+ alt<-d[d$beer==beer & d$unit_scenario=="alternative_ug_L" & d$feature=="X.E..2.nonenal",]
+ tab<-rbind(main[1:4,],alt,main[5:12,])
+ labels<-c(profile_labels[1:4],"T2N",profile_labels[5:12])
+ openfig("15_Q3迁移前后化合物谱",8.2,9.0)
+ par(oma=c(.15,0,.55,0))
+ layout(matrix(c(1,8,2,9,3,10,4,11,5,12,6,13,7,14),7,2,byrow=TRUE))
+ for(i in 1:13) {
+  a<-tab[i,];v<-as.numeric(a[,c("source","transferred","tripel_reference")])
+  upper<-max(v);zero<-upper==0;if(zero)upper<-1
+  par(mar=c(1.8,1.1,1.3,1.0))
+  plot.new();plot.window(xlim=c(-upper*.06,upper*1.23),ylim=c(-.55,.85))
+  ticks<-if(zero)0 else pretty(c(0,upper),n=3);ticks<-ticks[ticks>=0 & ticks<=upper*1.06]
+  axis(1,at=ticks,labels=vapply(ticks,fmt_number,character(1)),cex.axis=.76,lwd=0,lwd.ticks=.65)
+  if(!zero)segments(0,par("usr")[3],upper*1.1,par("usr")[3],xpd=NA,lwd=.65)
+  abline(v=v[3],col=adjustcolor(orange,.65),lty=3,lwd=.8)
+  segments(v[1],.2,v[2],.2,col=blue,lwd=1.65)
+  if(abs(v[2]-v[1])>upper*.015)arrows(v[1],.2,v[2],.2,col=blue,lwd=1.1,length=.07)
+  points(v[1],.2,pch=21,col="#697780",bg="white",cex=1.3,lwd=1)
+  points(v[2],.2,pch=16,col=blue,cex=.85)
+  points(v[3],-.28,pch=18,col=orange,cex=1.0)
+  text(v[1],.65,fmt_number(signif(v[1],3)),col="#566773",cex=.83)
+  text(v[2],-.13,fmt_number(signif(v[2],3)),col=blue,cex=.83)
+  mtext(paste(labels[i],a$unit,sep=" · "),3,line=.22,adj=0,cex=.88)
+ }
+ par(mar=c(.2,.2,.2,.2));plot.new()
+ legend("center",legend=c(paste("源酒 Beer",beer),"主约束迁移后","Tripel 参考"),
+        col=c("#697780",blue,orange),pch=c(21,16,18),pt.bg=c("white",blue,orange),
+        bty="n",cex=.92,pt.cex=c(1.3,.85,1),y.intersp=1.3)
+ closefig()
 }
 if("16" %in% selected) {
  examples<-read(file.path(dat,"generated_example_chemistry.csv"));examples<-examples[match(styles,examples$style),]
  meta<-read(file.path(dat,"chemical_medians.csv"));meta<-meta[!duplicated(meta$feature),];meta<-meta[match(profile_features,meta$feature),]
- units<-gsub("ug/L","μg/L",meta$unit,fixed=TRUE);units[is.na(units)|units==""]<-"—"
- concentration_table("16_Q3生成化合物谱示例",meta$compound,units,t(as.matrix(examples[,profile_features])),styles,
-                     paste0("#",sub(".*_","",examples$sample_id)),separate=4,value_colors=c(blue,orange,green))
+ units<-gsub("ug/L","μg/L",meta$unit,fixed=TRUE);values<-t(as.matrix(examples[,profile_features]))
+ colors<-c(blue,orange,green)
+ openfig("16_Q3生成化合物谱示例",8.2,7.2)
+ par(oma=c(0,0,.55,0))
+ layout(rbind(matrix(1:12,4,3,byrow=TRUE),c(13,13,13)),heights=c(rep(1.65,4),.6))
+ for(i in 1:12) {
+  v<-values[i,];upper<-max(v);zero<-upper==0;if(zero)upper<-1
+  par(mar=c(2.0,if((i-1)%%3==0)3.65 else .8,1.45,.65))
+  plot.new();plot.window(xlim=c(-upper*.025,upper*1.37),ylim=c(.4,3.6))
+  ticks<-if(zero)0 else pretty(c(0,upper),n=3);ticks<-ticks[ticks>=0 & ticks<=upper*1.06]
+  abline(v=ticks,col="#E9EDEF",lwd=.6)
+  segments(0,3:1,v,3:1,col=adjustcolor(colors,.55),lwd=2)
+  points(v,3:1,pch=16,col=colors,cex=.95)
+  text(v+upper*.055,3:1,vapply(signif(v,3),fmt_number,character(1)),adj=0,col=colors,cex=.83)
+  if((i-1)%%3==0)axis(2,at=3:1,labels=styles,las=1,tick=FALSE,cex.axis=.75)
+  axis(1,at=ticks,labels=vapply(ticks,fmt_number,character(1)),cex.axis=.72,lwd=0,lwd.ticks=.65)
+  if(!zero)segments(0,par("usr")[3],upper*1.1,par("usr")[3],xpd=NA,lwd=.65)
+  mtext(paste(profile_labels[i],units[i],sep=" · "),3,line=.3,adj=0,cex=.88)
+ }
+ par(mar=c(0,0,0,0));plot.new()
+ legend("center",legend=paste(styles,paste0("#",sub(".*_","",examples$sample_id))),
+        col=colors,pch=16,bty="n",horiz=TRUE,cex=.9)
+ closefig()
+}
+# 17-21: direct comparisons inspired by the project's earlier bar, radar and PCA figures.
+style_colors<-c(Tripel=blue,Kriek=orange,Lambic=green,"Pils/Lager"="#BA9844")
+if("17" %in% selected) {
+ observed<-read(file.path(dat,"calibrated.csv"));counts<-sort(table(observed$style),decreasing=TRUE)
+ count_colors<-rep("#B8C4CB",length(counts));highlight<-names(counts)%in%names(style_colors)
+ count_colors[highlight]<-style_colors[names(counts)[highlight]]
+ openfig("17_风格样本分布",8.4,5.5)
+ par(mar=c(3.4,10.7,.75,.75))
+ yy<-barplot(rev(counts),horiz=TRUE,names.arg=rev(names(counts)),col=rev(count_colors),border=NA,
+             xlim=c(0,max(counts)*1.12),las=1,cex.names=.78,space=.24,xlab="酒样数")
+ text(as.numeric(rev(counts))+.45,yy,as.integer(rev(counts)),adj=0,cex=.8)
+ closefig()
+}
+if("18" %in% selected) {
+ top<-read("data/q2/top3.csv")
+ cases<-c("A_malt_all","A_hops_citrus","A_esters_fruity","dms","diacetyl","X4vg","t2n","stale_hops")
+ case_labels<-c("麦芽香","酒花香 · 柑橘","酯香 · 果香","DMS","双乙酰","4VG","T2N","陈旧酒花")
+ palette<-c("#376E91","#709CB5","#AAC4D3")
+ openfig("18_Q2关键化合物柱状图",9.0,8.3);par(oma=c(1.6,0,.5,0))
+ layout(matrix(1:8,4,2,byrow=TRUE))
+ par(cex=1)
+ for(k in seq_along(cases)) {
+  z<-top[top$target==cases[k],];z<-z[order(z$rank),];stopifnot(nrow(z)==3)
+  labels<-paste0(z$rank,"  ",vapply(z$compound_2csv,function(s)paste(strwrap(s,width=25),collapse="\n"),character(1)))
+  par(mar=c(2.2,11.4,1.6,.95))
+  plot.new();plot.window(xlim=c(0,1.12),ylim=c(.4,3.6))
+  abline(v=c(.25,.5,.75,1),col="#E7EBED",lwd=.65)
+  rect(0,3:1-.28,z$stability_freq,3:1+.28,col=palette,border=NA)
+  axis(2,at=3:1,labels=labels,tick=FALSE,las=2,cex.axis=.77)
+  axis(1,at=c(0,.25,.5,.75,1),labels=c(0,25,50,75,100),cex.axis=.72)
+  inside<-z$stability_freq>.85
+  for(i in 1:3)text(z$stability_freq[i]+if(inside[i])-.025 else .025,4-i,
+       paste0(formatC(z$stability_freq[i]*100,format="f",digits=1),"%"),
+       adj=if(inside[i])1 else 0,col=if(inside[i])"white" else "#20272D",cex=.76)
+  mtext(case_labels[k],3,line=.35,adj=0,cex=.95)
+ }
+ mtext("Top-3 入选频率 / %",1,outer=TRUE,line=.1,cex=.88)
+ closefig()
+}
+if("19" %in% selected) {
+ points_data<-read(file.path(dat,"pca_points.csv"))
+ # Percentages come from the same observed-only fitted axes for every panel.
+ # Read the two explained-variance values without a non-base R JSON dependency.
+ config_lines<-readLines(file.path(dat,"pca_config.json"),warn=FALSE)
+ pos<-grep('"explained_variance_ratio"',config_lines,fixed=TRUE)
+ variance<-as.numeric(gsub("[, ]","",config_lines[pos+1:2]))
+ real<-points_data[points_data$dataset=="real",]
+ ranges<-lapply(c("pc1","pc2"),function(col){r<-range(points_data[[col]]);r+c(-1,1)*diff(r)*.055})
+ openfig("19_Q3生成与迁移PCA",8.8,7.1);par(oma=c(.9,0,.6,0))
+ layout(rbind(matrix(1:4,2,2,byrow=TRUE),c(5,5)),heights=c(3.2,3.2,.65))
+ par(cex=1)
+ for(k in 1:4) {
+  par(mar=c(3.3,3.9,1.6,.7))
+  plot.new();plot.window(xlim=ranges[[1]],ylim=ranges[[2]])
+  abline(h=0,v=0,col="#DFE4E6",lwd=.6)
+  points(real$pc1,real$pc2,pch=16,col=adjustcolor("#BBC0C1",.5),cex=.45)
+  for(st in styles) {
+   r<-real[real$style==st,];hull<-chull(r$pc1,r$pc2)
+   polygon(r$pc1[hull],r$pc2[hull],col=adjustcolor(style_colors[st],.055),
+           border=adjustcolor(style_colors[st],.6),lwd=.75)
+  }
+  if(k==1)for(st in c(styles,"Pils/Lager")) {
+   z<-real[real$style==st,];points(z$pc1,z$pc2,pch=21,bg=style_colors[st],col="white",cex=.8,lwd=.35)
+  }
+  if(k%in%c(2,3))for(st in styles) {
+   z<-points_data[points_data$dataset==if(k==2)"copula" else "ot_rank",]
+   z<-z[z$style==st,];points(z$pc1,z$pc2,pch=16,col=adjustcolor(style_colors[st],.35),cex=.45)
+  }
+  if(k==4) {
+   a<-points_data[points_data$dataset=="transfer_source",]
+   b<-points_data[points_data$dataset=="transfer_excess",];b<-b[match(a$sample_id,b$sample_id),]
+   arrows(a$pc1,a$pc2,b$pc1,b$pc2,col=adjustcolor(blue,.5),length=.07,lwd=.8)
+   points(a$pc1,a$pc2,pch=21,bg=style_colors["Pils/Lager"],col="white",cex=.85,lwd=.4)
+   points(b$pc1,b$pc2,pch=21,bg=blue,col="white",cex=.9,lwd=.4)
+  }
+  axis(1,cex.axis=.77);axis(2,las=1,cex.axis=.77);box(bty="l")
+  mtext(paste0("PC1 · ",formatC(100*variance[1],digits=1,format="f"),"%"),1,line=2.0,cex=.82)
+  mtext(paste0("PC2 · ",formatC(100*variance[2],digits=1,format="f"),"%"),2,line=2.4,cex=.82,las=0)
+  mtext(c("a  实测风格","b  Copula 生成","c  OT 秩校准生成","d  Pils/Lager → Tripel")[k],3,line=.35,adj=0,cex=.94)
+ }
+ par(mar=c(0,0,0,0));plot.new()
+ legend("center",legend=c(styles,"Pils/Lager","实测背景"),col=c(style_colors[c(styles,"Pils/Lager")],"#BBC0C1"),
+        pch=16,bty="n",horiz=TRUE,cex=.88)
+ closefig()
+}
+radar_panel<-function(values,labels,colors,lty=c(1,2),fill=NULL) {
+ n<-length(labels);theta<-pi/2-seq(0,2*pi,length.out=n+1)[-(n+1)]
+ par(mar=c(.3,.3,1.4,.3))
+ plot.new();plot.window(xlim=c(-1.56,1.56),ylim=c(-1.34,1.34),asp=1)
+ if(length(fill))for(k in seq_along(fill))if(!is.na(fill[k])) {
+  r<-values[k,]/100;polygon(r*cos(theta),r*sin(theta),col=fill[k],border=NA)
+ }
+ for(r in c(.25,.5,.75,1)) {
+  t<-seq(0,2*pi,length.out=241)
+  lines(r*cos(t),r*sin(t),col=if(r==1)"#9EAAB0" else "#D7DFE2",lwd=if(r==1).8 else .6)
+ }
+ segments(0,0,cos(theta),sin(theta),col="#D7DFE2",lwd=.6)
+ for(k in seq_len(nrow(values))) {
+  r<-values[k,]/100
+  lines(c(r*cos(theta),r[1]*cos(theta[1])),c(r*sin(theta),r[1]*sin(theta[1])),
+        col=colors[k],lty=lty[k],lwd=if(k==1)1.8 else 1.35)
+  if(k==1)points(r*cos(theta),r*sin(theta),pch=16,col=colors[k],cex=.45)
+ }
+ label_x<-1.14*cos(theta);label_y<-1.14*sin(theta)
+ for(i in seq_len(n))text(label_x[i],label_y[i],labels[i],cex=.88,
+                         adj=c(if(abs(label_x[i])<.05).5 else if(label_x[i]>0)0 else 1,.5),xpd=NA)
+ angle<-pi/2-pi/n
+ for(v in c(25,50,75,100))text(v/100*cos(angle),v/100*sin(angle),v,col="#64747D",cex=.63,
+                              adj=c(.5,.5))
+}
+if("20" %in% selected) {
+ z<-read(file.path(dat,"radar_profiles.csv"))
+ dims<-c("A_esters_all","A_hops_all","A_malt_all","bitternes","body","alcohol","sweetness","acidity")
+ labels<-c("酯香","酒花香","麦芽香","苦味","酒体","酒精","甜味","酸度")
+ openfig("20_Q3生成感官雷达",8.8,7.4);par(oma=c(.15,.25,.65,.25))
+ layout(rbind(matrix(1:4,2,2,byrow=TRUE),c(5,5)),heights=c(3.3,3.3,.65))
+ par(cex=1)
+ for(k in seq_along(styles)) {
+  a<-z[z$kind=="generated"&z$style==styles[k]&z$model=="copula",]
+  b<-z[z$kind=="real"&z$style==styles[k],]
+  values<-rbind(a$percentile[match(dims,a$target)],b$percentile[match(dims,b$target)])
+  radar_panel(values,labels,c(style_colors[styles[k]],"#5D6970"),fill=c(adjustcolor(style_colors[styles[k]],.12),NA))
+  mtext(styles[k],3,line=.1,cex=1.05)
+ }
+ values<-t(sapply(styles,function(st) {
+  a<-z[z$kind=="generated"&z$style==st&z$model=="copula",]
+  a$percentile[match(dims,a$target)]
+ }))
+ radar_panel(values,labels,style_colors[styles],lty=c(1,1,1),fill=rep(NA,3))
+ mtext("三风格生成对照",3,line=.1,cex=1.05)
+ par(mar=c(0,0,0,0));plot.new()
+ legend("center",legend=c(styles,"实测中位画像"),col=c(style_colors[styles],"#5D6970"),lty=c(1,1,1,2),lwd=c(1.8,1.35,1.35,1.35),
+        bty="n",horiz=TRUE,cex=.85)
+ closefig()
+}
+if("21" %in% selected) {
+ z<-read(file.path(dat,"radar_profiles.csv"));tr<-read("data/q3/transfer_profiles.csv")
+ dims<-list(c("A_malt_all","A_hops_all","A_esters_all","F_esters_all","F_hops_all","F_malt_all"),
+            c("acidity","bitternes","sweetness","alcohol","body","overall"))
+ labels<-list(c("麦芽香","酒花香","酯香","酯风味","酒花风味","麦芽风味"),
+              c("酸度","苦味","甜味","酒精","酒体","整体"))
+ profiles<-list(z[z$kind=="transfer"&z$model=="attachment_mg_L_excess",],
+                z[z$kind=="transfer"&z$model=="attachment_mg_L_source",],
+                z[z$kind=="real"&z$style=="Tripel",],
+                z[z$kind=="transfer"&z$model=="attachment_mg_L_raw",])
+ openfig("21_Q3迁移画像与缺陷",8.8,7.3);par(oma=c(.2,.25,.65,.25))
+ layout(rbind(c(1,2),c(3,3),c(4,5),c(6,6)),heights=c(3.45,.55,2.65,.55))
+ par(cex=1)
+ for(k in 1:2) {
+  values<-t(sapply(profiles,function(a)a$percentile[match(dims[[k]],a$target)]))
+  radar_panel(values,labels[[k]],c(blue,orange,green,"#929BA0"),lty=c(1,1,2,3),
+              fill=c(adjustcolor(blue,.12),adjustcolor(orange,.07),NA,NA))
+  mtext(c("a  香气与风味","b  口感与整体")[k],3,line=.1,cex=.98)
+ }
+ par(mar=c(0,0,0,0));plot.new()
+ legend("center",legend=c("主约束迁移","源酒","Tripel 参考","原始 OT"),col=c(blue,orange,green,"#929BA0"),
+        lty=c(1,1,2,3),lwd=c(1.8,1.35,1.35,1.35),bty="n",horiz=TRUE,cex=.86)
+ for(k in 1:2) {
+  scenario<-c("attachment_mg_L","alternative_ug_L")[k]
+  group<-tr[tr$unit_scenario==scenario,];ids<-sort(unique(group$sample_id))
+  original<-group[group$variant=="source",];original<-original[match(ids,original$sample_id),]
+  cc<-c("DMS","X2.3.butanedione","X4VG","X.E..2.nonenal");tau<-c(17.25,.09,.1,if(k==1).0001 else .1)
+  counts<-sapply(c("raw","excess"),function(method) {
+   moved<-group[group$variant==method,];moved<-moved[match(ids,moved$sample_id),]
+   colSums(pmax(sweep(as.matrix(moved[,cc]),2,tau,"/")-1,0)>
+           pmax(sweep(as.matrix(original[,cc]),2,tau,"/")-1,0)+1e-7)
+  })
+  par(mar=c(2.8,3.7,1.7,.65))
+  mid<-barplot(t(counts),beside=TRUE,names.arg=c("DMS","双乙酰","4VG","T2N"),
+               col=c("#AEB7BD",blue),border=NA,ylim=c(0,13),yaxt="n",cex.names=.85,space=c(.15,.9))
+  axis(2,at=c(0,3,6,9,11),las=1,cex.axis=.78)
+  text(mid,as.numeric(t(counts))+.55,as.integer(t(counts)),cex=.9,col=rep(c("#697780",blue),4))
+  mtext("恶化酒样数",2,line=2.35,cex=.84,las=0)
+  mtext(c("c  T2N 按附件 mg/L","d  T2N 按替代 μg/L")[k],3,line=.4,adj=0,cex=.94)
+ }
+ par(mar=c(0,0,0,0));plot.new()
+ legend("center",legend=c("原始 OT","主约束迁移"),fill=c("#AEB7BD",blue),border=NA,bty="n",horiz=TRUE,cex=.88)
+ closefig()
 }
 cat("R version: ",R.version.string,"; graphics: Cairo\n")
