@@ -25,8 +25,6 @@
 
 % ==================== 图表 ====================
 \usepackage{graphicx}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{longtable}
@@ -118,6 +116,14 @@
 \setlength{\absleftindent}{0pt}
 \setlength{\absrightindent}{0pt}
 \setlength{\abstitleskip}{6pt}
+% ==================== 论文配图 ====================
+\graphicspath{{img/paper/}}
+\newcommand{\figinsert}[4][\textwidth]{%
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[width=#1]{#2}%
+    \caption{#3}\label{#4}%
+  \end{figure}}
 
 \begin{document}
 \thispagestyle{empty}
@@ -134,7 +140,7 @@
 \hrule
 \vspace{0.8em}
 \begin{center}
-{\zihao{-2}\bfseries 啤酒风味评分、关键化合物识别与风格生成}
+{\zihao{-2}\bfseries 啤酒感官评分、关键化合物筛选与风格条件生成}
 \end{center}
 \vspace{0.2em}
 \begin{center}
@@ -142,7 +148,7 @@
 \end{center}
 
 针对商用啤酒的化学特征、感官响应与风格生成问题，本文从尺度核验与任务可识别性出发，建立由简单基线到模型比较的流程。
-附件实测 \textbf{250 种啤酒、231 个化学与理化特征、50 个标准化感官响应}；70 个可校准特征中 \textbf{37 列支持 log10、33 列支持线性}，
+附件实测 \textbf{250 款酒、231 个化学与理化特征、50 个标准化感官响应}；70 个可校准特征中 \textbf{37 列支持 log10、33 列支持线性}，
 其余 161 列不作未经验证的浓度反演。外部评论数据仅用于 22 个风格的语义校验，不作逐酒标签补充。
 
 问题一采用\textbf{训练内预处理、选参与选型的嵌套交叉验证}，比较 Ridge、PLS2、ExtraTrees、RandomForest、LightGBM 及融合。
@@ -203,10 +209,10 @@ Ehrlich 降解生成酯类与高级醇；酒花添加带来萜烯、萜醇与异
     \toprule
     文件 & 主要内容 & 规模 & 本文用途 \\
     \midrule
-    \file{1.csv} & 250 个啤酒样品的化合物丰度矩阵 & $250\!\times\!234$（其中 231 列为化学与理化特征） & 问题一至三的主特征 \\
+    \file{1.csv} & 250 个啤酒样品的化合物丰度矩阵 & $250\!\times\!234$ & 问题一至三的主特征 \\
     \file{2.csv} & 化合物之间的相关系数矩阵 & $231\!\times\!231$ & 问题二的关联网络 \\
     \file{3.xlsx} & Aroma 与 Flavour 两套评分卡 & 13 个 sheet & 问题一的评分项目与分档定义 \\
-    \file{4.csv} & 感官评分的标准化连续值 & $250\!\times\!53$（其中 50 列为感官响应） & 问题一、二的响应取值 \\
+    \file{4.csv} & 感官评分的标准化连续值 & $250\!\times\!53$ & 问题一、二的响应取值 \\
     \file{5.csv} & 感官属性之间的相关矩阵 & $50\!\times\!50$ & 感官维度相关结构的核对 \\
     \file{6.csv} & 化合物与感官属性的交叉相关矩阵 & $44\!\times\!50$ & 问题二的同源一致性检查 \\
     \file{7.csv} & 感官描述符与风格标签 & $250\!\times\!189$ & 问题三的风格标签 \\
@@ -244,76 +250,39 @@ Ehrlich 降解生成酯类与高级醇；酒花添加带来萜烯、萜醇与异
 
 \subsection{技术路线}
 
-本文围绕“化学表征—感官预测—关联解释—风格构造”展开研究，技术路线如图~\ref{fig:roadmap} 所示。
-经样本对齐、尺度核验与评分项目映射形成统一数据基础后，问题一建立化学特征到感官响应的预测映射，并给出相对等级；
-问题二结合化合物网络与实测化学—感官配对，识别各维度的关键关联候选；
-问题三在70个校准指标上分别开展风格条件生成与缺陷约束迁移，再由另行训练的感官代理形成画像。
-三问依次推进预测、解释与分布构造，共享经核验的数据基础，并分别检验预测稳健性、选择稳定性及生成与迁移质量。
+
+
+\begin{table}[H]
+  \centering
+  \caption{三问的技术路线}
+  \label{tab:roadmap}
+  \footnotesize
+  \begin{tabularx}{\textwidth}{@{}l >{\hsize=0.82\hsize}X >{\hsize=1.12\hsize}X >{\hsize=1.06\hsize}X@{}}
+    \toprule
+    问题 & 基线 & 改进 & 最终方案 \\
+    \midrule
+    问题一 & 总体均值与风格均值 & 多输出正则化与树模型比较 & 训练内选型的等权融合与相对等级 \\
+    问题二 & 边际关联排序 & Top-10 并集加权图与一跳平滑 & 五类排序的秩融合与全流程重采样 \\
+    问题三 & 经验行重采样与噪声注入 & 条件高斯 copula 与收缩相关 & 高斯最优传输与超阈值程度约束 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+三问共享同一份原始数据与 \file{beer} 对齐结果，
+但本文按不同任务进行对应的预处理：问题一的插补与分位数变换在每个内层、
+外层训练集内重新估计；问题二在每次重采样中重新插补、缩放与选参；
+问题三在每个风格留出的训练部分拟合尺度、协方差与分位数上限。
+这一点与“统一预处理后再建模”的做法不同，
+目的是让每一问的结论只依赖它自己的训练信息。
+三问的技术路线见表~\ref{tab:roadmap}。输入、建模与产物关系见图~\ref{fig:roadmap}。
 
 \begin{figure}[H]
-\centering
-\begin{tikzpicture}[
-  >=Stealth,
-  every node/.style={font=\fontsize{9}{11.5}\selectfont},
-  process/.style={rectangle,draw=black,line width=0.45pt,minimum height=0.68cm,text width=2.85cm,align=center,inner sep=3pt},
-  compact/.style={process,minimum height=0.6cm},
-  pathline/.style={->,line width=0.5pt},
-  annotation/.style={font=\fontsize{8}{10}\selectfont,align=center}
-]
-\node[process,text width=11.9cm,minimum height=0.95cm] (data) at (0,0)
-  {\textbf{数据预处理与统一表征}\\化学特征与感官响应\quad 化合物相关矩阵\quad 风格标签与感官阈值};
-
-\draw[line width=0.4pt] (-6.0,-1.2) rectangle (6.0,-3.35);
-\node[anchor=west,font=\fontsize{9}{11.5}\selectfont\bfseries] at (-5.8,-1.48)
-  {Q1\quad 感官响应预测与等级表达};
-\node[process] (xy) at (-4.35,-2.25) {化学特征与感官响应};
-\node[process] (predict) at (-0.65,-2.25) {化学—感官预测映射};
-\node[compact] (response) at (3.65,-1.98) {连续感官响应};
-\node[compact] (grade) at (3.65,-2.85) {相对0--6等级};
-\draw[pathline] (xy) -- (predict);
-\draw[pathline] (predict) -- (response.west);
-\draw[pathline] (response) -- (grade);
-\node[annotation] (cv) at (-0.65,-3.0) {嵌套交叉验证与缺失压力};
-\draw[densely dashed,line width=0.4pt] (predict.south) -- (cv.north);
-
-\draw[line width=0.4pt] (-6.0,-3.75) rectangle (6.0,-6.5);
-\node[anchor=west,font=\fontsize{9}{11.5}\selectfont\bfseries] at (-5.8,-4.03)
-  {Q2\quad 化合物关联结构与关键候选};
-\node[process] (network) at (-4.35,-4.75) {化合物关联网络};
-\node[process] (paired) at (-4.35,-5.75) {实测化学—感官配对};
-\node[process] (ranking) at (-0.65,-5.05) {多方法关联排序\\平均秩融合};
-\node[compact] (top) at (3.65,-4.75) {逐维Top-3候选};
-\node[compact] (stability) at (3.65,-5.8) {重采样稳定性\\化学合理性审查};
-\draw[pathline] (network.east) -- (ranking.west);
-\draw[pathline] (paired.east) -- (ranking.west);
-\draw[pathline] (ranking.east) -- (top.west);
-\draw[pathline] (top) -- (stability);
-
-\draw[line width=0.4pt] (-6.0,-6.75) rectangle (6.0,-10.75);
-\node[anchor=west,font=\fontsize{9}{11.5}\selectfont\bfseries] at (-5.8,-7.03)
-  {Q3\quad 校准子谱的风格生成与约束迁移};
-\node[process] (generate) at (-4.35,-7.95) {风格条件copula};
-\node[process] (spectrum) at (-0.65,-7.95) {目标风格化合物谱};
-\node[process] (ot) at (-4.35,-9.2) {{\fontsize{8}{10}\selectfont Pils/Lager$\rightarrow$Tripel}\\高斯最优传输};
-\node[process] (constraint) at (-0.65,-9.2) {直接缺陷约束投影\\超阈值程度不增加};
-\node[compact] (transfer) at (-0.65,-10.22) {约束迁移化合物谱};
-\node[process] (proxy) at (3.65,-8.6) {感官代理预测};
-\node[process] (portrait) at (3.65,-10.0) {生成与迁移感官画像};
-\draw[pathline] (generate) -- (spectrum);
-\draw[pathline] (ot) -- (constraint);
-\draw[pathline] (constraint) -- (transfer);
-\draw[pathline] (spectrum.east) -- (proxy.west);
-\draw[pathline] (transfer.east) -- (1.55,-10.22) |- (proxy.west);
-\draw[pathline] (proxy) -- (portrait);
-
-\draw[line width=0.5pt] (data.west) -- (-6.6,0) -- (-6.6,-9.0);
-\draw[pathline] (-6.6,-2.25) -- (-6.0,-2.25);
-\draw[pathline] (-6.6,-5.05) -- (-6.0,-5.05);
-\draw[pathline] (-6.6,-9.0) -- (-6.0,-9.0);
-\end{tikzpicture}
-\caption{数据基础与三问建模关系}
-\label{fig:roadmap}
+  \centering
+  \includegraphics[width=0.9\textwidth]{fig01_roadmap.png}
+  \caption{技术路线：以 8 份附件数据为底座，三问分别给出连续预测与相对等级、关联网络与关键候选、条件生成与缺陷约束迁移，并在各自训练划分内完成对照与验证。}
+  \label{fig:roadmap}
 \end{figure}
+
 
 % ==================== 2 数据预处理 ====================
 \section{数据预处理}
@@ -377,6 +346,13 @@ Ehrlich 降解生成酯类与高级醇；酒花添加带来萜烯、萜醇与异
 
 风格标签共 22 类，样本量高度不均衡：最多的 \file{Blond} 31 个、\file{Tripel} 28 个，最少的 \file{Faro} 仅 3 个。小样本风格在问题三中改用收缩估计，并单独报告其不确定性。
 
+样本量的完整分布见图~\ref{fig:styles}：最多与最少相差约一个数量级。这既是第~5 章采用收缩原型（式~\eqref{eq:shrinkage}）的原因，也是按风格留出评价时必须限制每轮留出数的原因——样本最少的风格只有 3 款，留出 1 款即占三分之一。
+
+\figinsert[0.95\textwidth]{fig17_styles}{%
+22 个风格的样本量（按样本数降序）。蓝、橙、绿分别为 \file{Tripel}（28）、
+\file{Kriek}（10）、\file{Lambic}（11），金色为 \file{Pils/Lager}（11）；
+柱长为实测样本数，不是生成数量。}{fig:styles}
+
 \subsection{尺度核验与使用边界}
 \label{sec:scale}
 
@@ -402,11 +378,11 @@ Ehrlich 降解生成酯类与高级醇；酒花添加带来萜烯、萜醇与异
 
 因此本文不尝试从主特征表统一反演浓度：凡是需要浓度口径的地方（如问题三的缺陷阈值比较），直接使用 \file{8.xlsx} 校准表的对应列，避免把混合尺度的主特征表当成可逆数据源。
 
-还有一处单位问题需要交代。反式-2-壬烯醛在附件中标为 mg/L，但同一列也存在按 $\mu$g/L 理解的可能，两种解读相差 $10^{3}$ 倍，附件中没有可据以判定的校准记录。由于 $0.10\ \mu\mathrm{g/L}=0.00010\ \mathrm{mg/L}$，不能因为数值看起来更合理就选单位：本文以保留附件标注、上限取 0.00010 为主情景，另报告按 $\mu$g/L 解释、上限取 0.10 的替代情景，两种情景的约束与超阈值评价分别计算。
+关于单位问题，反式-2-壬烯醛在附件中标为 mg/L，但同一列也存在按 $\mu$g/L 理解的可能，两种解读相差 $10^{3}$ 倍，附件中没有可据以判定的校准记录。由于 $0.10\ \mu\mathrm{g/L}=0.00010\ \mathrm{mg/L}$，不能因为数值看起来更合理就选单位：本文以保留附件标注、上限取 0.00010 为主情景，另报告按 $\mu$g/L 解释、上限取 0.10 的替代情景，两种情景的约束与超阈值评价分别计算。
 
 \subsection{缺失值与异常值处理}
 
-预处理按任务分别拟合，而不是先做一次全表清洗。问题一在每个内层与外层训练集内做中位数插补与分位数正态化，缺失指示仅作为独立消融，且固定为全部 231 列的观测指示。问题二在每次重采样中重新插补、缩放，并在弹性网选参的内部折中重新拟合插补与标准化。问题三在每个风格留出的训练部分拟合浓度尺度、协方差、经验边际与分位数上限，留出样本不参与这些估计。
+预处理按任务分别拟合。问题一在每个内层与外层训练集内做中位数插补与分位数正态化，缺失指示仅作为独立消融，且固定为全部 231 列的观测指示。问题二在每次重采样中重新插补、缩放，并在弹性网选参的内部折中重新拟合插补与标准化。问题三在每个风格留出的训练部分拟合浓度尺度、协方差、经验边际与分位数上限，留出样本不参与这些估计。
 
 缺失机制本身无法从附件中验证，其处理框架按 MCAR 与 MAR 的经典分类展开。本文没有缺失原因的元数据，也没有检测限信息；低于检出限的缺失可能与未观测的低浓度有关，这一点无法用随机遮蔽来检验。因此 MCAR 5\%--30\% 与按酒精度分层的 MAR 只作为压力测试情景使用，不声称自然缺失就是其中任何一种机制。
 
@@ -414,7 +390,7 @@ Ehrlich 降解生成酯类与高级醇；酒花添加带来萜烯、萜醇与异
 
 \subsection{标准化与特征构造}
 
-两个任务的尺度处理不同，这里分别说明。
+两个任务的尺度处理不同，本文在这里分别说明。
 
 问题一对 231 个特征做训练集内的分位数正态化，把每列的经验分布映射到标准正态，从而消除量纲与偏态；插补与变换参数都只在当前折的训练部分估计。
 
@@ -435,11 +411,11 @@ z_{i,j}=\frac{\ell_{i,j}-\mu_{j}}{\sigma_{j}},
 题目推荐的外部评论数据取自已公开的 Top Beer Information 数据集（Kaggle 平台），来源为 BeerAdvocate，
 许可依既有获取记录记为 CC BY 4.0。该数据在本地取得 5{,}558 行、112 个风格的评论词频记录。
 
-该数据不能与附件逐酒合并。附件 250 款酒在全部表格中都没有酒名、酒厂或条码，Kaggle 一侧也没有条码；退而用同风格且 ABV 相近作代理匹配，无法确认到具体酒款。
+该数据不与附件逐酒合并，附件 250 款酒在全部表格中都没有酒名、酒厂或条码，
+Kaggle 一侧也没有条码；退而用同风格且 ABV 相近作代理匹配，
+无法确认到具体酒款，因此本文只在风格层级使用它：按互斥语义规则把 112 个原风格中的 96 个映射到附件的 22 类，映射覆盖 4{,}760 行（85.6\%）；11 列词频按每行总词频归一化，剔除总词频小于 50 的行后，映射范围内保留 4{,}492 行，按风格聚合为 22 个感官词频原型。映射规则、原型构造与过滤由同一脚本执行，不依赖手工填入的原型表。
 
-本文因此只在风格层级使用它：按互斥语义规则把 112 个原风格中的 96 个映射到附件的 22 类，映射覆盖 4{,}760 行（85.6\%）；11 列词频按每行总词频归一化，剔除总词频小于 50 的行后，映射范围内保留 4{,}492 行，按风格聚合为 22 个感官词频原型。映射规则、原型构造与过滤由同一脚本执行，不依赖手工填入的原型表。
-
-使用范围需要写明：该数据只用于风格级外部校验，没有进入问题一的风格编码，也没有用于问题三的生成分布或迁移方向估计。以 \file{7.csv} 的风格均值作对照，风格级酸感、酒花与麦芽词频的相关分别约为 0.890、0.818 与 0.799；这些相关只建立在 22 个风格上，属于生态相关，词频比例也不等于训练面板的强度或 0--6 评分，语义映射更不是官方的风格等价关系，因此不能外推到逐酒预测。
+该数据只用于风格级外部校验，没有进入问题一的风格编码，也没有用于问题三的生成分布或迁移方向估计。以 \file{7.csv} 的风格均值作对照，风格级酸感、酒花与麦芽词频的相关分别约为 0.890、0.818 与 0.799；这些相关只建立在 22 个风格上，属于生态相关，词频比例也不等于训练面板的强度或 0--6 评分，语义映射更不是官方的风格等价关系，因此不能外推到逐酒预测。
 
 \section{问题一：缺失条件下的感官响应预测与相对分级}
 \label{sec:q1}
@@ -555,6 +531,16 @@ z_{i,j}=\frac{\ell_{i,j}-\mu_{j}}{\sigma_{j}},
 
 最终相对等级取三次外层报告等级的中位数；250 款、52 项的完整输出见支撑材料，其中 500 个乙醛栏位（250 款 $\times$ 2 项）标注为无可识别分数。
 
+交付格式见图~\ref{fig:card}：52 项按评分卡版面排布，50 项给出相对 0--6 等级，两侧乙醛保留为空。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{fig03_card.png}
+  \caption{评分卡位置输出示例（Beer 1--3，共 52 项）。30 项 Aroma/Flavour 项目与 20 项可映射项目给出相对 0--6 等级；两侧乙醛 2 项保留为空，标注为现有数据不可识别。等级为训练锚点下的相对尺度，不是人工原始评分。完整 250 款 $\times$ 52 项见支撑材料。}
+  \label{fig:card}
+\end{figure}
+
+
 \subsection{缺失压力测试}
 
 每个外层训练模型保持冻结，只遮蔽其测试特征。MCAR 追加 5\%、10\%、20\%、30\% 随机缺失；MAR 按训练酒精度四分位数确定测试样本的缺失概率 0.05、0.15、0.30、0.50，且酒精度驱动列本身不遮蔽。两者都叠加在自然缺失之上，故名义比例与实测总比例略有差异。
@@ -609,7 +595,15 @@ A_{j,k}=\left|r_{j,k}\right|\cdot\mathbf{1}\left\{k\in N_{10}(j)\ \text{或}\ j\
 \end{equation}
 邻接取绝对值，原始正负号另作保留。每个节点至少保留 10 个邻居，不代表这些边都强或都显著。
 
-以加权 Louvain 划分社区\cite{blondel2008}，主图得到 231 个节点、1\,683 条边、8 个社区，模块度 0.5862。Top-5 图的模块度更高，硬阈值 $|r|\ge0.5$ 则产生 48 个孤立点；这说明模块度与连通性都不能单独作为“图构造最优”的依据，社区反映的是相关模块，也可能受风格混杂影响。
+以加权 Louvain 划分社区\cite{blondel2008}，主图得到 231 个节点、1\,683 条边、8 个社区，模块度 0.5862（图~\ref{fig:q2net}）。Top-5 图的模块度更高，硬阈值 $|r|\ge0.5$ 则产生 48 个孤立点；这说明模块度与连通性都不能单独作为“图构造最优”的依据，社区反映的是相关模块，也可能受风格混杂影响。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{fig05_network.png}
+  \caption{231 个节点的化合物关联网络。节点颜色表示 Louvain 社区，C1--C8 按社区规模降序编号，图例数字为节点数；节点大小表示度，布局为 ForceAtlas2。构图使用绝对相关，正负关联均可能成边，同社区不表示浓度同向变化，也不表示存在因果关系。}
+  \label{fig:q2net}
+\end{figure}
+
 
 \subsubsection{五类排序与融合}
 
@@ -670,9 +664,24 @@ S_{E}=(1-\lambda)S+\lambda WS,\qquad \lambda=0.3,
   \end{minipage}
 \end{table}
 
-预测用途检查的结果不支持“网络不可替代”的说法：全指标边际、五法融合、去网络四法融合的平均 $R^2$ 分别为 0.1170、0.1308、0.1312，去掉网络平滑反而略高；化学候选限定的结果为 $R^2=0.0760$、$\mathrm{RMSE}=0.5166$。因此现有证据支持把网络用于结构展示与候选扩展，不支持声称它带来已证实的性能提升。
+图~\ref{fig:q2top3} 固定展示三类香气与五类缺陷共 8 个维度，其中在表~\ref{tab:q2-top3} 之外的两项用于补足香气与缺陷的覆盖；图中出现五个缺陷维度，不等于五类缺陷已获控制。
 
-网络构造的敏感性也直接对照 Top-3 集合：与 Top-10、平滑 0.3 相比，Top-5/0.3 与硬阈值/0.3 的平均 Jaccard 约为 0.93 与 0.92，Top-10 平滑 0 与 0.6 约为 0.92 与 0.84。这一诊断只针对全指标融合，不与主化学候选的频率混称；社区划分的调整兰德指数不能替代 Top-3 敏感性。
+预测用途检查的结果不支持“网络不可替代”的说法：全指标边际、五法融合、去网络四法融合的
+平均 $R^2$ 分别为 0.1170、0.1308、0.1312，去掉网络平滑反而略高；化学候选限定的结果
+为 $R^2=0.0760$、$\mathrm{RMSE}=0.5166$。因此现有证据支持把网络用于结构展示与候选扩展，
+不支持声称它带来已证实的性能提升。
+
+网络构造的敏感性也直接对照 Top-3 集合：与 Top-10、平滑 0.3 相比，Top-5/0.3 
+与硬阈值/0.3 的平均 Jaccard 约为 0.93 与 0.92，Top-10 平滑 0 与 0.6 约为 0.92 与 0.84。
+这一诊断只针对全指标融合，不与主化学候选的频率混称；社区划分的调整兰德指数不能替代 Top-3 
+敏感性。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{fig18_top3.png}
+  \caption{八个代表性感官维度的 24 项化学候选。条目顺序为五法平均秩，柱长为 500 次酒样 bootstrap 下的 Top-3 入选频率；两者口径不同，频率不随名次单调下降。维度固定在三类香气与五类缺陷，未按结果好坏挑选。完整 50 维、150 项见附录。}
+  \label{fig:q2top3}
+\end{figure}
+
 
 \subsection{化学合理性与先验敏感性}
 
@@ -709,7 +718,7 @@ u_{j,s}=1-\frac{\bar r_{j,s}-1}{230},\qquad u^{*}_{j,s}=u_{j,s}+\gamma p_{j,s},\
 
 精确度、画像 Pearson 相关与马氏距离同样按上述划分计算。精确度与覆盖度虽然都是比例，但分母不同——覆盖度以留出真实样本为分母，精确度以每轮设定的生成条数为分母，后者随生成规模改变，两者并列会误导；画像 Pearson 相关与马氏距离亦不与 RMSE 同尺度。因此这四项随结果文件提供，不进入表~\ref{tab:q3-res}。
 
-各风格分别记录，再对三个风格等权平均、对 5 次重复汇总。需要说明，重复留出的样本相互重叠，其标准差不是独立实验的置信区间。
+分别记录各风格，再对三个风格等权平均、对 5 次重复汇总。需要说明，重复留出的样本相互重叠，其标准差不是独立实验的置信区间。
 
 \subsection{模型构建：从基线到正确的高斯最优传输}
 
@@ -822,11 +831,40 @@ copula 的 $\mathrm{MMD}^{2}$ 在 5 次重复间的标准差约 0.0569，画像 
 
 感官代理每轮在训练内都选中 Ridge，留出宏平均 $R^2$ 约 0.2129；stale hops 单维的平均 $R^2=-0.0466$，因此它的迁移预测只能作弱诊断。留出集小、重复划分重叠且风格样本不均衡，这些结果不能外推到所有商业啤酒。
 
+全量重拟合后的两个描述性产物见图~\ref{fig:q3pca} 与图~\ref{fig:q3radar}：前者是 70 维校准子谱的低维投影，后者是生成谱经感官代理后的核心画像。两者都不计为独立验证，生成质量的独立留出论证仍以表~\ref{tab:q3-res} 为准。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{fig19_pca.png}
+  \caption{70 维校准子谱的 PCA 投影，坐标只在 250 款实测酒上拟合。(a) 实测；(b)(c) 三个风格各 300 条条件 copula 
+  与高斯 OT 秩校准生成谱；(d) 11 款源酒到主约束迁移结果的配对箭头。PC1 约 15.8\%、PC2 约 12.5\%、合计约 28.3\%，}
+  \label{fig:q3pca}
+\end{figure}
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{fig20_radar.png}
+  \caption{三个风格的生成与实测中位感官画像；第四面板叠加三风格生成画像。半径为统一实测参考下的感官响应百分位（0--100），
+  曲线为组内中位响应的映射：50 表示处于全体实测响应的中间位置，100 表示高于全部该维度实测响应。八维依次为酯香、酒花香、麦芽香、苦味、酒体、酒精、甜味、酸度。}
+  \label{fig:q3radar}
+\end{figure}
+
+
 \subsection{跨风格迁移结果}
 
 Pils/Lager 到 Tripel 的 11 款源酒使用正确的高斯 OT 迁移。在两个单位情景下，主约束式~\eqref{eq:defect-main} 在四类直接化合物上均无恶化（0/11）；strict 更强约束下，浓度升高与超阈值率也均为 0。
 
-相反，style 对照的 DMS 与双乙酰超阈值程度在 11 款源酒上全部升高（11/11），反式-2-壬烯醛按附件单位时同样为 11/11、按替代单位时为 0/11。因此 style 不能替代题目给出的主约束，反式-2-壬烯醛的单位选择还会直接改变这一具体结论——这正是本文必须双情景报告的原因。
+相反，style 对照的 DMS 与双乙酰超阈值程度在 11 款源酒上全部升高（11/11），4VG 仅
+1 款升高，反式-2-壬烯醛按附件单位时同样为 11/11、按替代单位时为 0/11（图~\ref{fig:q3trans}）。
+因此 style 不能替代题目给出的主约束，反式-2-壬烯醛的单位选择还会直接改变这一具体结论
+——这正是本文必须双情景报告的原因。
+
+\figinsert[\textwidth]{fig21_transfer}{%
+上方为感官代理画像，下方为四类直接化合物的超阈值恶化酒样数，两种反式-2-壬烯醛
+单位情景分列。下方柱高为相对各自源酒超阈值程度 $\max(\mathrm{OAV}-1,0)$ 增加的酒样数，
+不是超过阈值的总酒样数；0 表示在该情景与所用阈值下无对应数值恶化，不保证浓度均下降、
+真实品评改善或工艺可达。}{fig:q3trans}
 
 这些约束只对声明的四类化学指标成立。stale hops 没有可靠实测或代理保证；派生指标之间的一致性、工艺可达性与人的最终品评也未验证。本文把它们列为尚未解决的边界，而不是用高分类命中率代替验证。
 
