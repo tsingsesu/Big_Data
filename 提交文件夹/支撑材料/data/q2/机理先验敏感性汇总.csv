@@ -1,0 +1,5 @@
+﻿lambda,mean_overlap_with_data_top3,mean_stability_fused,mean_data_fused_rank,n_direct_prior_in_top3_total,mean_top3_overlap_6csv_final,mean_sign_agreement_6csv_final,mean_top3_overlap_6csv_restricted,mean_sign_agreement_6csv_restricted
+0.0,1.0,0.5105,7.04,5,0.4733,1.0,0.5867,1.0
+0.1,0.7933,0.5261,8.38,5,0.4133,1.0,0.54,1.0
+0.2,0.66,0.5519,11.36,5,0.3733,1.0,0.5533,1.0
+0.5,0.4267,0.6412,23.76,8,0.3267,1.0,0.4867,1.0

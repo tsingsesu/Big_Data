@@ -1,0 +1,16 @@
+repeat,fold,model,inner_r2,selection_scope,n_train,n_test
+0,0,blend_avg,0.2266381787948948,outer_training_only,200,50
+0,1,blend_avg,0.21757433177662855,outer_training_only,200,50
+0,2,blend_avg,0.23228702031080672,outer_training_only,200,50
+0,3,blend_avg,0.22746305296328578,outer_training_only,200,50
+0,4,blend_avg,0.23334435061502226,outer_training_only,200,50
+1,0,extratrees,0.22348888094143052,outer_training_only,200,50
+1,1,blend_avg,0.22842299650057327,outer_training_only,200,50
+1,2,blend_avg,0.22322367672471038,outer_training_only,200,50
+1,3,blend_avg,0.23029011585275236,outer_training_only,200,50
+1,4,blend_avg,0.2301496561587859,outer_training_only,200,50
+2,0,blend_avg,0.215150116337042,outer_training_only,200,50
+2,1,blend_avg,0.22462197826190425,outer_training_only,200,50
+2,2,blend_avg,0.22065145012263274,outer_training_only,200,50
+2,3,blend_avg,0.24003213916605212,outer_training_only,200,50
+2,4,blend_avg,0.22237519120026505,outer_training_only,200,50

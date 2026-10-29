@@ -302,18 +302,6 @@ def paired_comparison(y, oof, n_boot=2000):
         rows.append(dict(reference=name, delta_r2=point, ci_low=np.quantile(diffs, 0.025), ci_high=np.quantile(diffs, 0.975), n_beers=len(y), n_boot=n_boot, scope='paired_beer_bootstrap_of_averaged_OOF_predictions_conditional_on_fitted_CV_models'))
     return pd.DataFrame(rows)
 
-def _sanitize_json(obj):
-    if isinstance(obj, dict):
-        return {str(k): _sanitize_json(v) for (k, v) in obj.items()}
-    if isinstance(obj, (list, tuple)):
-        return [_sanitize_json(v) for v in obj]
-    if isinstance(obj, np.ndarray):
-        return _sanitize_json(obj.tolist())
-    if isinstance(obj, (float, np.floating)):
-        return float(obj) if np.isfinite(obj) else None
-    if isinstance(obj, np.integer):
-        return int(obj)
-    return obj
 
 def main():
     parser = argparse.ArgumentParser(description='Nested Q1 evaluation; defaults are the paper run.')
@@ -436,7 +424,6 @@ def main():
     cv = pd.DataFrame(records)
     grade = pd.DataFrame(grade_rows)
     mf = pd.DataFrame(missing_rows)
-    summary = {name: {metric: {'mean': float(sub[metric].mean()), 'std': float(sub[metric].std())} for metric in METRIC_COLS} for name in ALL_MODELS for sub in [cv[(cv.model == name) & (cv.target == 'MACRO')]]}
     missing = mf.groupby('scenario', sort=False).agg(total_missing_rate=('total_missing_rate', 'mean'), r2_mean=('r2', 'mean'), r2_std=('r2', 'std'), rmse_mean=('rmse', 'mean'), n_folds=('fold', 'size')).reset_index()
     natural = float(missing.loc[missing.scenario == 'natural', 'r2_mean'].iloc[0])
     missing['delta_r2_pct'] = 100 * (missing.r2_mean - natural) / abs(natural)
@@ -468,8 +455,7 @@ def main():
         b = macros[macros.model == base].sort_values(['repeat', 'fold'])
         ablation_rows.append(dict(model=name, feature_set=feature, n_folds=len(a), **{m + '_mean': float(a[m].mean()) for m in ['r2', 'rmse', 'mae', 'spearman']}, delta_r2_vs_chemical=float(np.mean(a.r2.values - b.r2.values))))
     pd.DataFrame(ablation_rows).to_csv(OUT_DIR / '风格特征消融.csv', index=False)
-    payload = {'meta': {'schema_version': 2, 'n_splits': 5, 'n_repeats': nrep, 'trees': args.trees, 'n_samples': n, 'n_targets': len(targets), 'selection': 'inner_training_only; no outer scores select a learner', 'grade_primary': 'predeclared_raw_training_y_q01_q99_minmax', 'grade_reference': 'same outer-training y q01/q99 for all methods; never full-data quantiles', 'calibration_note': 'inner HP-selected OOF predictions within outer training; selection and calibration evaluated on untouched outer test', 'missingness': 'test_only_frozen_model; MAR quartiles fit on outer training', 'warning': 'Relative grades are not recovered original 0-6 labels; outer candidate comparisons exploratory', 'runtime_note': 'runtime_sec measures this process; resumed fold fitting time is not included'}, 'models': {name: {'macro_mean_std_over_folds': summary[name], 'final_oof_macro': macro_from_per_target(per_target_metrics(Y, oof[name].mean(axis=0)))} for name in ALL_MODELS}, 'best_model': {'name': 'selected_pipeline', 'criterion': 'learner chosen inside each outer training fold'}, 'grade': {'primary_calibration': 'minmax', 'macro_mean_std_over_folds': {cal: {m: {'mean': float(a[m].mean()), 'std': float(a[m].std())} for m in ['qwk', 'grade_mae', 'exact_hit', 'within1_hit']} for (cal, a) in grade.query('target=="MACRO"').groupby('calibration')}}, 'hyperparameters': hp_rows, 'selection': selection, 'paired_comparison': compare.to_dict('records'), 'missingness': missing.to_dict('records'), 'runtime_sec': time.time() - t0, 'provenance': provenance(), 'limitations': ['Unlabeled aroma/flavour acetaldehyde retained explicitly without invented score', 'No absolute grade accuracy is identifiable', 'Paired bootstrap conditions on fitted CV models; not full retraining uncertainty']}
-    (OUT_DIR / '模型结果汇总.json').write_text(json.dumps(_sanitize_json(payload), ensure_ascii=False, indent=2, allow_nan=False))
-    print('[Q1] complete', json.dumps(payload['models']['selected_pipeline'], ensure_ascii=False), flush=True)
+    print('[Q1] 完成，所选流程各折宏平均：', flush=True)
+    print(cv[(cv.model == 'selected_pipeline') & (cv.target == 'MACRO')][METRIC_COLS].mean(), flush=True)
 if __name__ == '__main__':
     main()

@@ -43,7 +43,7 @@ def map_style(style):
     return next((k for k,v in exact.items() if style in v),None)
 
 def build_prototypes():
-    import json,hashlib,io,zipfile,urllib.request
+    import io,zipfile,urllib.request
     EXT.mkdir(exist_ok=True)
     path=EXT/'外部啤酒数据.csv'
     if not path.exists():
@@ -65,18 +65,7 @@ def build_prototypes():
     p.insert(0,'n_kept',fraction.groupby('风格').size());p=p.rename(columns={'Astringency':'Astr','Alcohol':'Alc'}).reset_index()
     p.to_csv(EXT/'外部风格画像.csv',index=False,float_format='%.12g')
     assert np.allclose(p.drop(columns=['风格','n_kept']).sum(axis=1),1.)
-    meta={'n_raw':len(raw),'n_raw_styles':raw.Style.nunique(),'n_mapped_styles':mapping.attachment_style.notna().sum(),
-        'n_mapped_rows':int(raw['style'].notna().sum()),'n_quality_rows_all':int(total.ge(50).sum()),
-        'n_mapped_quality_rows':int(keep.sum()),'n_target_styles':len(p),
-        'raw_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),
-        'source':'https://www.kaggle.com/datasets/stephenpolozoff/top-beer-information',
-        'license_recorded':'CC BY 4.0; project 2026-10-24 API retrieval record, not re-verified online',
-        'role':'style-level external validation only; not Q1 or Q3 training input',
-        'mapping':'hand-authored mutually exclusive semantic mapping; source table exported',
-        'normalization':'11 word counts / row total; total>=50'}
-    meta={k:int(v) if isinstance(v,np.integer) else v for k,v in meta.items()}
-    (EXT/'数据来源记录.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2))
-    print('[external]',json.dumps(meta,ensure_ascii=False),flush=True)
+    print('[external] 原始行数、映射行数、筛选行数、风格数：', len(raw), int(raw['style'].notna().sum()), int(keep.sum()), len(p), flush=True)
     return p
 
 def main() -> None:

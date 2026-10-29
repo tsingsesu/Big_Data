@@ -1,0 +1,151 @@
+﻿scheme,target,rank,feature,chemical_class,stability_freq,compound_2csv,chemical_name,scope
+compound_only,A_malt_all,1,beta.phellandrene,Terpene hydrocarbons,0.452,Beta-phellandrene,Beta-phellandrene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_all,2,ethyl..E..linalool,Terpenoids,0.222,Ethyl linalool,Ethyl linalool,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_all,3,X5.methylfurfural,Aldehydes,0.142,5-methylfurfural,5-methylfurfural,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_grain,1,furfural,Aldehydes,0.27,Furfural,Furfural,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_grain,2,X5.methylfurfural,Aldehydes,0.3,5-methylfurfural,5-methylfurfural,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_grain,3,isoborneol,Terpenoids,0.334,Isoborneol,Isoborneol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_bread,1,neryl.formate,Esters,0.248,Neryl formate,Neryl formate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_bread,2,X4.ethyl.guaiacol,Volatile phenols,0.156,4-ethyl-guaiacol,4-ethyl-guaiacol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_bread,3,beta.phellandrene,Terpene hydrocarbons,0.07,Beta-phellandrene,Beta-phellandrene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_cara,1,X2.acetylpyrrole,Furans/pyrazines,0.106,2-acetylpyrrole,2-acetylpyrrole,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_cara,2,ethanol..v.v.,Alcohols,0.116,Ethanol,Ethanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_cara,3,X2.methyl.benzofuran,Furans/pyrazines,0.244,2-methyl-benzofuran,2-methyl-benzofuran,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_burn,1,methylpyrazine,Furans/pyrazines,0.346,Methylpyrazine,Methylpyrazine,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_burn,2,MeSH,Sulfur compounds,0.328,Methanethiol,Methanethiol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_malt_burn,3,y.methyl.1.octanol,Alcohols,0.282,Y-methyl-1-octanol,Y-methyl-1-octanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_all,1,ethyl_octanoate,Esters,0.774,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_all,2,DMS,Sulfur compounds,0.47,Dimethyl sulfide,Dimethyl sulfide,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_all,3,cis.dihydro.beta.terpineol,Terpenoids,0.364,Cis-dihydro-β-terpineol,Cis-dihydro-Î²-terpineol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_citrus,1,cis.dihydro.beta.terpineol,Terpenoids,0.492,Cis-dihydro-β-terpineol,Cis-dihydro-Î²-terpineol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_citrus,2,X6.methyl.5.hepten.2.one,Ketones,0.336,Methyl heptenone,Methyl heptenone,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_citrus,3,geraniol,Terpenoids,0.28,Geraniol,Geraniol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_tropical,1,DMS,Sulfur compounds,0.73,Dimethyl sulfide,Dimethyl sulfide,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_tropical,2,methyl.geranate,Esters,0.436,Methyl geranate,Methyl geranate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_tropical,3,citronellol,Terpenoids,0.22,Citronellol,Citronellol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_noble,1,ethyl_octanoate,Esters,0.972,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_noble,2,ethyl_decanoate,Esters,0.646,Ethyl decanoate,Ethyl decanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_noble,3,isopentyl.hexanoate,Esters,0.244,Isopentyl hexanoate,Isopentyl hexanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_woody,1,ethyl_2.methyl_butyrate,Esters,0.438,Ethyl 2-methylbutyrate,Ethyl 2-methylbutyrate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_woody,2,X.E..ortho.methoxy.cinnamaldehyde,Aldehydes,0.354,E-ortho-methoxy cinnamaldehyde,E-ortho-methoxy cinnamaldehyde,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_hops_woody,3,trans.dihydro.alpha.terpinyl.acetate,Esters,0.112,Trans-dihydro-α-terpinyl acetate,Trans-dihydro-Î±-terpinyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_all,1,acetaldehyde,Aldehydes,0.892,Acetaldehyde,Acetaldehyde,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_all,2,n.hexanol,Alcohols,0.398,N-hexanol,N-hexanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_all,3,isopentyl_acetate,Esters,0.242,Isoamyl acetate,Isoamyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_ethac,1,ethyl_acetate,Esters,0.714,Ethyl acetate,Ethyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_ethac,2,acetaldehyde,Aldehydes,0.614,Acetaldehyde,Acetaldehyde,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_ethac,3,X2E.6Z.farnesal,Aldehydes,0.17,"E,Z-farnesal","E,Z-farnesal",214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_isoaa,1,isopentyl_acetate,Esters,0.81,Isoamyl acetate,Isoamyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_isoaa,2,n.hexanol,Alcohols,0.686,N-hexanol,N-hexanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_isoaa,3,isoamyl_alcohol,Alcohols,0.13,Isoamyl alcohol,Isoamyl alcohol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_flower,1,beta.phellandrene,Terpene hydrocarbons,0.288,Beta-phellandrene,Beta-phellandrene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_flower,2,X.E..beta.ionone,Ketones,0.228,E-β-ionone,E-Î²-ionone,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_flower,3,isobutyl_acetate,Esters,0.226,Isobutyl acetate,Isobutyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_fruity,1,beta.phellandrene,Terpene hydrocarbons,0.754,Beta-phellandrene,Beta-phellandrene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_fruity,2,X1.10.di.epi.cubenol,Terpenoids,0.438,Epicubenol,Epicubenol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,A_esters_fruity,3,humulene.epoxide.II,Terpenoids,0.218,Humulene epoxide II,Humulene epoxide II,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_all,1,acetaldehyde,Aldehydes,0.902,Acetaldehyde,Acetaldehyde,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_all,2,terpinen.4.ol,Terpenoids,0.166,Terpinen-4-ol,Terpinen-4-ol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_all,3,X.E..alpha.ionone,Ketones,0.298,E-α-ionone,E-Î±-ionone,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_grain,1,isoborneol,Terpenoids,0.452,Isoborneol,Isoborneol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_grain,2,terpinen.4.ol,Terpenoids,0.42,Terpinen-4-ol,Terpinen-4-ol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_grain,3,X.E..beta.ionone,Ketones,0.276,E-β-ionone,E-Î²-ionone,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_bread,1,acetaldehyde,Aldehydes,0.516,Acetaldehyde,Acetaldehyde,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_bread,2,ethyl.tiglate,Esters,0.158,Ethyl tiglate,Ethyl tiglate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_bread,3,terpinen.4.ol,Terpenoids,0.324,Terpinen-4-ol,Terpinen-4-ol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_cara,1,acetaldehyde,Aldehydes,0.848,Acetaldehyde,Acetaldehyde,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_cara,2,ethanol..v.v.,Alcohols,0.298,Ethanol,Ethanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_cara,3,phenethyl_alcohol,Alcohols,0.196,Phenethyl alcohol,Phenethyl alcohol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_burn,1,MeSH,Sulfur compounds,0.618,Methanethiol,Methanethiol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_burn,2,glycerol,Polyols,0.178,Glycerol,Glycerol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_malt_burn,3,ethanol..v.v.,Alcohols,0.288,Ethanol,Ethanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_all,1,cis.dihydro.beta.terpineol,Terpenoids,0.778,Cis-dihydro-β-terpineol,Cis-dihydro-Î²-terpineol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_all,2,ethyl_octanoate,Esters,0.768,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_all,3,DMS,Sulfur compounds,0.266,Dimethyl sulfide,Dimethyl sulfide,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_citrus,1,methyl.geranate,Esters,0.246,Methyl geranate,Methyl geranate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_citrus,2,geosmin,Terpenoids,0.316,Geosmin,Geosmin,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_citrus,3,trans.dihydro.alpha.terpinyl.acetate,Esters,0.152,Trans-dihydro-α-terpinyl acetate,Trans-dihydro-Î±-terpinyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_tropical,1,DMS,Sulfur compounds,0.392,Dimethyl sulfide,Dimethyl sulfide,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_tropical,2,geraniol,Terpenoids,0.28,Geraniol,Geraniol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_tropical,3,X6.methyl.5.hepten.2.one,Ketones,0.46,Methyl heptenone,Methyl heptenone,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_noble,1,ethyl_octanoate,Esters,0.966,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_noble,2,bitterness,Hop acids,0.518,Iso-alpha acids,Iso-alpha acids,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_noble,3,glycerol,Polyols,0.312,Glycerol,Glycerol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_woody,1,bitterness,Hop acids,0.628,Iso-alpha acids,Iso-alpha acids,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_woody,2,ethyl_decanoate,Esters,0.288,Ethyl decanoate,Ethyl decanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_hops_woody,3,isobutanol,Alcohols,0.512,Isobutanol,Isobutanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_all,1,acetaldehyde,Aldehydes,0.85,Acetaldehyde,Acetaldehyde,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_all,2,isopentyl_acetate,Esters,0.244,Isoamyl acetate,Isoamyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_all,3,n.hexanol,Alcohols,0.284,N-hexanol,N-hexanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_ethac,1,ethyl_acetate,Esters,0.914,Ethyl acetate,Ethyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_ethac,2,acetaldehyde,Aldehydes,0.598,Acetaldehyde,Acetaldehyde,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_ethac,3,Z.Z.geranyl.linalool,Terpenoids,0.29,"Z,Z-geranyl linalool","Z,Z-geranyl linalool",214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_isoaa,1,isopentyl_acetate,Esters,0.648,Isoamyl acetate,Isoamyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_isoaa,2,X.Z..beta.farnesene,Terpene hydrocarbons,0.09,Z-β-farnesene,Z-Î²-farnesene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_isoaa,3,heptyl.acetate,Esters,0.146,Heptyl acetate,Heptyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_flower,1,eucalyptol,Terpenoids,0.514,Eucalyptol,Eucalyptol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_flower,2,beta.phellandrene,Terpene hydrocarbons,0.432,Beta-phellandrene,Beta-phellandrene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_flower,3,terpinolene,Terpene hydrocarbons,0.13,Terpinolene,Terpinolene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_fruity,1,beta.phellandrene,Terpene hydrocarbons,0.498,Beta-phellandrene,Beta-phellandrene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_fruity,2,MeSH,Sulfur compounds,0.302,Methanethiol,Methanethiol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,F_esters_fruity,3,acetic_acid.g.L.,Organic acids,0.202,Acetic acid,Acetic acid,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,acidity,1,lactic_acid.mg.L.,Organic acids,0.94,Lactic acid,Lactic acid,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,acidity,2,X4.ethyl.guaiacol,Volatile phenols,0.49,4-ethyl-guaiacol,4-ethyl-guaiacol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,acidity,3,isopentyl_acetate,Esters,0.33,Isoamyl acetate,Isoamyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,bitternes,1,bitterness,Hop acids,0.996,Iso-alpha acids,Iso-alpha acids,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,bitternes,2,ethyl_octanoate,Esters,0.988,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,bitternes,3,ethyl_decanoate,Esters,0.604,Ethyl decanoate,Ethyl decanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,sweetness,1,ethyl_decanoate,Esters,0.76,Ethyl decanoate,Ethyl decanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,sweetness,2,X2.undecanol,Alcohols,0.232,2-undecanol,2-undecanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,sweetness,3,ethyl_octanoate,Esters,0.388,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,X4vg,1,X4VG,Volatile phenols,0.992,4-vinylguaiacol,4-vinylguaiacol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,X4vg,2,neryl.formate,Esters,0.294,Neryl formate,Neryl formate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,X4vg,3,X4.ethyl.guaiacol,Volatile phenols,0.194,4-ethyl-guaiacol,4-ethyl-guaiacol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,diacetyl,1,pentyl.octanoate,Esters,0.39,Pentyl octanoate,Pentyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,diacetyl,2,beta.phellandrene,Terpene hydrocarbons,0.336,Beta-phellandrene,Beta-phellandrene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,diacetyl,3,ethyl_decanoate,Esters,0.35,Ethyl decanoate,Ethyl decanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,dms,1,SO2.mg.L.,Sulfur compounds,0.288,Sulfur dioxide,Sulfur dioxide,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,dms,2,X.Z..dihydro.apofarnesal,Aldehydes,0.102,Z-dihydro-apofarnesal,Z-dihydro-apofarnesal,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,dms,3,terpinen.4.ol,Terpenoids,0.168,Terpinen-4-ol,Terpinen-4-ol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,metallic,1,ethyl_isovalerate,Esters,0.658,Ethyl 3-methylbutyrate,Ethyl 3-methylbutyrate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,metallic,2,isopentyl.butanoate,Esters,0.354,Isopentyl butanoate,Isopentyl butanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,metallic,3,isopentyl_acetate,Esters,0.214,Isoamyl acetate,Isoamyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,stale_hops,1,X.E..ortho.methoxy.cinnamaldehyde,Aldehydes,0.346,E-ortho-methoxy cinnamaldehyde,E-ortho-methoxy cinnamaldehyde,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,stale_hops,2,gamma.eudesmol,Terpenoids,0.41,Gamma-eudesmol,Gamma-eudesmol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,stale_hops,3,ethyl_2.methyl_butyrate,Esters,0.146,Ethyl 2-methylbutyrate,Ethyl 2-methylbutyrate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,t2n,1,glycerol,Polyols,0.378,Glycerol,Glycerol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,t2n,2,geraniol,Terpenoids,0.09,Geraniol,Geraniol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,t2n,3,beta.phellandrene,Terpene hydrocarbons,0.218,Beta-phellandrene,Beta-phellandrene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,orange,1,limonene,Terpene hydrocarbons,0.662,Limonene,Limonene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,orange,2,terpinolene,Terpene hydrocarbons,0.23,Terpinolene,Terpinolene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,orange,3,linalool,Terpenoids,0.18,Linalool,Linalool,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,coriander,1,limonene,Terpene hydrocarbons,0.438,Limonene,Limonene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,coriander,2,geraniol,Terpenoids,0.324,Geraniol,Geraniol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,coriander,3,terpinolene,Terpene hydrocarbons,0.326,Terpinolene,Terpinolene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,clove,1,eucalyptol,Terpenoids,0.834,Eucalyptol,Eucalyptol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,clove,2,limonene,Terpene hydrocarbons,0.746,Limonene,Limonene,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,clove,3,linalool,Terpenoids,0.498,Linalool,Linalool,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,lactic,1,lactic_acid.mg.L.,Organic acids,0.994,Lactic acid,Lactic acid,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,lactic,2,isopentyl_acetate,Esters,0.512,Isoamyl acetate,Isoamyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,lactic,3,ethyl.phenylacetate,Esters,0.308,Ethyl phenylacetate,Ethyl phenylacetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,acetic,1,lactic_acid.mg.L.,Organic acids,0.986,Lactic acid,Lactic acid,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,acetic,2,isopentyl_acetate,Esters,0.344,Isoamyl acetate,Isoamyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,acetic,3,ethyl_isovalerate,Esters,0.168,Ethyl 3-methylbutyrate,Ethyl 3-methylbutyrate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,barnyard,1,gamma.eudesmol,Terpenoids,0.552,Gamma-eudesmol,Gamma-eudesmol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,barnyard,2,X1.10.di.epi.cubenol,Terpenoids,0.186,Epicubenol,Epicubenol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,barnyard,3,heptyl.acetate,Esters,0.05,Heptyl acetate,Heptyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,alcohol,1,ethanol..v.v.,Alcohols,0.966,Ethanol,Ethanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,alcohol,2,ethyl_octanoate,Esters,0.858,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,alcohol,3,acetaldehyde,Aldehydes,0.526,Acetaldehyde,Acetaldehyde,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,aftertaste,1,ethyl_octanoate,Esters,0.794,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,aftertaste,2,ethanol..v.v.,Alcohols,0.656,Ethanol,Ethanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,aftertaste,3,ethyl_isovalerate,Esters,0.558,Ethyl 3-methylbutyrate,Ethyl 3-methylbutyrate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,body,1,glycerol,Polyols,0.584,Glycerol,Glycerol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,body,2,ethyl_octanoate,Esters,0.6,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,body,3,MeSH,Sulfur compounds,0.31,Methanethiol,Methanethiol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,co2,1,ethyl_octanoate,Esters,0.984,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,co2,2,X3.methyl.2.hexanol,Alcohols,0.434,3-methyl-2-hexanol,3-methyl-2-hexanol,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,co2,3,isopentyl.hexanoate,Esters,0.168,Isopentyl hexanoate,Isopentyl hexanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,overall,1,ethyl_acetate,Esters,0.846,Ethyl acetate,Ethyl acetate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,overall,2,isopentyl.hexanoate,Esters,0.174,Isopentyl hexanoate,Isopentyl hexanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded
+compound_only,overall,3,ethyl_octanoate,Esters,0.28,Ethyl octanoate,Ethyl octanoate,214 chemical candidates; 13 physicochemical and 4 derived indices excluded

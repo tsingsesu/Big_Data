@@ -1,0 +1,232 @@
+feature,compound_2csv,field_name_python,chemical_name,unit,calibrated,origin_paper,aging,off_flavors,threshold_mean,threshold_median,in_cal_dataset,transform,transform_source,range_hypothesis,median_relative_error_linear,median_relative_error_log10,median_relative_error_ln,calibrated_zero_count,zero_inversion_mismatch_count,positive_match_count
+acetaldehyde,Acetaldehyde,acetaldehyde,Acetaldehyde,mg/L,yes,Yeast,increase,"pungent, rotten-apples, green apple",50.0,50.0,True,log10,calibrated_positive_values,none,0.863971337808925,5.653409622737258e-10,0.5602773383588707,1.0,1.0,249.0
+CS2,Carbon disulfide,CS2,Carbon disulfide,ug/L,yes,Yeast,,,50.0,50.0,True,log10,calibrated_positive_values,none,4.304099630461561,5.030445485865274e-10,1.437482732041303,209.0,209.0,41.0
+DES,Diethyl sulfide,DES,Diethyl sulfide,ug/L,yes,Yeast,,rotting vegetables,1.2,1.2,True,log10,calibrated_positive_values,none,1.278271728717531,5.120167372731627e-10,0.3401222912382555,29.0,29.0,221.0
+DMS,Dimethyl sulfide,DMS,Dimethyl sulfide,ug/L,yes,Malt,increase,"cooked vegetables, onion, garlic, corn, black currant, sulfidic, cabbage, tinned tomato, baked beans",17.25,19.0,True,log10,calibrated_positive_values,none,0.943241276528254,6.964807057561175e-10,0.8361271642783012,1.0,1.0,249.0
+ethyl_2.methyl_butyrate,Ethyl 2-methylbutyrate,ethyl 2-methyl butyrate,Ethyl 2-methylbutyrate,mg/L,yes_gcms,Others,increase,,0.027,0.027,True,log10,calibrated_positive_values,none,226.1811149944873,6.687664223388262e-10,13.301870055891875,85.0,85.0,165.0
+ethyl_acetate,Ethyl acetate,ethyl acetate,Ethyl acetate,mg/L,yes,Yeast,decrease,,24.0,23.0,True,log10,calibrated_positive_values,none,0.9482379314955588,6.156363665944087e-10,0.8475090121359393,0.0,0.0,250.0
+ethyl_decanoate,Ethyl decanoate,ethyl decanoate,Ethyl decanoate,mg/L,"yes_gcms, yes",Yeast,decrease,,1.035,1.035,True,log10,calibrated_positive_values,none,9.309991728992522,5.803426784813704e-10,2.421917849762967,1.0,1.0,249.0
+ethyl_hexanoate,Ethyl hexanoate,ethyl hexanoate,Ethyl hexanoate,mg/L,"yes_gcms,yes",Yeast,decrease,,0.23,0.225,True,log10,calibrated_positive_values,none,3.6397023299003886,5.781941761523779e-10,1.2583500303277202,1.0,1.0,249.0
+ethyl_isovalerate,Ethyl 3-methylbutyrate,ethyl isovalerate,Ethyl 3-methylbutyrate,mg/L,"yes_gcms,yes",Others,increase,,0.1,0.1,True,log10,calibrated_positive_values,none,231.40561719101126,6.467986806806929e-10,13.455775297019093,83.0,83.0,167.0
+ethyl_octanoate,Ethyl octanoate,ethyl octanoate,Ethyl octanoate,mg/L,"yes_gcms, yes",Yeast,decrease,,0.7,0.75,True,log10,calibrated_positive_values,none,1.614766910765749,5.300138167741006e-10,0.48731071358767686,0.0,0.0,250.0
+ethyl_propionate,Ethyl propionate,ethyl propionate,Ethyl propionate,mg/L,"yes_gcms, yes",Yeast,,,10.0,10.0,True,log10,calibrated_positive_values,none,17.428805114040514,6.444921409324736e-10,3.493380831251544,10.0,10.0,240.0
+H2S,Hydrogen sulfide,H2S,Hydrogen sulfide,ug/L,yes,Yeast,,"sulfidic, rotten eggs",3.5,3.5,True,log10,calibrated_positive_values,none,0.893034116122721,5.981593167956909e-10,0.7086956963665731,10.0,10.0,240.0
+isoamyl_alcohol,Isoamyl alcohol,isoamyl alcohol,Isoamyl alcohol,mg/L,"yes_gcms,yes",Yeast,,,40.015,45.0,True,log10,calibrated_positive_values,none,0.9606714878656719,5.503182666206506e-10,0.8769199240463983,2.0,2.0,248.0
+isobutanol,Isobutanol,isobutanol,Isobutanol,mg/L,"yes_gcms,yes",Yeast,increase,,80.0,100.0,True,log10,calibrated_positive_values,none,0.9077372845029151,5.967797814018594e-10,0.7449792455586849,5.0,5.0,245.0
+isobutyl_acetate,Isobutyl acetate,isobutyl acetate,Isobutyl acetate,mg/L,"yes_gcms,yes",Yeast,,,1.0,1.0,True,log10,calibrated_positive_values,none,16.451396017475375,5.928571544281897e-10,3.3818184642833122,8.0,8.0,242.0
+isopentyl_acetate,Isoamyl acetate,isopentyl acetate,Isoamyl acetate,mg/L,"yes_gcms,yes",Yeast,decrease,,0.603333333,0.6,True,log10,calibrated_positive_values,none,0.8626003198050566,5.804647824415683e-10,0.4590433872888727,1.0,1.0,249.0
+MeSH,Methanethiol,MeSH,Methanethiol,ug/L,yes,Yeast,,"putrefaction, drains, rotting vegetables, estery",,,True,log10,calibrated_positive_values,none,1.0679489141283516,5.468411726562871e-10,0.185007515054589,0.0,0.0,250.0
+octyl_acetate,Octyl acetate,octyl acetate,Octyl acetate,mg/L,"yes_gcms,yes",Yeast,,,0.5,0.5,True,log10,calibrated_positive_values,none,288.5423061932927,5.563641190751581e-10,15.035799813559997,110.0,110.0,140.0
+phenethyl_acetate,Phenethyl acetate,phenethyl acetate,Phenethyl acetate,mg/L,"yes_gcms,yes",Yeast,,,1.763333333,1.29,True,log10,calibrated_positive_values,none,4.596858139712432,6.405276471013606e-10,1.5106140865841131,1.0,1.0,249.0
+phenethyl_alcohol,Phenethyl alcohol,phenethyl alcohol,Phenethyl alcohol,mg/L,"yes_gcms, yes",Yeast,,,35.01,32.5,True,log10,calibrated_positive_values,none,0.8998067050389466,5.824064161860901e-10,0.7060344510889913,0.0,0.0,250.0
+X4VG,4-vinylguaiacol,X4VG,4-vinylguaiacol,mg/L,yes_gcms,Yeast,,,0.206333333,0.2,True,log10,calibrated_positive_values,none,8.55957592334124,5.931456524862944e-10,2.2992585223611948,168.0,168.0,82.0
+SO2.mg.L.,Sulfur dioxide,SO2-mg.L.,Sulfur dioxide,mg/L,yes,Yeast,,Burnt matches,15.33333333,11.0,True,log10,calibrated_positive_values,none,0.8561096627622031,5.172902846813562e-10,0.35145856400996295,1.0,1.0,249.0
+acetic_acid.g.L.,Acetic acid,acetic acid.g.L.,Acetic acid,g/L,yes,Wild flora,,,0.14025,0.145,True,log10,calibrated_positive_values,none,5.526771052941176,5.327477520498956e-10,1.7248292427257437,2.0,2.0,248.0
+ammonia.mg.L.,Ammonia,ammonia,Ammonia,mg/L,yes,Malt,,,2.6,2.6,True,log10,calibrated_positive_values,none,0.9099979953383608,6.333489517161894e-10,0.7295831245263018,5.0,5.0,244.0
+color.EBC.,Color,color.EBC.,Color,EBC,yes,Malt,,,,,True,log10,calibrated_positive_values,none,0.9308270038775235,6.738160325335336e-10,0.8064306128649733,0.0,0.0,250.0
+betaglucan.mg.L.,Betaglucan,betaglucan,Betaglucan,mg/L,yes,Malt,,,,,True,log10,calibrated_positive_values,none,0.9820591010106348,6.084008026844816e-10,0.9316672241042179,10.0,10.0,238.0
+lactic_acid.mg.L.,Lactic acid,lactic acid,Lactic acid,mg/L,yes,Wild flora,,,416.6666667,400.0,True,log10,calibrated_positive_values,none,0.9845381285748618,6.096559902615345e-10,0.9385428306864336,0.0,0.0,250.0
+glycerol,Glycerol,glycerol,Glycerol,g/L,yes,Yeast,,,4.433333333,2.0,True,log10,calibrated_positive_values,none,0.8439851468468469,5.723599679976258e-10,0.4114580641346967,0.0,0.0,250.0
+iron,Iron,iron,Iron,mg/L,yes,Others,,,0.1,0.1,True,log10,calibrated_positive_values,none,11.760804157894736,6.578654287991981e-10,2.7871054446583265,3.0,3.0,247.0
+pH,pH,pH,pH,pH,yes,Others,,,,,True,log10,calibrated_positive_values,none,0.850886182800226,3.8513298099761873e-10,0.5518689316901098,0.0,0.0,250.0
+protein.g.L.,Protein,protein.g.L.,Protein,g/L,yes,Others,,,1.023933,0.846,True,log10,calibrated_positive_values,none,0.884680017861387,6.669313463325074e-10,0.6825120728717049,0.0,0.0,250.0
+bitterness,Iso-alpha acids,bitterness,Iso-alpha acids,IBU,yes,Hops,,,5.0,5.0,True,log10,calibrated_positive_values,none,0.9314021036857867,5.25431432875351e-10,0.8071835419658383,2.0,2.0,248.0
+GFS,Sugars,GFS,Sugars,g/L,yes,Malt,,,2.9,2.9,True,log10,calibrated_positive_values,none,4.718440913832659,6.686977099043594e-10,1.5400012174256887,6.0,6.0,244.0
+ethanol..v.v.,Ethanol,ethanol..v.v.,Ethanol,v/v,yes,Yeast,,,1.757256,1.737199,True,log10,calibrated_positive_values,none,0.8821377770068026,5.987259767724785e-10,0.6754533185908508,1.0,1.0,249.0
+CO2.PSI.,Carbon dioxide,CO2-PSI.,Carbon dioxide,PSI,yes,Others,,,,,True,log10,calibrated_positive_values,none,0.8434744364444444,5.35840877841704e-10,0.4044981138623435,0.0,0.0,211.0
+unfermentables,Unfermentables,unfermentables,Unfermentables,,yes,Malt,,,,,True,log10,calibrated_positive_values,none,0.9516259320221067,6.297381472379122e-10,0.8560412982061554,0.0,0.0,249.0
+kcalperc,Caloric value,kcalperc,Caloric value,kcal%,yes,Others,,,,,True,log10,calibrated_positive_values,none,0.9689941872465222,6.295061387537427e-10,0.8979494162322335,0.0,0.0,250.0
+X1.propanol,1-propanol,1-propanol,1-propanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.3.butanedione,Diacetyl,"2,3-butanedione",Diacetyl,mg/L,yes_gcms,Yeast,increase,"butterscotch, popcorn, oily, milky",0.29925,0.09,True,linear,calibrated_positive_values,none,0.0,10.342222417190188,4.847641623046954,0.0,0.0,241.0
+X3.methylbutanal,3-methylbutanal,3-methylbutanal,3-methylbutanal,A.U.,,Malt,increase,,,,True,linear,calibrated_positive_values,none,4.5009095557113405e-10,11.957303329911912,10.269793238325622,0.0,0.0,242.0
+propylene.glycol,Propylene glycol,propylene glycol,Propylene glycol,,,Others,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+propyl.acetate,N-propyl acetate,propyl acetate,N-propyl acetate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+n.pentanol,N-pentanol,n-pentanol,N-pentanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.methyl.1.butanol,2-methyl-1-butanol,2-methyl-1-butanol,2-methyl-1-butanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+isopentyl.formate,Isopentyl formate,isopentyl-formate,Isopentyl formate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.isobutyrate,Ethyl isobutyrate,ethyl isobutyrate,Ethyl isobutyrate,mg/L,yes_gcms,Yeast,,,2.6,2.6,True,linear,calibrated_positive_values,none,0.0,24.92706540735159,23.52951240981078,0.0,0.0,246.0
+X3.methyl.2.butenal,3-methyl-2-butenal,3-methyl-2-butenal,3-methyl-2-butenal,,,Internal standard solution,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.methyltetrahydrofuran.3.one,2-methyltetrahydrofuran-3-one,2-methyltetrahydrofuran-3-one,2-methyltetrahydrofuran-3-one,mg/L,yes_gcms,Malt,,,,,True,linear,calibrated_positive_values,none,1.5628997832927772e-09,23.790727456945774,22.270544051865947,0.0,0.0,250.0
+ethyl.butyrate,Ethyl butyrate,ethyl butyrate,Ethyl butyrate,mg/L,yes_gcms,Yeast,,,0.45,0.45,True,linear,calibrated_positive_values,none,0.0,16.181032488183895,13.724042963951039,0.0,0.0,249.0
+butyl.acetate,Butyl acetate,butyl acetate,Butyl acetate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+methylpyrazine,Methylpyrazine,methylpyrazine,Methylpyrazine,mg/L,yes_gcms,Malt,,,1.0,1.0,True,linear,calibrated_positive_values,none,1.2334749380908033e-08,3462.8753322989114,3461.5721233550826,0.0,0.0,238.0
+furfural,Furfural,furfural,Furfural,mg/L,yes_gcms,Malt,increase,,60.0,37.5,True,linear,calibrated_positive_values,none,0.0,119.82388506748259,118.503008886428,0.0,0.0,248.0
+ethyl.lactate,Ethyl lactate,ethyl lactate,Ethyl lactate,,,Others,increase,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X3Z.hexenol,Cis-3-hexenol,3Z-hexenol,Cis-3-hexenol,mg/L,yes_gcms,Hops,,,,,True,linear,calibrated_positive_values,none,0.0,43.373033716766464,40.45772355154151,0.0,0.0,250.0
+n.hexanol,N-hexanol,n-hexanol,N-hexanol,mg/L,yes_gcms,Yeast,,,,,True,linear,calibrated_positive_values,none,0.0,6.5170654686513965,3.530633661866709,0.0,0.0,250.0
+styrene,Styrene,styrene,Styrene,mg/L,yes_gcms,Yeast,,,,,True,linear,calibrated_positive_values,none,0.0,26.542274119401057,23.53353535815188,0.0,0.0,250.0
+X2.furanmethanol,Furfuryl alcohol,2-furanmethanol,Furfuryl alcohol,,,Others,increase,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X3.methyl.2.hexanol,3-methyl-2-hexanol,3-methyl-2-hexanol,3-methyl-2-hexanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X3.furanmethanol,3-furanmethanol,3-furanmethanol,3-furanmethanol,,,Malt,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.acetylfuran,2-acetylfuran,2-acetylfuran,2-acetylfuran,,,Malt,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.6.dimethyl.pyrazine,"2,6-dimethylpyrazine","2,6-dimethyl-pyrazine","2,6-dimethylpyrazine",A.U.,,Malt,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+amyl.acetate,Amyl acetate,amyl acetate,Amyl acetate,mg/L,yes_gcms,Yeast,,,,,True,linear,calibrated_positive_values,none,1.6520505068741148e-08,435.49468248951047,434.18713320790056,0.0,0.0,223.0
+ethyl.tiglate,Ethyl tiglate,ethyl tiglate,Ethyl tiglate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+benzaldehyde,Benzaldehyde,benzaldehyde,Benzaldehyde,mg/L,yes_gcms,Yeast,increase,,,,True,linear,calibrated_positive_values,none,0.0,186.21374582035446,184.89947254089572,0.0,0.0,247.0
+X5.methylfurfural,5-methylfurfural,5-methylfurfural,5-methylfurfural,mg/L,yes_gcms,Malt,,,,,True,linear,calibrated_positive_values,none,0.0,1696.0341348950205,1694.730278846801,0.0,0.0,249.0
+n.heptanol,N-heptanol,n-heptanol,N-heptanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X1.octen.3.ol,1-octen-3-ol,1-octen-3-ol,1-octen-3-ol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X3.methylthio.propanol,Methionol,3-methylthio-propanol,Methionol,,,Others,increase,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+isomaltol,Isomaltol,isomaltol,Isomaltol,,,Malt,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X6.methyl.5.hepten.2.one,Methyl heptenone,6-methyl-5-hepten-2-one,Methyl heptenone,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.pentyl.furan,2-pentyl furan,2-pentyl furan,2-pentyl furan,,,Malt,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.hex..3E..enoate,Ethyl 3-hexanoate,ethyl-hex-(3E)-enoate,Ethyl 3-hexanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+alpha.phellandrene,α-phellandrene,alpha-phellandrene,Î±-phellandrene,A.U.,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+dehydroxy.cis.linalool.oxide,Dehydroxy-cis-linalool oxide,dehydroxy-cis-linalool oxide,Dehydroxy-cis-linalool oxide,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+hexyl.acetate,Hexyl acetate,hexyl acetate,Hexyl acetate,mg/L,yes_gcms,Yeast,,,,,True,linear,calibrated_positive_values,none,0.0,19.560888662381533,17.94338017578331,0.0,0.0,250.0
+isopentyl.butanoate,Isopentyl butanoate,isopentyl butanoate,Isopentyl butanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.ethyl.1.hexanol,2-ethyl-1-hexanol,2-ethyl-1-hexanol,2-ethyl-1-hexanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+beta.phellandrene,Beta-phellandrene,beta-phellandrene,Beta-phellandrene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+limonene,Limonene,limonene,Limonene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+eucalyptol,Eucalyptol,eucalyptol,Eucalyptol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+benzyl.alcohol,Benzyl alcohol,benzyl alcohol,Benzyl alcohol,mg/L,yes_gcms,Hops,,,,,True,linear,calibrated_positive_values,none,0.0,343.24743691589975,341.9385451476446,0.0,0.0,246.0
+ethyl.hex..2E..enoate,Ethyl 2-hexenoate,ethyl-hex-(2E)-enoate,Ethyl 2-hexenoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+phenylacetaldehyde,Phenylacetaldehyde,phenylacetaldehyde,Phenylacetaldehyde,mg/L,yes_gcms,Others,increase,,,,True,linear,calibrated_positive_values,none,6.887192366640102e-10,93.30003755280259,90.81282185713044,0.0,0.0,248.0
+X.E..beta.ocimene,E-β-ocimene,(E)-beta-ocimene,E-Î²-ocimene,mg/L,yes_gcms,Hops,,,,,True,linear,calibrated_positive_values,none,3.656118247479178e-09,93.89891155418839,92.57287040444861,0.0,0.0,249.0
+prenyl.isobutyrate,Prenyl isobutyrate,prenyl isobutyrate,Prenyl isobutyrate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.furoate,Ethyl furoate,ethyl furoate,Ethyl furoate,,,Malt,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ortho.cresol,O-cresol,ortho-cresol,O-cresol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.5.methylhexanoate,Ethyl 5-methylhexanoate,ethyl 5-methylhexanoate,Ethyl 5-methylhexanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.acetylpyrrole,2-acetylpyrrole,2-acetylpyrrole,2-acetylpyrrole,A.U.,,Malt,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+isoamyl.lactate,Isoamyl lactate,isoamyl lactate,Isoamyl lactate,,,Wild flora,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+n.octanol,N-octanol,n-octanol,N-octanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+cis.linalool.oxide,Cis-linalool oxide,cis-linalool oxide,Cis-linalool oxide,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+meta.cymenene,Meta-cymenene,meta-cymenene,Meta-cymenene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+terpinolene,Terpinolene,terpinolene,Terpinolene,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+linalool,Linalool,linalool,Linalool,mg/L,yes_gcms,Hops,decrease,,0.027285,0.0045,True,linear,calibrated_positive_values,none,0.0,9.980987516964035,6.332722244263711,0.0,0.0,247.0
+nonan.2.ol,2-nonanol,nonan-2-ol,2-nonanol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+n.nonanal,N-nonanal,n-nonanal,N-nonanal,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.methyl.benzofuran,2-methyl-benzofuran,2-methyl-benzofuran,2-methyl-benzofuran,,,Malt,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+heptyl.acetate,Heptyl acetate,heptyl acetate,Heptyl acetate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X4.methyl.1.pentanol,4-methyl-1-pentanol,4-methyl-1-pentanol,4-methyl-1-pentanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+neo.allo.ocimene,Neo-allo-ocimene,neo-allo-ocimene,Neo-allo-ocimene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+x.methyl.1.octanol,X-methyl-1-octanol,x-methyl-1-octanol,X-methyl-1-octanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+trans.dihydro.beta.terpineol,Trans-dihydro-β-terpineol,trans-dihydro-beta-terpineol,Trans-dihydro-Î²-terpineol,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+cis.beta.terpineol,Cis-β-terpineol,cis-beta-terpineol,Cis-Î²-terpineol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+y.methyl.1.octanol,Y-methyl-1-octanol,y-methyl-1-octanol,Y-methyl-1-octanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+camphor,Camphor,camphor,Camphor,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+isobutyl.hexanoate,Isobutyl hexanoate,isobutyl-hexanoate,Isobutyl hexanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+nerol.oxide,Nerol oxide,nerol oxide,Nerol oxide,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X.E..2.nonenal,E-2-nonenal,(E)-2-nonenal,E-2-nonenal,mg/L,yes_gcms,Others,increase,,,,True,linear,calibrated_positive_values,none,6.700748950574894e-09,88.06062387291101,83.50310421522948,0.0,0.0,249.0
+cis.dihydro.beta.terpineol,Cis-dihydro-β-terpineol,cis-dihydro-beta-terpineol,Cis-dihydro-Î²-terpineol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X4.ethyl.phenol,4-ethyl-phenol,4-ethyl-phenol,4-ethyl-phenol,A.U.,,Wild flora,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+isoborneol,Isoborneol,isoborneol,Isoborneol,,,Others,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.benzoate,Ethyl benzoate,ethyl benzoate,Ethyl benzoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+n.nonanol,N-nonanol,n-nonanol,N-nonanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+terpinen.4.ol,Terpinen-4-ol,terpinen-4-ol,Terpinen-4-ol,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+diethyl.succinate,Diethyl succinate,diethyl succinate,Diethyl succinate,mg/L,yes_gcms,Yeast,,,,,True,linear,calibrated_positive_values,none,0.0,12.951857327180354,10.924407048468144,0.0,0.0,247.0
+vinyl.caprylate,Vinyl caprylate,vinyl caprylate,Vinyl caprylate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X1.alpha.terpineol,Alpha-terpineol,1-alpha-terpineol,Alpha-terpineol,mg/L,yes_gcms,Hops,,,1.5,1.5,True,linear,calibrated_positive_values,none,0.0,6.97179068887251,3.0573173042270527,0.0,0.0,250.0
+ethyl..E..linalool,Ethyl linalool,ethyl-(E)-linalool,Ethyl linalool,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.nicotinate,Ethyl nicotinate,ethyl nicotinate,Ethyl nicotinate,mg/L,yes_gcms,Others,increase,,6.0,6.0,True,linear,calibrated_positive_values,none,3.6939686864569373e-09,88.23885040617927,86.91124260669432,0.0,0.0,248.0
+citronellol,Citronellol,citronellol,Citronellol,mg/L,yes_gcms,Hops,,,0.0245,0.0245,True,linear,calibrated_positive_values,none,0.0,8.481013828485791,5.147232554676773,0.0,0.0,250.0
+nerol,Nerol,nerol,Nerol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+hydroxy.methyl.furfural,5-hydroxymethylfurfural,hydroxy methyl furfural,5-hydroxymethylfurfural,,,Malt,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+E.ocimenone,Ocimenone,E-ocimenone,Ocimenone,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+cumin.aldehyde,Cumin aldehyde,cumin aldehyde,Cumin aldehyde,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.phenylacetate,Ethyl phenylacetate,ethyl-phenylacetate,Ethyl phenylacetate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+isopentyl.hexanoate,Isopentyl hexanoate,isopentyl-hexanoate,Isopentyl hexanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+geraniol,Geraniol,geraniol,Geraniol,mg/L,yes_gcms,Hops,decrease,,0.0315,0.023,True,linear,calibrated_positive_values,none,0.0,11.283264037237142,7.679752951446383,0.0,0.0,246.0
+beta.cyclohomocitral,β-cyclohomocitral,beta-cyclohomocitral,Î²-cyclohomocitral,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+E.cinnamaldehyde,Cinnamaldehyde,E-cinnamaldehyde,Cinnamaldehyde,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+n.decanol,N-decanol,n-decanol,N-decanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+neryl.formate,Neryl formate,neryl formate,Neryl formate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X4.ethyl.guaiacol,4-ethyl-guaiacol,4-ethyl-guaiacol,4-ethyl-guaiacol,A.U.,,Wild flora,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.undecanone,2-undecanone,2-undecanone,2-undecanone,A.U.,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+trans.dihydro.alpha.terpinyl.acetate,Trans-dihydro-α-terpinyl acetate,trans-dihydro-alpha-terpinyl acetate,Trans-dihydro-Î±-terpinyl acetate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+terpinen.4.ol.acetate,Terpinen-4-ol acetate,terpinen-4-ol acetate,Terpinen-4-ol acetate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.undecanol,2-undecanol,2-undecanol,2-undecanol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+delta.terpinyl.acetate,Terpiryl acetate,delta-terpinyl acetate,Terpiryl acetate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X.E.E..2.4.decadienal,"E,E-2,4-decadienal","(E,E)-2,4-decadienal","E,E-2,4-decadienal",mg/L,yes_gcms,Others,,,,,True,linear,calibrated_positive_values,none,0.0,1295.0334803680637,1293.729230717218,0.0,0.0,249.0
+methyl.geranate,Methyl geranate,methyl geranate,Methyl geranate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+car.3.en.2.one,Car-3-en-2-one,car-3-en-2-one,Car-3-en-2-one,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+dimethoxy..E..citral,Dimethoxy-E-citral,dimethoxy-(E)-citral,Dimethoxy-E-citral,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.butyloctanoate,2-butyl octanoate,2-butyloctanoate,2-butyl octanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X4.methoxysalicylaldehyde,4-methoxysalicylaldehyde,4-methoxysalicylaldehyde,4-methoxysalicylaldehyde,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.hydrocinnamate,Ethyl hydrocinnamate,ethyl-hydrocinnamate,Ethyl hydrocinnamate,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+eugenol,Eugenol,eugenol,Eugenol,mg/L,yes_gcms,Spices,,,,,True,linear,calibrated_positive_values,none,0.0,680.5905897142068,677.4325893014519,0.0,0.0,250.0
+gamma.nonalactone,Gamma-nonalactone,gamma-nonalactone,Gamma-nonalactone,mg/L,yes_gcms,Yeast,increase,,,,True,linear,calibrated_positive_values,none,1.1987843261309105e-10,5.979493332886033,2.8900331887910244,0.0,0.0,250.0
+methyl.para.anisate,Methyl para-anisate,methyl para-anisate,Methyl para-anisate,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X.E..beta.damascenone,E-β-damascenone,(E)-beta-damascenone,E-Î²-damascenone,mg/L,yes_gcms,Hops,increase,,,,True,linear,calibrated_positive_values,none,1.4630925160043908e-10,6.179643478050156,2.3585412325949724,0.0,0.0,250.0
+ethyl..9..decenoate,Ethyl 9-decenoate,ethyl-(9)-decenoate,Ethyl 9-decenoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+vanillin,Vanillin,vanillin,Vanillin,,,Others,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+geosmin,Geosmin,geosmin,Geosmin,,,Wild flora,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+dodecanal,Dodecanal,dodecanal,Dodecanal,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X4.8.alpha.epoxy.caryophyllane,"4,8-α-epoxy-caryophyllane","4,8-alpha-epoxy-caryophyllane","4,8-Î±-epoxy-caryophyllane",,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+E.caryophyllene,Caryophyllene,E-caryophyllene,Caryophyllene,mg/L,yes_gcms,Hops,,,0.28,0.23,True,linear,calibrated_positive_values,none,6.873690805780596e-11,1133.7583211832793,1058.4521832890873,0.0,0.0,250.0
+X.E..alpha.ionone,E-α-ionone,(E)-alpha-ionone,E-Î±-ionone,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+perillyl.acetate,Perillyl acetate,perillyl acetate,Perillyl acetate,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+beta.humulene,β-humulene,beta-humulene,Î²-humulene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.phenyl.ethyl.butyrate,2-phenyl ethyl butyrate,2-phenyl ethyl butyrate,2-phenyl ethyl butyrate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X.Z..beta.farnesene,Z-β-farnesene,(Z)-beta-farnesene,Z-Î²-farnesene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+pentyl.octanoate,Pentyl octanoate,pentyl-octanoate,Pentyl octanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X.E..beta.farnesene,E-β-farnesene,(E)-beta-farnesene,E-Î²-farnesene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.methylbutyl.octanoate,2-methylbutyl octanoate,2-methylbutyl octanoate,2-methylbutyl octanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+alpha.humulene,Alpha-humulene,alpha-humulene,Alpha-humulene,mg/L,yes_gcms,Hops,,,0.625,0.625,True,linear,calibrated_positive_values,none,0.0,86.80375854048383,84.45741383027978,0.0,0.0,250.0
+neryl.propanoate,Neryl propanoate,neryl propanoate,Neryl propanoate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X9.epi..E..caryophyllene,9-epi-E-caryophyllene,9-epi-(E)-caryophyllene,9-epi-E-caryophyllene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl..E..cinnamate,Ethyl cinnamate,ethyl-(E)-cinnamate,Ethyl cinnamate,,,Others,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+linalool.isovalerate,Linalool isovalerate,linalool isovalerate,Linalool isovalerate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+alpha.terpinyl.isobutanoate,α-terpinyl isobutanoate,alpha-terpinyl isobutanoate,Î±-terpinyl isobutanoate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+n.dodecanol,N-dodecanol,n-dodecanol,N-dodecanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+germacrene.D,Germacrene D,germacrene D,Germacrene D,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X.E..beta.ionone,E-β-ionone,(E)-beta-ionone,E-Î²-ionone,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+valencene,Valencene,valencene,Valencene,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+neryl.isobutanoate,Neryl isobutanoate,neryl isobutanoate,Neryl isobutanoate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+E.methyl.isoeugenol,Methyl isoeugenol,E-methyl isoeugenol,Methyl isoeugenol,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X.Z..dihydro.apofarnesal,Z-dihydro-apofarnesal,(Z)-dihydro-apofarnesal,Z-dihydro-apofarnesal,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+butylated.hydroxytoluene,Butylated hydroxytoluene,butylated hydroxytoluene,Butylated hydroxytoluene,,,Others,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X.E..dihydro.apofarnesal,E-dihydro-apofarnesal,(E)-dihydro-apofarnesal,E-dihydro-apofarnesal,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+Z.nerolidol,Z-nerolidol,Z-nerolidol,Z-nerolidol,mg/L,yes_gcms,Hops,,,25.0,25.0,True,linear,calibrated_positive_values,none,0.0,102.06962075620356,100.44426217943777,0.0,0.0,250.0
+X.E..ortho.methoxy.cinnamaldehyde,E-ortho-methoxy cinnamaldehyde,(E)-ortho-methoxy cinnamaldehyde,E-ortho-methoxy cinnamaldehyde,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+alpha.calacorene,α-calacorene,alpha-calacorene,Î±-calacorene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+E.nerolidol,E-nerolidol,E-nerolidol,E-nerolidol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+dihydroisocaryophyllene.epoxide,Tobacarol,dihydroisocaryophyllene epoxide,Tobacarol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+caryophyllene.alcohol,Caryophyllene alcohol,caryophyllene alcohol,Caryophyllene alcohol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+neryl.isovalerate,Neryl isovalerate,neryl isovalerate,Neryl isovalerate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+spathulenol,Spathulenol,spathulenol,Spathulenol,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+caryophyllene.oxide,Caryophyllene oxide,caryophyllene oxide,Caryophyllene oxide,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+humulene.epoxide.II,Humulene epoxide II,humulene epoxide II,Humulene epoxide II,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+alloaromadendrene.epoxide,Allo-aromadendrene epoxide,alloaromadendrene epoxide,Allo-aromadendrene epoxide,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X1.10.di.epi.cubenol,Epicubenol,"1,10-di-epi-cubenol",Epicubenol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+isopropyl.laurate,Isopropyl laurate,isopropyl laurate,Isopropyl laurate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+caryophylla.4.12..8.13..dien.5.alpha.ol,"Caryophylla-4,8-dien-5-ol","caryophylla-4(12),8(13)-dien-5-alpha-ol","Caryophylla-4,8-dien-5-ol",,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+gamma.eudesmol,Gamma-eudesmol,gamma-eudesmol,Gamma-eudesmol,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+alpha.muurolol,α-muurolol,alpha-muurolol,Î±-muurolol,A.U.,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X1.2.dihydro.8.hydroxy..2E..linalool,"1,2-dihydro-8-hydroxy-2E-linalool","1,2-dihydro-8-hydroxy-(2E)-linalool","1,2-dihydro-8-hydroxy-2E-linalool",,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+tau.cadinol,Tau-cadinol,tau-cadinol,Tau-cadinol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+selin.11.en.4.alpha.ol,Kongol,selin-11-en-4-alpha-ol,Kongol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+alpha.eudesmol,α-eudesmol,alpha-eudesmol,Î±-eudesmol,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X14.hydroxy.9.epi..E..caryophyllene,14-hydroxy-9-epi-(E)-caryophyllene,14-hydroxy-9-epi-(E)-caryophyllene,14-hydroxy-9-epi-(E)-caryophyllene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+tau.muurolol,Tau-muurolol,tau-muurolol,Tau-muurolol,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+n.tetradecanol,N-tetradecanol,n-tetradecanol,N-tetradecanol,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+foeniculin,Eoeniculin,foeniculin,Eoeniculin,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+cadalene,Cadalene,cadalene,Cadalene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.3.dihydro.farnesol,"2,3-dihydro-farnesol","2,3-dihydro-farnesol","2,3-dihydro-farnesol",,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2E.6Z.farnesal,"E,Z-farnesal","2E,6Z-farnesal","E,Z-farnesal",,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+caryophyllene.acetate,Caryophyllene acetate,caryophyllene acetate,Caryophyllene acetate,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X14.hydroxy.alpha.humulene,14-hydroxy-α-humulene,14-hydroxy-alpha-humulene,14-hydroxy-Î±-humulene,,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2Z.6E.farnesal,"Z,E-farnesal","2Z,6E-farnesal","Z,E-farnesal",,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2Z.6Z.farnesol,"Z,Z-farnesol","2Z,6Z-farnesol","Z,Z-farnesol",,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2Z.6E.farnesol,"Z,E-farnesol","2Z,6E-farnesol","Z,E-farnesol",,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ambroxide,Ambroxide,ambroxide,Ambroxide,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+benzyl.benzoate,Benzyl benzoate,benzyl benzoate,Benzyl benzoate,,,Others,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2E.6E.methyl.farnesoate,"2E,6E-methyl farnesoate","2E,6E-methyl farnesoate","2E,6E-methyl farnesoate",,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.tetradecanoate,Ethyl tetradecanoate,ethyl tetradecanoate,Ethyl tetradecanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X2.ethylhexylsalicylate,2-ethylhexyl acrylate,2-ethylhexylsalicylate,2-ethylhexyl acrylate,,,Others,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+isopropyl.tetradecanoate,Isopropyl tetradecanoate,isopropyl-tetradecanoate,Isopropyl tetradecanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.pentadecanoate,Ethyl pentadecanoate,ethyl pentadecanoate,Ethyl pentadecanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+methyl.hexadecanoate,Methyl hexadecanoate,methyl hexadecanoate,Methyl hexadecanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+Z.Z.geranyl.linalool,"Z,Z-geranyl linalool","Z,Z-geranyl linalool","Z,Z-geranyl linalool",,,Hops,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.hexadecanoate,Ethyl hexadecanoate,ethyl hexadecanoate,Ethyl hexadecanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+manool.oxide,Manool oxide,manool oxide,Manool oxide,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+X13.epi.manool.oxide,13-epi manool oxide,13-epi-manool oxide,13-epi manool oxide,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+isopropyl.hexadecanoate,Isopropyl hexadecanoate,isopropyl hexadecanoate,Isopropyl hexadecanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+manool,Manool,manool,Manool,,,Spices,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.octadecanoate,Ethyl octadecanoate,ethyl octadecanoate,Ethyl octadecanoate,,,Yeast,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+ethyl.pentanoate,Ethyl pentanoate,ethyl pentanoate,Ethyl pentanoate,,,Yeast,,,,,True,linear,calibrated_positive_values,none,0.0,41.64331246321858,40.286149674000086,0.0,0.0,250.0
+X2.ethyl.3.methylpyrazine,2-ethyl-3-methylpyrazine,2-ethyl-3-methylpyrazine,2-ethyl-3-methylpyrazine,A.U.,,Malt,,,,,True,linear,calibrated_positive_values,none,0.0,138.90297073243815,137.58465246167984,0.0,0.0,249.0
+esters_sum,Total ester compounds,esters_sum,Total ester compounds,,,,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+aroma_hops_sum,Total hop aroma compounds,aroma_hops_sum,Total hop aroma compounds,,,,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+acids_sum,Total acids,acids_sum,Total acids,,,,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,
+sulfur_sum,Total sulfur compounds,sulfur_sum,Total sulfur compounds,,,,,,,,False,unknown,unresolved,log_like_base_unverified,,,,,,

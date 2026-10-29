@@ -6,8 +6,8 @@ Run:
     python src/问题二_化合物关联.py
 
 Outputs:
-    data/q2/*.csv, data/q2/结果汇总.json
-    可视化统一由00_统一运行.py调用论文配图.R，仅保留03、05、17–21。
+    data/q2/*.csv
+    绘图数据由01_数据预处理.py --plots准备，图形由论文配图.R生成。
 
 Design notes
 ------------
@@ -753,32 +753,6 @@ def domain_tables(data: dict, maps: dict, methods: dict, boot_freq: dict, prior:
         agg.append({'lambda': lam, 'mean_overlap_with_data_top3': round(float(sub.overlap_with_data_top3.mean()), 4), 'mean_stability_fused': round(float(sub.mean_stability_fused.mean()), 4), 'mean_data_fused_rank': round(float(sub.mean_data_fused_rank.mean()), 2), 'n_direct_prior_in_top3_total': int(sub.n_direct_prior_in_top3.sum()), 'mean_top3_overlap_6csv_final': round(float(sub.top3_overlap_6csv_final.mean()), 4), 'mean_sign_agreement_6csv_final': round(float(sub.sign_agreement_6csv_final.mean()), 4), 'mean_top3_overlap_6csv_restricted': round(float(sub.top3_overlap_6csv_restricted.mean()), 4), 'mean_sign_agreement_6csv_restricted': round(float(sub.sign_agreement_6csv_restricted.mean()), 4)})
     return {'domain': domain_df, 'sensitivity': sens_df, 'aggregate': pd.DataFrame(agg), 'lambda_main': lam_main}
 
-def build_summary(data, net, methods, boot_freq, boot_sec, jac_mat, bench, enrich, top3, case_df, domain, n_boot, elapsed) -> dict:
-    feats = data['feats']
-    entries = top3['stability_freq'].values
-    per_target = top3.groupby('target')['stability_freq'].apply(list)
-    n_all3_80 = int(sum((all((v >= 0.8 for v in vals)) for vals in per_target)))
-    n_any3_80 = int(sum((any((v >= 0.8 for v in vals)) for vals in per_target)))
-    n_entries_80 = int((entries >= 0.8).sum())
-    n_entries_50 = int((entries >= 0.5).sum())
-    stability_thresholds = []
-    for thr in (0.8, 0.7, 0.6, 0.5, 0.4, 0.3):
-        stability_thresholds.append({'threshold': thr, 'entries_ge': int((entries >= thr).sum()), 'targets_all3': int(sum((all((v >= thr for v in vals)) for vals in per_target))), 'targets_at_least2': int(sum((sum((v >= thr for v in vals)) >= 2 for vals in per_target))), 'targets_at_least1': int(sum((any((v >= thr for v in vals)) for vals in per_target)))})
-    bench_means = bench.groupby('method').mean(numeric_only=True).reindex(list(METHODS) + ['FUSED'])
-    bench_out = {}
-    for (m, r) in bench_means.iterrows():
-        bench_out[m] = {k: None if pd.isna(v) else float(v) for (k, v) in r.items()}
-    a_corr = bench[bench.method == 'A']['rank_corr_spearman'].mean()
-    e_corr = bench[bench.method == 'E']['rank_corr_spearman'].mean()
-    a_ov = bench[bench.method == 'A']['top3_overlap_restricted'].mean()
-    e_ov = bench[bench.method == 'E']['top3_overlap_restricted'].mean()
-    hub_cols = ['feature', 'compound_2csv', 'chemical_name', 'origin_paper', 'chemical_class', 'community', 'degree', 'betweenness', 'eigenvector', 'hub_score', 'hub_rank']
-    hubs = net['nodes'].sort_values('hub_rank')[hub_cols].head(15).to_dict('records')
-    sig3 = enrich[(enrich.k == 3) & (enrich.q < 0.05)]
-    sig10 = enrich[(enrich.k == 10) & (enrich.q < 0.05)]
-    best_enrich = enrich[enrich.k == 10].sort_values('p').groupby('target').head(1).sort_values('p').head(15)[['target', 'chemical_class', 'class_size', 'observed', 'expected', 'fold_enrichment', 'p', 'q']].to_dict('records')
-    cases = {t: case_df[case_df.target == t][['rank', 'feature', 'compound_2csv', 'chemical_class', 'origin', 'fused_score', 'freq_fused', 'rank_A', 'rank_B', 'rank_C', 'rank_D', 'rank_E', 'corr6_r', 'in_final_top3']].to_dict('records') for t in case_df.target.drop_duplicates()}
-    return {'generated': time.strftime('%Y-%m-%d %H:%M:%S'), 'runtime_sec': round(elapsed, 1), 'bootstrap': {'n_boot': n_boot, 'seconds': round(boot_sec, 1), 'scope': 'median/scaling refit, EN pipeline retuned, same ET and SHAP fits; given 2.csv graph fixed', 'trees': N_TREES_FULL, 'shap_trees': LGB_FULL, 'shap_scope': 'descriptive_in_sample_both_point_and_bootstrap'}, 'provenance': provenance(), 'data': {'n_samples': int(data['X'].shape[0]), 'n_features': int(data['X'].shape[1]), 'n_targets': int(data['y'].shape[1]), 'n_missing_X': int(data['X'].isna().sum().sum()), 'n_matched_6csv_compounds': int(len(C6_COMPOUND_MAP))}, 'network': {'main_scheme': net['main_scheme'], 'comparison': net['scheme_table'].to_dict('records'), 'n_nodes': int(net['G'].number_of_nodes()), 'n_edges': int(net['G'].number_of_edges()), 'n_communities': int(net['stats']['n_communities']), 'modularity': round(float(net['stats']['modularity']), 4), 'community_sizes': net['stats']['community_sizes'], 'mean_intra_abs_r_edges': round(float(net['stats']['mean_intra_abs_r_edges']), 4), 'mean_intra_abs_r_allpairs': round(float(net['stats']['mean_intra_abs_r_allpairs']), 4), 'ari_top5_vs_top10': round(float(net['ari_top5_top10']), 4), 'selection_reason': 'Prespecified top10 descriptive graph; weak forced edges and isolates in alternative graphs are reported. Not optimized or inferred to improve prediction.', 'hubs_top15': hubs}, 'top3': {'n_targets': int(top3.target.nunique()), 'n_entries': int(len(top3)), 'mean_stability': round(float(np.mean(entries)), 4), 'median_stability': round(float(np.median(entries)), 4), 'n_entries_freq_ge_0.8': n_entries_80, 'n_entries_freq_ge_0.5': n_entries_50, 'n_targets_all3_freq_ge_0.8': n_all3_80, 'n_targets_any_freq_ge_0.8': n_any3_80, 'stability_thresholds': stability_thresholds, 'mean_freq_by_method_on_fused_top3': {m: round(float(boot_freq[m][np.arange(50), topk_indices(methods['fused_rank'], 3)].mean()), 4) for m in ['A', 'B', 'C', 'D', 'E', 'FUSED']}}, 'jaccard': {'mean_pairwise': round(float(jac_mat[np.triu_indices(5, 1)].mean()), 4), 'matrix': {m: {m2: round(float(jac_mat[i, j]), 4) for (j, m2) in enumerate(METHODS)} for (i, m) in enumerate(METHODS)}}, 'benchmark_6csv': {'note': '6.csv is computed from the same 250 beers and 44 compounds; method A reproduces its rank order almost exactly (mean rank correlation ~1.0). High agreement validates data alignment, not independent replication. Multivariate methods are expected to deviate because 6.csv is marginal.', 'per_method': bench_out}, 'network_enhancement': {'lambda': NET_LAMBDA, 'mean_rank_corr_A': round(float(a_corr), 4), 'mean_rank_corr_E': round(float(e_corr), 4), 'delta_rank_corr': round(float(e_corr - a_corr), 4), 'mean_top3_overlap_A': round(float(a_ov), 4), 'mean_top3_overlap_E': round(float(e_ov), 4), 'conclusion': 'Same-source correlation reconstruction is alignment checking, not independent validation; network usefulness is assessed separately by subset CV and graph sensitivity.'}, 'enrichment': {'n_significant_q05_top3': int(len(sig3)), 'n_significant_q05_top10': int(len(sig10)), 'top10_best_per_target': best_enrich}, 'cases': cases, 'domain_informed': {'lambda_main': domain['lambda_main'], 'selection_rule': 'lambda=0.5 is a fixed strong-prior scenario. It is not tuned to force eponymous chemicals into Top-3, nor claimed optimal.', 'prior_weights': {'direct': 1.0, 'specific': 0.7, 'broad_family': 0.4, 'physicochemical_proxy': 0.3}, 'sensitivity_aggregate': domain['aggregate'].to_dict('records'), 'mean_overlap_with_pure_data_top3': round(float(domain['sensitivity'][domain['sensitivity']['lambda'] == domain['lambda_main']]['overlap_with_data_top3'].mean()), 4), 'mean_stability_domain_top3': round(float(domain['sensitivity'][domain['sensitivity']['lambda'] == domain['lambda_main']]['mean_stability_fused'].mean()), 4), 'n_direct_prior_in_top3_total': int(domain['sensitivity'][domain['sensitivity']['lambda'] == domain['lambda_main']]['n_direct_prior_in_top3'].sum()), 'note': '机理先验前三候选.csv is a mechanism-oriented scenario that adds a literature-derived prior bonus to the data fusion score. It is reported alongside, never instead of, the pure-data 前三关键化合物.csv. The prior is not causal evidence.'}, 'outputs': sorted(set([p.name for p in OUT.glob('*')]) | {'结果汇总.json'})}
 
 def subset_validation(data, net):
     """Evaluate 3-feature sets chosen strictly inside each training fold; graph is supplied prior."""
@@ -891,36 +865,16 @@ def main():
     print('[tables] written to data/q2/', flush=True)
     t0 = time.time()
     elapsed = time.time() - t_start
-    summary = build_summary(data, net, methods, boot_freq, boot_sec, jac_mat, bench, enrich, tables['top3'], case_df, domain, N_BOOT, elapsed)
-    summary['indicator_top3'] = summary['top3']
+    subset_validation(data, net)
     f = primary.stability_freq
     g = primary.groupby('target').stability_freq
-    summary['top3'] = {'n_targets': 50, 'n_entries': 150, 'candidate_count': 214, 'candidate_scope': str(primary.scope.iloc[0]), 'mean_stability': float(f.mean()), 'median_stability': float(f.median()), 'n_entries_freq_ge_0.8': int((f >= 0.8).sum()), 'n_entries_freq_ge_0.5': int((f >= 0.5).sum()), 'n_targets_all3_freq_ge_0.8': int((g.min() >= 0.8).sum()), 'n_targets_all3_freq_ge_0.5': int((g.min() >= 0.5).sum())}
-    summary['jaccard']['scope'] = 'all 231 indicators, descriptive method agreement'
-    summary['top3_prediction_cv'] = subset_validation(data, net)
-    summary['schema_version'] = 2
-
-    def safe_json(x):
-        if isinstance(x, dict):
-            return {str(k): safe_json(v) for (k, v) in x.items()}
-        if isinstance(x, (list, tuple)):
-            return [safe_json(v) for v in x]
-        if isinstance(x, (float, np.floating)):
-            return float(x) if np.isfinite(x) else None
-        if isinstance(x, np.integer):
-            return int(x)
-        return x
-    summary = safe_json(summary)
-    with open(OUT / '结果汇总.json', 'w', encoding='utf-8') as f:
-        json.dump(summary, f, ensure_ascii=False, indent=2, allow_nan=False)
-    print('[summary] 结果汇总.json written', flush=True)
     print('\n' + '=' * 78, flush=True)
     print('NETWORK MODULES', flush=True)
     print(net['communities'][['community', 'size', 'top_origins', 'top_classes']].to_string(index=False), flush=True)
     print('\nTOP HUBS (composite degree/betweenness/eigenvector rank)', flush=True)
     print(net['nodes'].sort_values('hub_rank')[['feature', 'compound_2csv', 'origin_paper', 'chemical_class', 'community', 'degree', 'betweenness', 'eigenvector']].head(12).to_string(index=False), flush=True)
     print('\nSTABILITY', flush=True)
-    print(f"mean fused Top-3 frequency = {summary['top3']['mean_stability']:.3f}; entries>=0.8 = {summary['top3']['n_entries_freq_ge_0.8']}/150; targets with all 3 >=0.8 = {summary['top3']['n_targets_all3_freq_ge_0.8']}/50", flush=True)
+    print(f"mean fused Top-3 frequency = {f.mean():.3f}; entries>=0.8 = {int((f >= 0.8).sum())}/150; targets with all 3 >=0.8 = {int((g.min() >= 0.8).sum())}/50", flush=True)
     print('\nJACCARD mean pairwise =', round(float(jac_mat[np.triu_indices(5, 1)].mean()), 3), flush=True)
     print('BENCHMARK 6.csv (44 matched):', flush=True)
     print(bench.groupby('method')[['rank_corr_spearman', 'top3_overlap_restricted', 'top3_overlap_final', 'sign_agreement_restricted', 'sign_agreement_final']].mean().round(3).to_string(), flush=True)

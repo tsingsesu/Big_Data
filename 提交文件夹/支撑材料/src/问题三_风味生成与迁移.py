@@ -7,7 +7,7 @@ Default: five repeated within-style holdouts; final all-data spectra are descrip
 T2N units are unresolved: retain both attachment-mg/L and alternative-ug/L scenarios.
 """
 from __future__ import annotations
-import argparse, json, time, warnings
+import argparse, time, warnings
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -19,7 +19,7 @@ from sklearn.cross_decomposition import PLSRegression
 from sklearn.linear_model import Ridge
 from sklearn.metrics import r2_score, balanced_accuracy_score
 from sklearn.model_selection import KFold
-from 公共数据处理 import load_all, provenance, TARGET_CN
+from 公共数据处理 import load_all, TARGET_CN
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / 'data/q3'
 IMG_DIR = ROOT / 'img'
@@ -362,8 +362,7 @@ def main():
     agg = repeat_means.groupby('model').agg(['mean', 'std'])
     agg.to_csv(OUT_DIR / '模型对比汇总.csv')
     print(agg.to_string(), flush=True)
-    summary = {'schema_version': 2, 'provenance': provenance(), 'runtime_sec': time.time() - t0, 'meta': {'n_features': len(features), 'n_samples': len(X), 'holdout_repeats': args.repeats, 'n_gen': args.n_gen, 'transform': 'training-median impute; log1p(c/training_positive_median); training standardization', 'holdout': 'per style ceil(0.2*n), at least 1 test and 2 train; repeated splits overlap; SD is not an independent-sample CI', 'primary_generator': 'copula predeclared; comparisons do not establish global optimality', 'scope': '生成评价指标.csv uses heldout real references; final spectra and transfer are descriptive all-data refits', 't2n_units': 'UNRESOLVED; primary retains attachment mg/L with tau=0.0001; alternative assumes ug/L with tau=0.1'}, 'generation': {'models': MODELS, 'metrics': {m + '|' + st: {k: float(v) for (k, v) in r.items()} for ((m, st), r) in averaged.iterrows()}}, 'sensory_model': {'outer_test_r2_macro_mean': float(sens.r2.mean()), 'pooled_repeated_holdout_r2_macro': float(r2_score(np.vstack(truth_oof), np.vstack(sensory_oof))), 'stale_hops_r2': float(sens.loc[sens.target == 'stale_hops', 'r2'].mean()), 'warning': 'Surrogate predictions are not observed grades; no stale-hops guarantee'}, 'classifier': classes.to_dict('records'), 'transfer': {'metrics': trm.to_dict('records'), 'primary_constraint': 'excess nonincrease; strict is stronger concentration nonincrease plus below threshold'}, 'limitations': ['Absolute sensory grades unidentified', 'T2N unit unresolved', 'No valid chemical proxy guarantee for stale hops', 'No physical brewing feasibility guarantee', 'Small heldout style sizes; MMD2 U statistic may be negative', 'Given taste-panel data do not identify a causal paired transfer']}
-    (OUT_DIR / '结果汇总.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2, allow_nan=False))
-    print(f'[Q3] complete in {time.time() - t0:.1f}s', flush=True)
+    print('[Q3] 完成，各模型指标已写入CSV。', flush=True)
+
 if __name__ == '__main__':
     main()

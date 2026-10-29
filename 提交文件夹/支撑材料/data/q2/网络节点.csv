@@ -1,0 +1,232 @@
+﻿feature,compound_2csv,chemical_name,origin_paper,chemical_class,threshold_mean,threshold_median,unit,community,community_size,degree,strength,betweenness,eigenvector,hub_score,hub_rank,is_hub_top10,top_degree10,top_betweenness10,top_eigenvector10
+acetaldehyde,Acetaldehyde,Acetaldehyde,Yeast,Aldehydes,50.0,50.0,mg/L,C4,29,12,5.988271243774612,0.0024530838246350725,0.010997108673541324,0.33694083694083693,165,False,False,False,False
+CS2,Carbon disulfide,Carbon disulfide,Yeast,Sulfur compounds,50.0,50.0,ug/L,C3,32,10,2.2028764426603633,0.005670027488792055,0.016615179841985198,0.4047619047619048,143,False,False,False,False
+DES,Diethyl sulfide,Diethyl sulfide,Yeast,Sulfur compounds,1.2,1.2,ug/L,C4,29,10,3.948230684478247,0.0029202442133890332,0.014959243062084267,0.2893217893217893,181,False,False,False,False
+DMS,Dimethyl sulfide,Dimethyl sulfide,Malt,Sulfur compounds,17.25,19.0,ug/L,C4,29,11,4.278201246359371,0.0046735783650687,0.014243887469307749,0.3975468975468976,145,False,False,False,False
+ethyl_2.methyl_butyrate,Ethyl 2-methylbutyrate,Ethyl 2-methylbutyrate,Others,Esters,0.027,0.027,mg/L,C3,32,16,7.06196989689441,0.005289925891376867,0.009408578777175165,0.5093795093795094,109,False,False,False,False
+ethyl_acetate,Ethyl acetate,Ethyl acetate,Yeast,Esters,24.0,23.0,mg/L,C4,29,20,10.350210414530597,0.007791116192238183,0.018859949442307865,0.7215007215007215,47,False,False,False,False
+ethyl_decanoate,Ethyl decanoate,Ethyl decanoate,Yeast,Esters,1.035,1.035,mg/L,C6,24,17,8.773560875138799,0.00710600794607336,0.15195919279448214,0.7655122655122656,38,False,False,False,False
+ethyl_hexanoate,Ethyl hexanoate,Ethyl hexanoate,Yeast,Esters,0.23,0.225,mg/L,C4,29,18,9.433133474713935,0.0026634851866458604,0.01900152478186643,0.5274170274170275,104,False,False,False,False
+ethyl_isovalerate,Ethyl 3-methylbutyrate,Ethyl 3-methylbutyrate,Others,Esters,0.1,0.1,mg/L,C3,32,17,7.562383351028323,0.006338656881414946,0.009158386915531096,0.549062049062049,95,False,False,False,False
+ethyl_octanoate,Ethyl octanoate,Ethyl octanoate,Yeast,Esters,0.7,0.75,mg/L,C4,29,16,8.581637997408508,0.009664938306375185,0.06920096187101885,0.7835497835497836,34,False,False,False,False
+ethyl_propionate,Ethyl propionate,Ethyl propionate,Yeast,Esters,10.0,10.0,mg/L,C4,29,11,3.147886560727526,0.004474396880373767,0.004586910742933657,0.24891774891774895,192,False,False,False,False
+H2S,Hydrogen sulfide,Hydrogen sulfide,Yeast,Sulfur compounds,3.5,3.5,ug/L,C4,29,13,5.776159538634855,0.002082424622300795,0.01025726989256531,0.3434343434343434,161,False,False,False,False
+isoamyl_alcohol,Isoamyl alcohol,Isoamyl alcohol,Yeast,Alcohols,40.015,45.0,mg/L,C4,29,19,9.38167346630373,0.006762493619303857,0.012901004923943244,0.63997113997114,74,False,False,False,False
+isobutanol,Isobutanol,Isobutanol,Yeast,Alcohols,80.0,100.0,mg/L,C4,29,13,6.286142617041761,0.0024454521168603524,0.012623903630513859,0.3852813852813853,150,False,False,False,False
+isobutyl_acetate,Isobutyl acetate,Isobutyl acetate,Yeast,Esters,1.0,1.0,mg/L,C4,29,15,8.246640059531742,0.001405863082254577,0.011768502133622117,0.3932178932178932,148,False,False,False,False
+isopentyl_acetate,Isoamyl acetate,Isoamyl acetate,Yeast,Esters,0.603333333,0.6,mg/L,C4,29,24,12.065157927574289,0.02010392949769858,0.01587377631412205,0.8362193362193362,28,False,False,True,False
+MeSH,Methanethiol,Methanethiol,Yeast,Sulfur compounds,,,ug/L,C4,29,15,6.4464122339367975,0.0054863658719297576,0.028759395460131183,0.6298701298701298,77,False,False,False,False
+octyl_acetate,Octyl acetate,Octyl acetate,Yeast,Esters,0.5,0.5,mg/L,C6,24,12,4.414041239839609,0.0030226791173294525,0.06735304834364292,0.4884559884559884,113,False,False,False,False
+phenethyl_acetate,Phenethyl acetate,Phenethyl acetate,Yeast,Esters,1.763333333,1.29,mg/L,C4,29,14,6.203255364857011,0.004720941249155177,0.007128376739011979,0.41558441558441556,138,False,False,False,False
+phenethyl_alcohol,Phenethyl alcohol,Phenethyl alcohol,Yeast,Alcohols,35.01,32.5,mg/L,C4,29,10,2.0977729342558753,0.004677669854306286,0.0019298389307455816,0.1608946608946609,216,False,False,False,False
+X4VG,4-vinylguaiacol,4-vinylguaiacol,Yeast,Volatile phenols,0.206333333,0.2,mg/L,C5,28,10,3.199798142914327,0.006691145451314426,0.0031319872925893743,0.2431457431457432,195,False,False,False,False
+SO2.mg.L.,Sulfur dioxide,Sulfur dioxide,Yeast,Sulfur compounds,15.33333333,11.0,mg/L,C5,28,10,2.238745964497317,0.006773734551762704,0.010684175997235125,0.38167388167388167,151,False,False,False,False
+acetic_acid.g.L.,Acetic acid,Acetic acid,Wild flora,Organic acids,0.14025,0.145,g/L,C3,32,10,4.573547179058324,0.0012727602935987015,0.006251488217932454,0.12193362193362194,224,False,False,False,False
+ammonia.mg.L.,Ammonia,Ammonia,Malt,Physicochemical,2.6,2.6,mg/L,C4,29,11,3.6580925619216607,0.005783664957894498,0.004528415872529929,0.30086580086580084,178,False,False,False,False
+color.EBC.,Color,Color,Malt,Physicochemical,,,EBC,C5,28,11,5.258715910900884,0.003064551886552093,0.00462301225097352,0.20562770562770563,205,False,False,False,False
+betaglucan.mg.L.,Betaglucan,Betaglucan,Malt,Physicochemical,,,mg/L,C4,29,10,2.960397789599378,0.0023323455193641684,0.004982616393032252,0.1277056277056277,222,False,False,False,False
+lactic_acid.mg.L.,Lactic acid,Lactic acid,Wild flora,Organic acids,416.6666667,400.0,mg/L,C3,32,13,5.915021315139176,0.0027894065161106723,0.00843855483142434,0.3434343434343434,161,False,False,False,False
+glycerol,Glycerol,Glycerol,Yeast,Polyols,4.433333333,2.0,g/L,C4,29,14,7.5800773465136455,0.002305019917628713,0.01485469446412904,0.43001443001443,135,False,False,False,False
+iron,Iron,Iron,Others,Physicochemical,0.1,0.1,mg/L,C2,34,11,4.79567309929053,0.005299499290352154,0.021671495665552598,0.4812409812409812,118,False,False,False,False
+pH,pH,pH,Others,Physicochemical,,,pH,C3,32,11,4.633819114850047,0.0041828571785397116,0.014725623763725153,0.38023088023088025,153,False,False,False,False
+protein.g.L.,Protein,Protein,Others,Physicochemical,1.023933,0.846,g/L,C5,28,14,6.142157566202819,0.009089439109558325,0.006986844818532621,0.5367965367965368,98,False,False,False,False
+bitterness,Iso-alpha acids,Iso-alpha acids,Hops,Hop acids,5.0,5.0,IBU,C2,34,13,5.554534569274482,0.008140626466081427,0.025832253782315292,0.6421356421356421,73,False,False,False,False
+GFS,Sugars,Sugars,Malt,Physicochemical,2.9,2.9,g/L,C6,24,10,2.960625091206541,0.005136461506026511,0.037061848344400204,0.4379509379509379,131,False,False,False,False
+ethanol..v.v.,Ethanol,Ethanol,Yeast,Alcohols,1.757256,1.737199,v/v,C4,29,25,13.847352214643864,0.015583745970829586,0.02535008195341406,0.8672438672438672,20,False,False,False,False
+CO2.PSI.,Carbon dioxide,Carbon dioxide,Others,Physicochemical,,,PSI,C4,29,11,3.831722493135776,0.01174763549787396,0.019981560577377468,0.5981240981240981,83,False,False,False,False
+unfermentables,Unfermentables,Unfermentables,Malt,Physicochemical,,,,C3,32,10,3.5950276280923763,0.003941700157665493,0.00598993131165207,0.19119769119769123,211,False,False,False,False
+kcalperc,Caloric value,Caloric value,Others,Physicochemical,,,kcal%,C4,29,24,11.96088176423712,0.012704972893178398,0.020533262977631122,0.8275613275613275,29,False,False,False,False
+X1.propanol,1-propanol,1-propanol,Yeast,Alcohols,,,,C1,40,12,5.627080557073719,0.003442706185307331,0.0043103737450910645,0.2474747474747475,194,False,False,False,False
+X2.3.butanedione,Diacetyl,Diacetyl,Yeast,Ketones,0.29925,0.09,mg/L,C5,28,20,8.811627063808015,0.01789367515092444,0.012961389295948773,0.7720057720057719,36,False,False,False,False
+X3.methylbutanal,3-methylbutanal,3-methylbutanal,Malt,Aldehydes,,,A.U.,C5,28,12,4.8996281282032825,0.01159536381451766,0.00891330854389617,0.5317460317460317,102,False,False,False,False
+propylene.glycol,Propylene glycol,Propylene glycol,Others,Polyols,,,,C5,28,10,1.8109498758857892,0.005651862288017995,0.006419275833334089,0.2763347763347763,187,False,False,False,False
+propyl.acetate,N-propyl acetate,N-propyl acetate,Yeast,Esters,,,,C1,40,10,4.144769058301836,0.004407827896194651,0.013528378311896893,0.31962481962481964,170,False,False,False,False
+n.pentanol,N-pentanol,N-pentanol,Yeast,Alcohols,,,,C1,40,10,5.1452971738344155,0.0019659257860918074,0.006962328193896496,0.14646464646464646,220,False,False,False,False
+X2.methyl.1.butanol,2-methyl-1-butanol,2-methyl-1-butanol,Yeast,Alcohols,,,,C1,40,15,7.619832195178174,0.0054657341726548235,0.005814692008793408,0.435064935064935,132,False,False,False,False
+isopentyl.formate,Isopentyl formate,Isopentyl formate,Yeast,Esters,,,,C1,40,13,6.225388813500548,0.005951989319430499,0.004935486582065225,0.3953823953823954,146,False,False,False,False
+ethyl.isobutyrate,Ethyl isobutyrate,Ethyl isobutyrate,Yeast,Esters,2.6,2.6,mg/L,C7,22,17,6.9363383855090195,0.014776639987271818,0.009038247929837985,0.665945165945166,63,False,False,False,False
+X3.methyl.2.butenal,3-methyl-2-butenal,3-methyl-2-butenal,Internal standard solution,Aldehydes,,,,C1,40,10,4.582311747498654,0.004306531074351275,0.015015563297246758,0.3282828282828283,169,False,False,False,False
+X2.methyltetrahydrofuran.3.one,2-methyltetrahydrofuran-3-one,2-methyltetrahydrofuran-3-one,Malt,Ketones,,,mg/L,C4,29,10,3.1673865658931946,0.004086853940995474,0.0045240056650584625,0.16522366522366524,214,False,False,False,False
+ethyl.butyrate,Ethyl butyrate,Ethyl butyrate,Yeast,Esters,0.45,0.45,mg/L,C4,29,20,8.999609615861338,0.012300014455653084,0.014179600256257138,0.7532467532467533,40,False,False,False,False
+butyl.acetate,Butyl acetate,Butyl acetate,Yeast,Esters,,,,C7,22,14,5.322085316690089,0.010872736910535453,0.009198333785178987,0.5974025974025974,84,False,False,False,False
+methylpyrazine,Methylpyrazine,Methylpyrazine,Malt,Furans/pyrazines,1.0,1.0,mg/L,C5,28,12,4.902048522206327,0.0027572238656813756,0.005836242333523371,0.25613275613275616,191,False,False,False,False
+furfural,Furfural,Furfural,Malt,Aldehydes,60.0,37.5,mg/L,C6,24,11,4.759191433593216,0.004949911909161501,0.04230240618519146,0.4971139971139971,112,False,False,False,False
+ethyl.lactate,Ethyl lactate,Ethyl lactate,Others,Esters,,,,C2,34,11,2.07082499205895,0.0074967754693086005,0.006184709960696731,0.38167388167388167,151,False,False,False,False
+X3Z.hexenol,Cis-3-hexenol,Cis-3-hexenol,Hops,Alcohols,,,mg/L,C4,29,11,3.8884833283041815,0.00600561133396439,0.015401200136821745,0.4682539682539682,122,False,False,False,False
+n.hexanol,N-hexanol,N-hexanol,Yeast,Alcohols,,,mg/L,C4,29,20,9.099592531850739,0.012408274583391159,0.011552713366480612,0.7344877344877344,46,False,False,False,False
+styrene,Styrene,Styrene,Yeast,Other,,,mg/L,C4,29,10,3.083292784157931,0.0026843280412544904,0.0064985033152653755,0.170995670995671,213,False,False,False,False
+X2.furanmethanol,Furfuryl alcohol,Furfuryl alcohol,Others,Furans/pyrazines,,,,C7,22,10,4.340296096308349,0.0009172489349234667,0.00817244277798187,0.15367965367965367,217,False,False,False,False
+X3.methyl.2.hexanol,3-methyl-2-hexanol,3-methyl-2-hexanol,Yeast,Alcohols,,,,C7,22,26,13.856598446513383,0.026407644949839458,0.021653166049997747,0.8838383838383838,13,False,True,True,False
+X3.furanmethanol,3-furanmethanol,3-furanmethanol,Malt,Furans/pyrazines,,,,C7,22,28,13.828247773890027,0.02402923560727005,0.020771936847568895,0.8838383838383838,13,False,True,True,False
+X2.acetylfuran,2-acetylfuran,2-acetylfuran,Malt,Furans/pyrazines,,,,C5,28,16,8.132376931376758,0.007375511992648183,0.01102066588306372,0.5930735930735931,85,False,False,False,False
+X2.6.dimethyl.pyrazine,"2,6-dimethylpyrazine","2,6-dimethylpyrazine",Malt,Furans/pyrazines,,,A.U.,C5,28,12,5.08758780548163,0.0045658220968797965,0.005611590754166474,0.31096681096681095,172,False,False,False,False
+amyl.acetate,Amyl acetate,Amyl acetate,Yeast,Esters,,,mg/L,C5,28,10,4.267064991539606,0.003586345531978421,0.004810776880270191,0.16233766233766234,215,False,False,False,False
+ethyl.tiglate,Ethyl tiglate,Ethyl tiglate,Yeast,Esters,,,,C1,40,12,4.614608612353765,0.00891324679691387,0.020465248305472188,0.6038961038961039,82,False,False,False,False
+benzaldehyde,Benzaldehyde,Benzaldehyde,Yeast,Aldehydes,,,mg/L,C5,28,12,5.055615103362742,0.0050091027108498005,0.007235974664903346,0.3672438672438672,156,False,False,False,False
+X5.methylfurfural,5-methylfurfural,5-methylfurfural,Malt,Aldehydes,,,mg/L,C5,28,14,6.050132213767344,0.009347060764918518,0.010121595743086378,0.5930735930735931,85,False,False,False,False
+n.heptanol,N-heptanol,N-heptanol,Yeast,Alcohols,,,,C7,22,18,8.787835591321974,0.011621591670670998,0.025213670902447697,0.7828282828282829,35,False,False,False,False
+X1.octen.3.ol,1-octen-3-ol,1-octen-3-ol,Yeast,Alcohols,,,,C2,34,20,10.677707367476133,0.008658545418647908,0.06203448244662509,0.8066378066378066,32,False,False,False,False
+X3.methylthio.propanol,Methionol,Methionol,Others,Alcohols,,,,C1,40,11,4.319897778930008,0.00455114519984304,0.007130272132175171,0.3008658008658009,177,False,False,False,False
+isomaltol,Isomaltol,Isomaltol,Malt,Furans/pyrazines,,,,C3,32,17,8.60024872091332,0.006094528920736155,0.016748425821896,0.6313131313131312,76,False,False,False,False
+X6.methyl.5.hepten.2.one,Methyl heptenone,Methyl heptenone,Yeast,Ketones,,,,C2,34,10,3.8342636534232413,0.0018667228966196608,0.01984625558882698,0.2792207792207792,184,False,False,False,False
+X2.pentyl.furan,2-pentyl furan,2-pentyl furan,Malt,Furans/pyrazines,,,,C5,28,15,6.680724997424764,0.011070343250531765,0.01502513930428933,0.6861471861471862,52,False,False,False,False
+ethyl.hex..3E..enoate,Ethyl 3-hexanoate,Ethyl 3-hexanoate,Yeast,Esters,,,,C3,32,11,5.169560300685186,0.004607601883365733,0.013705655430594361,0.3932178932178932,148,False,False,False,False
+alpha.phellandrene,α-phellandrene,Î±-phellandrene,Hops,Terpene hydrocarbons,,,A.U.,C8,22,11,4.615059507962882,0.0016167067235742494,0.003065099873982683,0.12770562770562768,223,False,False,False,False
+dehydroxy.cis.linalool.oxide,Dehydroxy-cis-linalool oxide,Dehydroxy-cis-linalool oxide,Hops,Terpenoids,,,,C3,32,10,3.905067573359717,0.0019705737911639284,0.019640288579929895,0.2792207792207792,184,False,False,False,False
+hexyl.acetate,Hexyl acetate,Hexyl acetate,Yeast,Esters,,,mg/L,C2,34,11,3.964939458287687,0.004094439731470959,0.02068862237091018,0.4134199134199134,140,False,False,False,False
+isopentyl.butanoate,Isopentyl butanoate,Isopentyl butanoate,Yeast,Esters,,,,C2,34,12,5.438879590908343,0.003296816370862951,0.040213428311643096,0.47691197691197695,121,False,False,False,False
+X2.ethyl.1.hexanol,2-ethyl-1-hexanol,2-ethyl-1-hexanol,Yeast,Alcohols,,,,C7,22,16,7.549086567702647,0.009511546670759995,0.014512811303836002,0.6782106782106783,56,False,False,False,False
+beta.phellandrene,Beta-phellandrene,Beta-phellandrene,Hops,Terpene hydrocarbons,,,,C8,22,14,7.2755238489093035,0.0012407016607951687,0.00584016180917408,0.27561327561327564,188,False,False,False,False
+limonene,Limonene,Limonene,Hops,Terpene hydrocarbons,,,,C8,22,12,5.428845403682672,0.0023062612047091598,0.0034936821924964273,0.19408369408369408,209,False,False,False,False
+eucalyptol,Eucalyptol,Eucalyptol,Hops,Terpenoids,,,,C8,22,10,4.077024341019749,0.00035821106529952847,0.003828885765503903,0.05844155844155844,231,False,False,False,False
+benzyl.alcohol,Benzyl alcohol,Benzyl alcohol,Hops,Alcohols,,,mg/L,C5,28,18,7.1515258699370845,0.017663569146466798,0.008057096402758266,0.6789321789321789,55,False,False,False,False
+ethyl.hex..2E..enoate,Ethyl 2-hexenoate,Ethyl 2-hexenoate,Yeast,Esters,,,,C2,34,14,7.668575677064314,0.0020609533542821,0.06029560813273418,0.5108225108225108,107,False,False,False,False
+phenylacetaldehyde,Phenylacetaldehyde,Phenylacetaldehyde,Others,Aldehydes,,,mg/L,C5,28,12,4.35914738590538,0.010248119862121964,0.0026971679641370327,0.41197691197691205,141,False,False,False,False
+X.E..beta.ocimene,E-β-ocimene,E-Î²-ocimene,Hops,Terpene hydrocarbons,,,mg/L,C8,22,10,3.995307444062797,0.008216474848264531,0.002302425952729759,0.2676767676767677,190,False,False,False,False
+prenyl.isobutyrate,Prenyl isobutyrate,Prenyl isobutyrate,Yeast,Esters,,,,C3,32,22,11.891060813585845,0.00747934030718958,0.021111114543045078,0.740981240981241,45,False,False,False,False
+ethyl.furoate,Ethyl furoate,Ethyl furoate,Malt,Esters,,,,C5,28,19,9.382171708316951,0.00854449752878126,0.011654783334691906,0.6688311688311689,61,False,False,False,False
+ortho.cresol,O-cresol,O-cresol,Yeast,Volatile phenols,,,,C7,22,27,14.208857579141362,0.017103775539177045,0.022477420481698873,0.8737373737373737,17,False,True,False,False
+ethyl.5.methylhexanoate,Ethyl 5-methylhexanoate,Ethyl 5-methylhexanoate,Yeast,Esters,,,,C3,32,16,8.193220689252366,0.006640437998284452,0.03606101482630125,0.6810966810966811,54,False,False,False,False
+X2.acetylpyrrole,2-acetylpyrrole,2-acetylpyrrole,Malt,Furans/pyrazines,,,A.U.,C5,28,13,5.988093927963516,0.0052144877727644525,0.0063637279361846094,0.39393939393939387,147,False,False,False,False
+isoamyl.lactate,Isoamyl lactate,Isoamyl lactate,Wild flora,Esters,,,,C3,32,12,5.957297945593477,0.0018146132414514308,0.013684842279909227,0.33694083694083693,165,False,False,False,False
+n.octanol,N-octanol,N-octanol,Yeast,Alcohols,,,,C7,22,17,8.871494253689118,0.0063710236371597295,0.01874798203983756,0.6428571428571429,70,False,False,False,False
+cis.linalool.oxide,Cis-linalool oxide,Cis-linalool oxide,Hops,Terpenoids,,,,C8,22,12,4.799820716093596,0.008421918030341265,0.008666790471082458,0.4841269841269842,114,False,False,False,False
+meta.cymenene,Meta-cymenene,Meta-cymenene,Hops,Terpene hydrocarbons,,,,C8,22,10,3.842963234770468,0.004391694697599891,0.0029333845177770446,0.15223665223665225,218,False,False,False,False
+terpinolene,Terpinolene,Terpinolene,Spices,Terpene hydrocarbons,,,,C8,22,18,8.111994113356138,0.00937933507409915,0.010531303808531522,0.6601731601731603,66,False,False,False,False
+linalool,Linalool,Linalool,Hops,Terpenoids,0.027285,0.0045,mg/L,C8,22,11,6.026075120731997,0.004694429978285498,0.010404314568701162,0.3600288600288601,157,False,False,False,False
+nonan.2.ol,2-nonanol,2-nonanol,Hops,Alcohols,,,,C2,34,19,9.42858610287225,0.019465575241160406,0.056734931554754967,0.8751803751803752,16,False,False,True,False
+n.nonanal,N-nonanal,N-nonanal,Yeast,Aldehydes,,,,C2,34,10,3.1626274203841076,0.009078051569749756,0.015325301303263657,0.47979797979797983,120,False,False,False,False
+X2.methyl.benzofuran,2-methyl-benzofuran,2-methyl-benzofuran,Malt,Furans/pyrazines,,,,C8,22,16,6.827682483120895,0.007085370044559599,0.0077696517983865745,0.5324675324675324,101,False,False,False,False
+heptyl.acetate,Heptyl acetate,Heptyl acetate,Yeast,Esters,,,,C1,40,11,4.649868482494643,0.0033661021356201862,0.004830319332900949,0.21717171717171715,203,False,False,False,False
+X4.methyl.1.pentanol,4-methyl-1-pentanol,4-methyl-1-pentanol,Yeast,Alcohols,,,,C7,22,25,12.596872593097741,0.01709898416951727,0.019770333439250325,0.8455988455988456,27,False,False,False,False
+neo.allo.ocimene,Neo-allo-ocimene,Neo-allo-ocimene,Hops,Terpene hydrocarbons,,,,C1,40,10,4.114242540628455,0.004270443677229223,0.0024165569479407552,0.1406926406926407,221,False,False,False,False
+x.methyl.1.octanol,X-methyl-1-octanol,X-methyl-1-octanol,Yeast,Alcohols,,,,C7,22,11,5.562336928376915,0.0015110181056655716,0.010037102957564896,0.2489177489177489,193,False,False,False,False
+trans.dihydro.beta.terpineol,Trans-dihydro-β-terpineol,Trans-dihydro-Î²-terpineol,Spices,Terpenoids,,,,C2,34,11,5.166994646212067,0.003616991614853751,0.030931068654538683,0.4307359307359307,134,False,False,False,False
+cis.beta.terpineol,Cis-β-terpineol,Cis-Î²-terpineol,Hops,Terpenoids,,,,C1,40,10,3.2243318471207987,0.0068927369825211695,0.001993309605594314,0.24170274170274172,197,False,False,False,False
+y.methyl.1.octanol,Y-methyl-1-octanol,Y-methyl-1-octanol,Yeast,Alcohols,,,,C2,34,13,6.555809773794008,0.0024470784754198546,0.05437793693316138,0.4978354978354978,111,False,False,False,False
+camphor,Camphor,Camphor,Spices,Physicochemical,,,,C8,22,10,4.916652715577323,0.0005081333241972918,0.005036187892463591,0.09163059163059163,229,False,False,False,False
+isobutyl.hexanoate,Isobutyl hexanoate,Isobutyl hexanoate,Yeast,Esters,,,,C6,24,17,9.76912006238542,0.005254020725330073,0.16192452147472555,0.712121212121212,50,False,False,False,False
+nerol.oxide,Nerol oxide,Nerol oxide,Hops,Terpenoids,,,,C2,34,29,16.047168706116903,0.02078583487446962,0.15397645897686502,0.9747474747474748,2,True,True,True,False
+X.E..2.nonenal,E-2-nonenal,E-2-nonenal,Others,Aldehydes,,,mg/L,C6,24,20,10.010490147882715,0.02483096626749806,0.106321685309393,0.9235209235209235,7,True,False,True,False
+cis.dihydro.beta.terpineol,Cis-dihydro-β-terpineol,Cis-dihydro-Î²-terpineol,Hops,Terpenoids,,,,C2,34,14,6.780184611648775,0.004766127821542185,0.07320929085418063,0.6204906204906205,79,False,False,False,False
+X4.ethyl.phenol,4-ethyl-phenol,4-ethyl-phenol,Wild flora,Volatile phenols,,,A.U.,C3,32,11,5.60967526279332,0.001494759233144353,0.009192808615137292,0.23593073593073596,200,False,False,False,False
+isoborneol,Isoborneol,Isoborneol,Others,Terpenoids,,,,C8,22,24,11.946966756898876,0.019459306925282346,0.024344282996814903,0.8708513708513709,18,False,False,True,False
+ethyl.benzoate,Ethyl benzoate,Ethyl benzoate,Yeast,Esters,,,,C3,32,18,8.861830726565145,0.01303523863676117,0.024543187718135552,0.7943722943722943,33,False,False,False,False
+n.nonanol,N-nonanol,N-nonanol,Yeast,Alcohols,,,,C7,22,18,9.158747231138351,0.009160855235821264,0.03307296022205477,0.766955266955267,37,False,False,False,False
+terpinen.4.ol,Terpinen-4-ol,Terpinen-4-ol,Spices,Terpenoids,,,,C8,22,21,10.796226680591959,0.005930934586003926,0.011314987866437483,0.6240981240981242,78,False,False,False,False
+diethyl.succinate,Diethyl succinate,Diethyl succinate,Yeast,Esters,,,mg/L,C5,28,11,4.732467961327147,0.003509959336406631,0.004238182811822676,0.20418470418470422,206,False,False,False,False
+vinyl.caprylate,Vinyl caprylate,Vinyl caprylate,Yeast,Esters,,,,C1,40,10,3.17696253033849,0.00741176710711687,0.007052302516998355,0.334054834054834,167,False,False,False,False
+X1.alpha.terpineol,Alpha-terpineol,Alpha-terpineol,Hops,Terpenoids,1.5,1.5,mg/L,C8,22,15,7.616874800395758,0.009347847344217836,0.008145442900940936,0.5822510822510822,89,False,False,False,False
+ethyl..E..linalool,Ethyl linalool,Ethyl linalool,Hops,Terpenoids,,,,C8,22,20,10.098813615434652,0.008700834864438739,0.010088981079343197,0.6608946608946609,65,False,False,False,False
+ethyl.nicotinate,Ethyl nicotinate,Ethyl nicotinate,Others,Esters,6.0,6.0,mg/L,C5,28,13,5.595106381033906,0.006626693355480908,0.005951621044760425,0.42857142857142855,136,False,False,False,False
+citronellol,Citronellol,Citronellol,Hops,Terpenoids,0.0245,0.0245,mg/L,C8,22,12,5.683414006355214,0.007488484303957502,0.012629729201285834,0.5173160173160173,106,False,False,False,False
+nerol,Nerol,Nerol,Hops,Terpenoids,,,,C8,22,16,7.051116246485984,0.00771521749613316,0.01251345776921067,0.6147186147186147,80,False,False,False,False
+hydroxy.methyl.furfural,5-hydroxymethylfurfural,5-hydroxymethylfurfural,Malt,Aldehydes,,,,C8,22,13,5.255847559574339,0.005912980147598406,0.009116022695256989,0.46176046176046176,124,False,False,False,False
+E.ocimenone,Ocimenone,Ocimenone,Hops,Terpenoids,,,,C8,22,13,5.855125948317869,0.009705276827019356,0.008024370191659105,0.541125541125541,97,False,False,False,False
+cumin.aldehyde,Cumin aldehyde,Cumin aldehyde,Spices,Aldehydes,,,,C7,22,10,4.890943944508688,0.00272068519869596,0.00897514125408246,0.20995670995670998,204,False,False,False,False
+ethyl.phenylacetate,Ethyl phenylacetate,Ethyl phenylacetate,Yeast,Esters,,,,C3,32,29,15.548716712028122,0.02847133020669145,0.0280347844192926,0.9155844155844156,9,True,True,True,False
+isopentyl.hexanoate,Isopentyl hexanoate,Isopentyl hexanoate,Yeast,Esters,,,,C6,24,24,15.11575308607861,0.015832676600820658,0.26636238868848683,0.9502164502164502,4,True,False,False,True
+geraniol,Geraniol,Geraniol,Hops,Terpenoids,0.0315,0.023,mg/L,C8,22,10,4.41429308582794,0.0005206821358516992,0.005078278338759091,0.09451659451659451,227,False,False,False,False
+beta.cyclohomocitral,β-cyclohomocitral,Î²-cyclohomocitral,Hops,Aldehydes,,,,C1,40,14,5.7733988811088395,0.00659544793973274,0.005838643833013195,0.45165945165945165,126,False,False,False,False
+E.cinnamaldehyde,Cinnamaldehyde,Cinnamaldehyde,Spices,Aldehydes,,,,C4,29,11,4.623288553923937,0.00485756513034201,0.00544465436636181,0.28066378066378067,182,False,False,False,False
+n.decanol,N-decanol,N-decanol,Yeast,Alcohols,,,,C1,40,14,6.265150860341214,0.006353364529219039,0.007729242840856136,0.481962481962482,117,False,False,False,False
+neryl.formate,Neryl formate,Neryl formate,Hops,Esters,,,,C3,32,21,10.404056233075229,0.015347615212955515,0.026046360459568985,0.8463203463203465,26,False,False,False,False
+X4.ethyl.guaiacol,4-ethyl-guaiacol,4-ethyl-guaiacol,Wild flora,Volatile phenols,,,A.U.,C3,32,15,7.669269969905072,0.005040465421441975,0.012820550864078014,0.5259740259740259,105,False,False,False,False
+X2.undecanone,2-undecanone,2-undecanone,Hops,Ketones,,,A.U.,C2,34,11,4.056812067490843,0.005204223259049506,0.018105855861789956,0.44949494949494945,127,False,False,False,False
+trans.dihydro.alpha.terpinyl.acetate,Trans-dihydro-α-terpinyl acetate,Trans-dihydro-Î±-terpinyl acetate,Hops,Esters,,,,C6,24,24,13.91435214590858,0.018499773037490782,0.23125952224519858,0.9531024531024531,3,True,False,False,True
+terpinen.4.ol.acetate,Terpinen-4-ol acetate,Terpinen-4-ol acetate,Hops,Terpenoids,,,,C2,34,13,5.979264280725259,0.004328022424200651,0.03634343311182863,0.5353535353535354,100,False,False,False,False
+X2.undecanol,2-undecanol,2-undecanol,Hops,Alcohols,,,,C2,34,22,11.406471422027323,0.009146609126954329,0.07766047484468118,0.8477633477633478,25,False,False,False,False
+delta.terpinyl.acetate,Terpiryl acetate,Terpiryl acetate,Hops,Esters,,,,C5,28,12,4.410972323253579,0.011141885834835726,0.006049725575168252,0.48268398268398277,115,False,False,False,False
+X.E.E..2.4.decadienal,"E,E-2,4-decadienal","E,E-2,4-decadienal",Others,Aldehydes,,,mg/L,C5,28,12,5.7087363292176985,0.004431003075474,0.02178726507798702,0.48268398268398266,116,False,False,False,False
+methyl.geranate,Methyl geranate,Methyl geranate,Hops,Esters,,,,C2,34,20,10.87154247677873,0.0037103380900039003,0.07073785614211738,0.6594516594516594,67,False,False,False,False
+car.3.en.2.one,Car-3-en-2-one,Car-3-en-2-one,Hops,Ketones,,,,C1,40,10,4.218085197467788,0.0048279875833043655,0.003844247672999113,0.18686868686868685,212,False,False,False,False
+dimethoxy..E..citral,Dimethoxy-E-citral,Dimethoxy-E-citral,Hops,Aldehydes,,,,C1,40,10,4.0871671494680974,0.0023030567114096217,0.0032336114031397503,0.08730158730158731,230,False,False,False,False
+X2.butyloctanoate,2-butyl octanoate,2-butyl octanoate,Yeast,Esters,,,,C6,24,18,11.259657231563667,0.004966641758641954,0.21030997108673408,0.7150072150072151,48,False,False,False,True
+X4.methoxysalicylaldehyde,4-methoxysalicylaldehyde,4-methoxysalicylaldehyde,Spices,Aldehydes,,,,C6,24,10,4.662723789603839,0.00430673386966325,0.05537755705896087,0.4148629148629149,139,False,False,False,False
+ethyl.hydrocinnamate,Ethyl hydrocinnamate,Ethyl hydrocinnamate,Spices,Esters,,,,C5,28,13,5.595462425321813,0.009545056634990343,0.024242792636775146,0.670995670995671,59,False,False,False,False
+eugenol,Eugenol,Eugenol,Spices,Volatile phenols,,,mg/L,C3,32,11,4.2191681575737245,0.0040800783076561115,0.013149726593953328,0.35858585858585856,158,False,False,False,False
+gamma.nonalactone,Gamma-nonalactone,Gamma-nonalactone,Yeast,Lactones,,,mg/L,C5,28,11,4.843322849609245,0.003060300195354735,0.004169229785394236,0.19264069264069264,210,False,False,False,False
+methyl.para.anisate,Methyl para-anisate,Methyl para-anisate,Spices,Esters,,,,C6,24,10,4.531732501878547,0.00013733247115969475,0.09869461156252347,0.34126984126984133,163,False,False,False,False
+X.E..beta.damascenone,E-β-damascenone,E-Î²-damascenone,Hops,Ketones,,,mg/L,C5,28,10,3.2416975341782504,0.005819142806382682,0.01065265595526109,0.34848484848484845,159,False,False,False,False
+ethyl..9..decenoate,Ethyl 9-decenoate,Ethyl 9-decenoate,Yeast,Esters,,,,C6,24,14,7.910881536499534,0.002501320819308019,0.16065424055198282,0.5699855699855699,92,False,False,False,False
+vanillin,Vanillin,Vanillin,Others,Volatile phenols,,,,C3,32,13,5.479311558583099,0.007275548776678647,0.014503459119414572,0.5656565656565656,93,False,False,False,False
+geosmin,Geosmin,Geosmin,Wild flora,Terpenoids,,,,C2,34,14,5.0625267809667,0.006838476970639347,0.04151532967943891,0.6681096681096682,62,False,False,False,False
+dodecanal,Dodecanal,Dodecanal,Spices,Aldehydes,,,,C1,40,12,4.246235638729307,0.004422661129918209,0.004019041927424776,0.2748917748917749,189,False,False,False,False
+X4.8.alpha.epoxy.caryophyllane,"4,8-α-epoxy-caryophyllane","4,8-Î±-epoxy-caryophyllane",Hops,Terpenoids,,,,C1,40,10,3.167700356789035,0.0022786625519364157,0.0038809172979195256,0.09595959595959597,225,False,False,False,False
+E.caryophyllene,Caryophyllene,Caryophyllene,Hops,Terpene hydrocarbons,0.28,0.23,mg/L,C3,32,11,4.25932637536007,0.004316055762701216,0.006580636525580731,0.27777777777777773,186,False,False,False,False
+X.E..alpha.ionone,E-α-ionone,E-Î±-ionone,Hops,Ketones,,,,C3,32,16,7.379612741915865,0.005312766625117817,0.015640304941641755,0.5858585858585859,87,False,False,False,False
+perillyl.acetate,Perillyl acetate,Perillyl acetate,Spices,Esters,,,,C3,32,19,9.44437062906338,0.006667814561114592,0.016280127551732228,0.6702741702741702,60,False,False,False,False
+beta.humulene,β-humulene,Î²-humulene,Hops,Terpene hydrocarbons,,,,C1,40,10,2.680346947662428,0.005674598759911221,0.004324438391716833,0.23737373737373738,199,False,False,False,False
+X2.phenyl.ethyl.butyrate,2-phenyl ethyl butyrate,2-phenyl ethyl butyrate,Yeast,Esters,,,,C6,24,16,10.721603998505072,0.0009462679474579693,0.22876881530575216,0.5656565656565656,93,False,False,False,True
+X.Z..beta.farnesene,Z-β-farnesene,Z-Î²-farnesene,Hops,Terpene hydrocarbons,,,,C6,24,19,12.479390773884651,0.0021536244424255322,0.24794091513452654,0.6356421356421357,75,False,False,False,True
+pentyl.octanoate,Pentyl octanoate,Pentyl octanoate,Yeast,Esters,,,,C6,24,26,16.228933840258563,0.012336019362399928,0.28138762435496706,0.9444444444444443,6,True,True,False,True
+X.E..beta.farnesene,E-β-farnesene,E-Î²-farnesene,Hops,Terpene hydrocarbons,,,,C5,28,17,7.071696894147925,0.019886393768499384,0.014496012805906053,0.7525252525252526,41,False,False,True,False
+X2.methylbutyl.octanoate,2-methylbutyl octanoate,2-methylbutyl octanoate,Yeast,Esters,,,,C6,24,27,16.940909448218427,0.019163688426409708,0.2909584944864989,0.9805194805194805,1,True,True,True,True
+alpha.humulene,Alpha-humulene,Alpha-humulene,Hops,Terpene hydrocarbons,0.625,0.625,mg/L,C6,24,13,5.287043777956376,0.008367760654531126,0.05328698587595529,0.6782106782106783,56,False,False,False,False
+neryl.propanoate,Neryl propanoate,Neryl propanoate,Hops,Esters,,,,C2,34,22,11.716492309173539,0.01588215128438162,0.09484930348908104,0.9141414141414143,10,True,False,False,False
+X9.epi..E..caryophyllene,9-epi-E-caryophyllene,9-epi-E-caryophyllene,Hops,Terpene hydrocarbons,,,,C7,22,13,6.001393035948559,0.0029717146602355046,0.006785402660295051,0.31890331890331886,171,False,False,False,False
+ethyl..E..cinnamate,Ethyl cinnamate,Ethyl cinnamate,Others,Esters,,,,C7,22,10,4.432598993846829,0.0020785207882129506,0.013308364710216899,0.24025974025974026,198,False,False,False,False
+linalool.isovalerate,Linalool isovalerate,Linalool isovalerate,Hops,Terpenoids,,,,C7,22,10,3.5894891885460423,0.010304809076369785,0.0062788466159967495,0.37878787878787884,155,False,False,False,False
+alpha.terpinyl.isobutanoate,α-terpinyl isobutanoate,Î±-terpinyl isobutanoate,Hops,Esters,,,,C7,22,21,9.479581555833754,0.014141380074722546,0.011016499607869412,0.7467532467532467,42,False,False,False,False
+n.dodecanol,N-dodecanol,N-dodecanol,Yeast,Alcohols,,,,C1,40,18,8.715402307764508,0.00934551179746926,0.012373199087831027,0.6760461760461761,58,False,False,False,False
+germacrene.D,Germacrene D,Germacrene D,Hops,Terpene hydrocarbons,,,,C3,32,13,6.576322011621176,0.005570519221163588,0.043422047732226125,0.6046176046176046,81,False,False,False,False
+X.E..beta.ionone,E-β-ionone,E-Î²-ionone,Hops,Ketones,,,,C3,32,22,11.110276915388152,0.013257299704794999,0.04415956653948067,0.8694083694083693,19,False,False,False,False
+valencene,Valencene,Valencene,Spices,Terpene hydrocarbons,,,,C1,40,10,3.46368657360994,0.005191853019243809,0.003869264661758892,0.2012987012987013,208,False,False,False,False
+neryl.isobutanoate,Neryl isobutanoate,Neryl isobutanoate,Hops,Esters,,,,C2,34,11,5.006828264190825,0.004775773318817829,0.06770487146930952,0.51010101010101,108,False,False,False,False
+E.methyl.isoeugenol,Methyl isoeugenol,Methyl isoeugenol,Spices,Volatile phenols,,,,C1,40,10,3.4982083221883085,0.0023752995026837514,0.00323410605755105,0.09451659451659451,227,False,False,False,False
+X.Z..dihydro.apofarnesal,Z-dihydro-apofarnesal,Z-dihydro-apofarnesal,Hops,Aldehydes,,,,C3,32,14,5.592346462105663,0.008880297489518373,0.007981709002994046,0.5454545454545454,96,False,False,False,False
+butylated.hydroxytoluene,Butylated hydroxytoluene,Butylated hydroxytoluene,Others,Terpenoids,,,,C1,40,10,3.364934541107116,0.004101958776684538,0.003541189463254593,0.14935064935064937,219,False,False,False,False
+X.E..dihydro.apofarnesal,E-dihydro-apofarnesal,E-dihydro-apofarnesal,Hops,Aldehydes,,,,C3,32,11,3.753870824842888,0.006187226513517869,0.009535302801022532,0.4047619047619048,143,False,False,False,False
+Z.nerolidol,Z-nerolidol,Z-nerolidol,Hops,Terpenoids,25.0,25.0,mg/L,C3,32,10,3.8471378741162363,0.0038519258318353696,0.006655890806332637,0.20274170274170275,207,False,False,False,False
+X.E..ortho.methoxy.cinnamaldehyde,E-ortho-methoxy cinnamaldehyde,E-ortho-methoxy cinnamaldehyde,Spices,Aldehydes,,,,C3,32,18,8.584630800468261,0.008465684172432342,0.02797699884240733,0.7438672438672439,43,False,False,False,False
+alpha.calacorene,α-calacorene,Î±-calacorene,Hops,Terpene hydrocarbons,,,,C2,34,26,14.6134522779881,0.018509531495453542,0.1035373023658794,0.9473304473304474,5,True,True,False,False
+E.nerolidol,E-nerolidol,E-nerolidol,Hops,Terpenoids,,,,C1,40,19,8.935263416637344,0.011205544140062172,0.017029260125892492,0.7582972582972584,39,False,False,False,False
+dihydroisocaryophyllene.epoxide,Tobacarol,Tobacarol,Hops,Terpene hydrocarbons,,,,C1,40,18,8.167170799547089,0.006868361108518652,0.015906675056356217,0.6616161616161617,64,False,False,False,False
+caryophyllene.alcohol,Caryophyllene alcohol,Caryophyllene alcohol,Hops,Terpene hydrocarbons,,,,C2,34,13,6.565225575653766,0.0031051565024960174,0.03813665724136393,0.5064935064935064,110,False,False,False,False
+neryl.isovalerate,Neryl isovalerate,Neryl isovalerate,Hops,Esters,,,,C2,34,11,5.204705469815011,0.0014943510047135213,0.07369685726113043,0.4062049062049062,142,False,False,False,False
+spathulenol,Spathulenol,Spathulenol,Spices,Terpenoids,,,,C7,22,12,4.819895539556617,0.00543880729617504,0.009538725334398156,0.42352092352092346,137,False,False,False,False
+caryophyllene.oxide,Caryophyllene oxide,Caryophyllene oxide,Hops,Terpenoids,,,,C2,34,20,10.039126020768409,0.010863416780375222,0.0712085600131253,0.8484848484848485,24,False,False,False,False
+humulene.epoxide.II,Humulene epoxide II,Humulene epoxide II,Hops,Terpenoids,,,,C2,34,21,11.194302523761097,0.007829286277453273,0.08674529405521912,0.8189033189033189,31,False,False,False,False
+alloaromadendrene.epoxide,Allo-aromadendrene epoxide,Allo-aromadendrene epoxide,Hops,Terpenoids,,,,C2,34,25,14.25633254702653,0.01204001924819547,0.09424071692635629,0.9033189033189033,12,False,False,False,False
+X1.10.di.epi.cubenol,Epicubenol,Epicubenol,Hops,Terpenoids,,,,C2,34,26,14.939242807906181,0.013331482543915057,0.09455035935124452,0.9227994227994228,8,True,True,False,False
+isopropyl.laurate,Isopropyl laurate,Isopropyl laurate,Yeast,Esters,,,,C1,40,11,3.790931990657708,0.006014633983184054,0.03837490671285416,0.536075036075036,99,False,False,False,False
+caryophylla.4.12..8.13..dien.5.alpha.ol,"Caryophylla-4,8-dien-5-ol","Caryophylla-4,8-dien-5-ol",Hops,Physicochemical,,,,C2,34,19,10.99637372542213,0.010347935301859741,0.14047802378058372,0.8564213564213564,23,False,False,False,False
+gamma.eudesmol,Gamma-eudesmol,Gamma-eudesmol,Spices,Terpenoids,,,,C5,28,11,4.161081930633925,0.004346091658689031,0.0046472640372050445,0.24314574314574314,196,False,False,False,False
+alpha.muurolol,α-muurolol,Î±-muurolol,Hops,Terpenoids,,,A.U.,C2,34,24,12.992054406029629,0.014612500058525924,0.07975653739110268,0.9098124098124099,11,False,False,False,False
+X1.2.dihydro.8.hydroxy..2E..linalool,"1,2-dihydro-8-hydroxy-2E-linalool","1,2-dihydro-8-hydroxy-2E-linalool",Hops,Terpenoids,,,,C6,24,23,14.634479543551503,0.008711913722492554,0.2632565582015635,0.8766233766233765,15,False,False,False,True
+tau.cadinol,Tau-cadinol,Tau-cadinol,Hops,Terpenoids,,,,C2,34,12,4.33868052598843,0.008383186363272288,0.01807925104250088,0.577922077922078,90,False,False,False,False
+selin.11.en.4.alpha.ol,Kongol,Kongol,Hops,Physicochemical,,,,C2,34,13,6.231893408689012,0.0022586462039705926,0.046814541209659714,0.4805194805194805,119,False,False,False,False
+alpha.eudesmol,α-eudesmol,Î±-eudesmol,Spices,Terpenoids,,,,C2,34,10,4.545515428834895,0.0023935774642741695,0.026641426229765758,0.3297258297258297,168,False,False,False,False
+X14.hydroxy.9.epi..E..caryophyllene,14-hydroxy-9-epi-(E)-caryophyllene,14-hydroxy-9-epi-(E)-caryophyllene,Hops,Terpenoids,,,,C1,40,17,6.617141417417995,0.014034760169720798,0.007777599810514175,0.6428571428571429,70,False,False,False,False
+tau.muurolol,Tau-muurolol,Tau-muurolol,Hops,Terpenoids,,,,C2,34,18,10.169558491476494,0.0059213966530195375,0.06362765095753552,0.7150072150072151,48,False,False,False,False
+n.tetradecanol,N-tetradecanol,N-tetradecanol,Yeast,Alcohols,,,,C1,40,15,7.098434060060469,0.008798061198129061,0.014404289886335638,0.6428571428571428,72,False,False,False,False
+foeniculin,Eoeniculin,Eoeniculin,Spices,Other,,,,C8,22,10,1.9620304026728512,0.007500863303495079,0.00413656995217848,0.28066378066378067,182,False,False,False,False
+cadalene,Cadalene,Cadalene,Hops,Terpene hydrocarbons,,,,C1,40,14,5.647275461269403,0.007093631074130393,0.003936685564650343,0.43145743145743154,133,False,False,False,False
+X2.3.dihydro.farnesol,"2,3-dihydro-farnesol","2,3-dihydro-farnesol",Hops,Terpenoids,,,,C1,40,14,6.890672399559519,0.008325532084712288,0.0400569101956775,0.6955266955266955,51,False,False,False,False
+X2E.6Z.farnesal,"E,Z-farnesal","E,Z-farnesal",Hops,Aldehydes,,,,C1,40,12,5.374554306563198,0.0052751388815886315,0.01109802387172156,0.4408369408369408,129,False,False,False,False
+caryophyllene.acetate,Caryophyllene acetate,Caryophyllene acetate,Hops,Terpene hydrocarbons,,,,C7,22,10,3.635818600824837,0.003577836355230799,0.008588916098273627,0.2272727272727273,201,False,False,False,False
+X14.hydroxy.alpha.humulene,14-hydroxy-α-humulene,14-hydroxy-Î±-humulene,Hops,Terpenoids,,,,C7,22,12,5.139256848498261,0.004058014501324224,0.005908534161208871,0.2907647907647908,180,False,False,False,False
+X2Z.6E.farnesal,"Z,E-farnesal","Z,E-farnesal",Hops,Aldehydes,,,,C1,40,13,5.295676855040856,0.009560260960946648,0.007507269239301761,0.5295815295815296,103,False,False,False,False
+X2Z.6Z.farnesol,"Z,Z-farnesol","Z,Z-farnesol",Hops,Terpenoids,,,,C7,22,10,3.6330408879860654,0.001282798350724436,0.004653957909108028,0.09451659451659451,227,False,False,False,False
+X2Z.6E.farnesol,"Z,E-farnesol","Z,E-farnesol",Hops,Terpenoids,,,,C1,40,18,8.31316129120971,0.011452152597144327,0.010662058191005205,0.6832611832611833,53,False,False,False,False
+ambroxide,Ambroxide,Ambroxide,Spices,Terpenoids,,,,C3,32,15,6.931262051890074,0.005026592263557918,0.021150843834537695,0.5851370851370851,88,False,False,False,False
+benzyl.benzoate,Benzyl benzoate,Benzyl benzoate,Others,Esters,,,,C7,22,12,4.84064236841673,0.004578611521572471,0.005550597223644708,0.31096681096681095,172,False,False,False,False
+X2E.6E.methyl.farnesoate,"2E,6E-methyl farnesoate","2E,6E-methyl farnesoate",Hops,Esters,,,,C6,24,13,5.227927169229154,0.006520954633256705,0.08618260119038854,0.658008658008658,68,False,False,False,False
+ethyl.tetradecanoate,Ethyl tetradecanoate,Ethyl tetradecanoate,Yeast,Esters,,,,C6,24,23,13.790451765745267,0.008308821731711434,0.24750755504733726,0.8607503607503607,21,False,False,False,True
+X2.ethylhexylsalicylate,2-ethylhexyl acrylate,2-ethylhexyl acrylate,Others,Esters,,,,C1,40,10,3.1168083371912534,0.006062334685275393,0.007159768528824391,0.30663780663780665,175,False,False,False,False
+isopropyl.tetradecanoate,Isopropyl tetradecanoate,Isopropyl tetradecanoate,Yeast,Esters,,,,C1,40,13,5.911124015355172,0.0030824988408954383,0.005975005769573725,0.31024531024531027,174,False,False,False,False
+ethyl.pentadecanoate,Ethyl pentadecanoate,Ethyl pentadecanoate,Yeast,Esters,,,,C6,24,19,11.609943582257111,0.005244782046407348,0.22063130578494697,0.7438672438672439,43,False,False,False,True
+methyl.hexadecanoate,Methyl hexadecanoate,Methyl hexadecanoate,Yeast,Esters,,,,C1,40,13,5.37959122793572,0.007679739949426906,0.03467059153053055,0.6464646464646465,69,False,False,False,False
+Z.Z.geranyl.linalool,"Z,Z-geranyl linalool","Z,Z-geranyl linalool",Hops,Terpenoids,,,,C6,24,13,6.915374563964402,0.004052664622813318,0.12034198340477117,0.5714285714285715,91,False,False,False,False
+ethyl.hexadecanoate,Ethyl hexadecanoate,Ethyl hexadecanoate,Yeast,Esters,,,,C6,24,12,8.364747786708083,0.00017055722062583764,0.17926870178277596,0.45815295815295815,125,False,False,False,False
+manool.oxide,Manool oxide,Manool oxide,Spices,Terpenoids,,,,C1,40,11,4.284363444294415,0.005298073679410164,0.009957064171588755,0.38023088023088025,153,False,False,False,False
+X13.epi.manool.oxide,13-epi manool oxide,13-epi manool oxide,Spices,Terpenoids,,,,C1,40,11,4.319011075459885,0.007782693529677065,0.004300912770726042,0.34848484848484845,159,False,False,False,False
+isopropyl.hexadecanoate,Isopropyl hexadecanoate,Isopropyl hexadecanoate,Yeast,Esters,,,,C1,40,10,3.9831001773830166,0.002386758171166941,0.010169786101664632,0.21861471861471862,202,False,False,False,False
+manool,Manool,Manool,Spices,Terpenoids,,,,C1,40,16,7.376526183489516,0.004411063903587825,0.00802475101503491,0.44588744588744583,128,False,False,False,False
+ethyl.octadecanoate,Ethyl octadecanoate,Ethyl octadecanoate,Yeast,Esters,,,,C6,24,16,7.881513275567559,0.01208310480348486,0.1154069033448391,0.8268398268398268,30,False,False,False,False
+ethyl.pentanoate,Ethyl pentanoate,Ethyl pentanoate,Yeast,Esters,,,,C5,28,13,6.33347925646458,0.004996980378446994,0.009709390270070449,0.4386724386724386,130,False,False,False,False
+X2.ethyl.3.methylpyrazine,2-ethyl-3-methylpyrazine,2-ethyl-3-methylpyrazine,Malt,Furans/pyrazines,,,A.U.,C3,32,11,3.8982258165602244,0.008988381541409265,0.009308068510632086,0.46681096681096684,123,False,False,False,False
+esters_sum,Total ester compounds,Total ester compounds,,Derived index,,,,C4,29,28,14.578395816291309,0.012400528580930445,0.023625996140889838,0.8564213564213565,22,False,True,False,False
+aroma_hops_sum,Total hop aroma compounds,Total hop aroma compounds,,Derived index,,,,C8,22,11,6.20407317568733,0.002666377862957293,0.010681772400509739,0.29653679653679654,179,False,False,False,False
+acids_sum,Total acids,Total acids,,Derived index,,,,C3,32,13,6.273589870942862,0.002992905483641907,0.008023074746546857,0.33910533910533913,164,False,False,False,False
+sulfur_sum,Total sulfur compounds,Total sulfur compounds,,Derived index,,,,C4,29,12,5.786160947533005,0.0005298164338176401,0.011953766263350697,0.3051948051948052,176,False,False,False,False

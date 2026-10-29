@@ -135,11 +135,7 @@ if("18" %in% selected) {
 }
 if("19" %in% selected) {
  points_data<-read(file.path(dat,"主成分投影坐标.csv"))
- # Percentages come from the same observed-only fitted axes for every panel.
- # Read the two explained-variance values without a non-base R JSON dependency.
- config_lines<-readLines(file.path(dat,"主成分投影配置.json"),warn=FALSE)
- pos<-grep('"explained_variance_ratio"',config_lines,fixed=TRUE)
- variance<-as.numeric(gsub("[, ]","",config_lines[pos+1:2]))
+ variance<-read(file.path(dat,"主成分解释率.csv"))$explained_variance_ratio
  real<-points_data[points_data$dataset=="real",]
  ranges<-lapply(c("pc1","pc2"),function(col){r<-range(points_data[[col]]);r+c(-1,1)*diff(r)*.055})
  openfig("19_问题三生成与迁移主成分分析",8.8,7.1);par(oma=c(.9,0,.6,0))
