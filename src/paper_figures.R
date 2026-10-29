@@ -145,7 +145,7 @@ pad <- function(x) range(x)+c(-1,1)*diff(range(x))*.035
 par(mar=c(.9,.15,.15,.15));plot(p$x,p$y,type="n",axes=FALSE,xlab="",ylab="",asp=1,xlim=pad(p$x),ylim=pad(p$y))
 a<-match(e$source,n$feature);b<-match(e$target,n$feature)
 segments(p$x[a],p$y[a],p$x[b],p$y[b],col=adjustcolor("#71808A",.16),lwd=.25+.55*e$abs_r)
-points(p$x,p$y,pch=21,bg=pal[match(n$community,g)],col="white",lwd=.3,cex=.42+.10*sqrt(n$degree))
+points(p$x,p$y,pch=21,bg=pal[match(n$community,g)],col=adjustcolor("#344B58",.7),lwd=.55,cex=.78+.18*sqrt(n$degree))
 keynames<-c("DMS","X2.3.butanedione","X4VG","ethanol..v.v.")
 keylabels<-c("DMS","双乙酰","4VG","乙醇")
 for(i in seq_along(keynames)) {
